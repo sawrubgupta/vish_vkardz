@@ -1,0 +1,96 @@
+
+API URL -->> 
+    http://localhost:3000/api/v3/{METHOD_NAME} (local URL)
+	http://win.vkardz.com/app/api/v1/{METHOD_NAME} (live URL)
+
+---------------------------------------------------------------------------
+Defined API Methods: -
+---------------------------------------------------------------------------
+        users
+    1. policy (get)
+    2. register (post)
+    3. login (post)
+    4. forgotPassword (post)
+    5. changePassword (patch)
+    6. checkUsername (get)
+    7. setting (post)
+
+        vcard
+    8. activateCard (post)
+    9. deactivateCard (get)
+    10. getSocialLinks (get)
+
+        card
+    11. getCategory (get)
+    12. productList (get)
+
+    -> addToWishlist (post)
+    -> getWishlist (get)
+    -> removeFromWishlist (delete)
+------------------------------------------
+What parameters to be Passed?  
+------------------------------------------
+
+1. /home/policy?type=
+    type === privacy, refund-policy, disclaimer, terms, faq
+
+2. /user/register
+    
+    name: Vishal Pathriya,
+    email: vishalpathriya29@gmail.com,
+    password: password,
+    dial_code: +91,
+    phone: 8209003362,
+    username: vishalpathriya29,
+    country: 91,
+    country_name: india
+
+3. /user/login
+
+    email: vishalpathriya29@gmail.com,
+    password: password
+
+4. /user/forgotPassword
+
+    email: vishalpathriya29@gmail.com
+
+5. /user/changePassword
+
+    oldPassword: 123456,
+    newPassword: 123456
+
+6. /user/checkUsername?username=
+
+    username: username
+
+7. /user/setting
+
+    pushNotificationEnable: true,
+    emailNotificationEnable: false,
+    currencyCode: AED,
+    languageSelection: hi
+
+8. /vcard/activateCard
+
+    username: vishalpathriya29,
+	code: 241544
+
+9. /vcard/deactivateCard
+
+10. /vcard/getSocialLinks
+
+11. /card/getCategory
+
+12. /card/productList?categoryId=
+
+    categoryId: 13
+
+--> /card/addToWishlist?productId=
+ 
+    productId: 52
+
+--> /card/getWishlist
+
+--> /card/removeFromWishlist?productId=
+
+    productId: 52

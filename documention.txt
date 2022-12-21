@@ -1,0 +1,18 @@
+Registration
+
+Password
+password - min 8, max 30
+username - min-3 , max - 50 
+phone  - min -9 , max- 15
+username and email unique ?  yes
+after registration what data you need in response ? yes
+and what will be by default values for new user to register 
+like plans and other things like that. -- for now don't care, i will check the controller and update you 
+
+if register via facebook and email
+fields of ussername and mobile num and password should be empty ?  after registration - >  user name required. 
+
+
+name api's 
+
+    

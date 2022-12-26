@@ -2,7 +2,7 @@ import pool from '../../../../db';
 import { Request, Response } from "express";
 import * as apiResponse from '../../helper/apiResponse';
 import * as utility from "../../helper/utility";
-//hello
+
 
 export const addToCart =async (req:Request, res:Response) => {
     try {
@@ -59,7 +59,7 @@ export const getCart =async (req:Request, res:Response) => {
         return apiResponse.errorMessage(res, 400, "Something went wrong");
     }
 }
- 
+
 // ====================================================================================================
 // ====================================================================================================
 

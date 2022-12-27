@@ -3,7 +3,7 @@ import nodemailer from "nodemailer";
 import config from "../config/development";
 import jwt from "jsonwebtoken";
 import 'dotenv/config';
-const secretKey:any = process.env.SECRET;
+const secretKey:any = config.secretKey; //process.env.SECRET;
 
 export const maxChecker = (vari: string, count: number) => {
 	if (vari.length > count) {

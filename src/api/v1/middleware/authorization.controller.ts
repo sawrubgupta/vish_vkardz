@@ -1,8 +1,9 @@
 import {Request, Response, NextFunction} from "express";
 import 'dotenv/config';
 import jwt from "jsonwebtoken";
+import config from "../config/development";
 
-const secretKey:any = process.env.SECRET;
+const secretKey:any = config.secretKey; //process.env.SECRET;
 
 // function  jwtGenerateKey(userId:any){
 //     const token = jwt.sign({userId}, secretKey)

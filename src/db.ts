@@ -2,11 +2,18 @@ import mysql from "mysql2";
 import 'dotenv/config';
 
 const pool = mysql.createPool({
-  host: process.env.DB_HOST || "localhost",
-  user: process.env.DB_USER || "root",
-  password: process.env.DB_PASSWORD || "",
-  database: process.env.DATABASE || "vkardz_new", 
+  host: process.env.DB_HOST || "localhost", //"194.31.52.223",
+  user: process.env.DB_USER || "root", //"vkar_vkardz",
+  password: process.env.DB_PASSWORD || "" , //"sOMAIqlIqrhzp!@4",
+  database: process.env.DATABASE || "vkardz_new", //"vkar_vkardz"
 });
+
+// const pool = mysql.createPool({
+//   host: "194.31.52.223",
+//   user: "vkar_staging1",
+//   password: "y9wJdr64Lk0by^h!",
+//   database: "vkar_staging1"
+// });
 
 pool.getConnection((err: any, connection: any) => {
   if (err) throw err;

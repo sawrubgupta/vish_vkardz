@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import pool from '../../../../db';
-import * as apiRespone from '../../helper/apiResponse';
+import * as apiResponse from '../../helper/apiResponse';
 
 export const deactivateCard =async (req:Request, res:Response) => {
     try {
@@ -11,13 +11,13 @@ export const deactivateCard =async (req:Request, res:Response) => {
         const [rows]:any =await pool.query(sql, VALUES);
 
         if (rows.affectedRows > 0) {
-            return apiRespone.successResponse(res, "Your card is Deactive Now!", null);
+            return apiResponse.successResponse(res, "Your card is Deactive Now!", null);
         } else {
-            return apiRespone.errorMessage(res,400, "Failed to Deactive the card, please try again later !");
+            return apiResponse.errorMessage(res,400, "Failed to Deactive the card, please try again later !");
         }
     } catch (error) {
         console.log(error);
-        return apiRespone.errorMessage(res, 400, "Something went wrong")
+        return apiResponse.errorMessage(res, 400, "Something went wrong")
     }
 }
 

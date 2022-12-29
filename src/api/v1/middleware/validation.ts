@@ -96,6 +96,57 @@ export const settingValidation = async (req: Request, res: Response, next: NextF
 // ====================================================================================================
 // ====================================================================================================
 
+export const updateProfileValidation =async (req:Request, res:Response, next:NextFunction) => {
+    
+    const schema = Joi.object({
+        name: Joi.string().trim().min(3).max(80).trim().required(),
+        designation: Joi.string().min(3).max(80).allow(''),
+        companyName : Joi.string().trim().min(3).max(80).allow(''),
+        dialCode: Joi.string().required(),
+        phone: Joi.string().trim().min(8).max(20).trim().required(),
+        email: Joi.string().email( ).max(60).required(),
+        website: Joi.string().trim().max(80).min(5).allow(''),
+        address: Joi.string().normalize().max(200).required(),
+    });
+
+    const value = schema.validate(req.body);
+
+    if (value.error) {
+        const errMsg = await validationCheck(value);
+        return await apiResponse.errorMessage(res,400, errMsg);
+    }
+    next();
+};
+
+// ====================================================================================================
+// ====================================================================================================
+
+export const editSocialLinksValidation =async (req:Request, res:Response, next:NextFunction) => {
+    
+    const schema = Joi.object({
+        socialSites: Joi.array().items({
+            siteId: Joi.number().integer().required(),
+            siteValue: Joi.string().max(100).allow(''),
+            orders: Joi.number().integer(),
+            siteLabel: Joi.string().max(20).allow('')
+        })
+    });
+
+    const value = schema.validate(req.body);
+
+    if (value.error) {
+        const errMsg = await validationCheck(value);
+        return await apiResponse.errorMessage(res,400, errMsg);
+    }
+    next();
+}
+
+// ====================================================================================================
+// ====================================================================================================
+
+
+
+/*
 export const affiliateRegValidation = async (
   req: Request,
   res: Response,
@@ -127,10 +178,12 @@ export const affiliateRegValidation = async (
   }
   next();
 };
+*/
 
 // ====================================================================================================
 // ====================================================================================================
 
+/*
   export const submitReportValidation = async (
     req: Request,
     res: Response,
@@ -152,42 +205,14 @@ export const affiliateRegValidation = async (
     }
     next();
   };
-
-// ====================================================================================================
-// ====================================================================================================
-
-
-
-
-/*
-    export const updateProfileValidation = async (req: Request,res: Response,next: NextFunction) => {
- 
-    
-        const schema = Joi.object({
-            name: Joi.string().trim().min(3).max(80).trim().required(),
-            username: Joi.string().trim().min(3).max(50).required(),
-            country: Joi.number().integer(),
-            phone: Joi.string().trim().min(8).max(20).required(),
-            country_name : Joi.string().trim().required(),
-            gender: Joi.string().trim().max(9).allow(''),
-            email: Joi.string().email( ).max(60).required(),
-            website: Joi.string().trim().max(50).allow(''),
-            profile_picture : Joi.string().trim().allow(''),
-            dial_code: Joi.string().required()
-        });
-   
-        const value = schema.validate(req.body);
-    
-        if (value.error) {
-        const errMsg = await validationCheck(value);
-        return await apiResponse.errorMessage(res,400, errMsg);
-        }
-        next();
-    };
 */
+
 // ====================================================================================================
 // ====================================================================================================
 
+
+
+    
 /*
     // qucick setup 
     export const quickSetupValidation = async (req: Request,res: Response,next: NextFunction) => {
@@ -230,77 +255,7 @@ export const affiliateRegValidation = async (
 // ====================================================================================================
 // ====================================================================================================
 
-/*
-    export const purchaseValidation = async (req: Request,res: Response,next: NextFunction) => {
 
-        const schema = Joi.object({
-            
-        orderType: Joi.string().min(3).max(10).required(),
-        coinReedem: Joi.boolean().required(),
-        reedemCoins:{
-            coins: Joi.number().min(200).allow(null).allow('').optional(),
-        },
-        deliveryDetails:{
-            name: Joi.string().trim().min(3).max(80).required(),
-            phoneNumber: Joi.string().trim().min(8).max(20).required(),
-            secondaryPhoneNumber: Joi.string().trim().min(8).max(20).allow(''),
-            email : Joi.string().email().max(80).required(),
-            country : Joi.string().trim().required(),
-            locality: Joi.string().normalize().max(50).required(),
-            address: Joi.string().normalize().max(200).required(),
-            zipCode: Joi.number().min(999).max(9999999).required(),
-            company: Joi.string().allow(null).allow('').optional(),
-            city: Joi.string().allow(null).allow('').optional(),
-            vat_number: Joi.string().allow(null).allow('').optional(),
-        },
-        // designSelection: {
-        //     designType: Joi.string().min(3).max(15).required(),
-        //     data:{
-        //         firstName: Joi.string().min(3).max(40).allow(''),
-        //         lastName: Joi.string().min(3).max(40).allow(''),
-        //         companyName: Joi.string().min(3).max(80).allow(''),
-        //         designation: Joi.string().min(3).max(80).allow(''),
-        //         tagline: Joi.string().min(3).max(120).allow(''),
-        //         qrCode: Joi.boolean(),
-        //         companyLogo: Joi.string().min(3).max(300).allow(''),
-        //         email: Joi.string().email( ).max(80).allow(''),
-        //         phone: Joi.string().trim().min(8).max(20).allow(''),
-        //         website: Joi.string().trim().max(80).min(5).allow(''),
-        //     }
-        // },
-        paymentInfo:{
-            username: Joi.string().trim().max(50).allow(''),
-            email: Joi.string().email( ).max(80).allow(''),
-            // packageId: Joi.number().integer().required(),
-            deliveryCharge: Joi.number(),
-            codCharge: Joi.number(),
-            price_currency_code: Joi.string().min(1).max(81).required(),
-            price: Joi.number().required(),
-            designCharge: Joi.number(),
-            paymentType: Joi.string().min(3).max(150).allow(''),
-            txnId: Joi.string(),
-            status: Joi.string().min(1).max(2500)
-        },
-        orderlist: Joi.array()
-        .items({
-            product_id: Joi.number(),
-            qty: Joi.number(),
-            sub_total: Joi.string(),
-        })
-        });
-
-        const value = schema.validate(req.body);
-    
-        if (value.error) {
-        const errMsg = await validationCheck(value);
-        return await apiResponse.errorMessage(res,400, errMsg);
-        }
-        next();
-    };
-*/
-
-// ====================================================================================================
-// ====================================================================================================
 
 /*
     export const updateVkardzValidation =async (req:Request, res:Response, next:NextFunction) => {
@@ -359,33 +314,7 @@ export const affiliateRegValidation = async (
 // ====================================================================================================
 // ====================================================================================================
 
-/*
-    export const editSocialLinksValidation =async (req:Request, res:Response, next:NextFunction) => {
 
-
-        
-            const schema = Joi.object({
-                social_sites:[{
-                    site_id: Joi.number().integer().required(),
-                    site_value: Joi.string().max(100).allow(''),
-                    orders: Joi.number().integer(),
-                    site_label: Joi.string().max(20).allow('')
-                }
-                ]
-            });
-        
-            const value = schema.validate(req.body);
-        
-            if (value.error) {
-            const errMsg = await validationCheck(value);
-            return await apiResponse.errorMessage(res,400, errMsg);
-            }
-            next();
-    }
-*/
-
-// ====================================================================================================
-// ====================================================================================================
 
 /*
     export const cardpurchaseValidation = async (req: Request, res: Response, next: NextFunction) =>{
@@ -414,28 +343,8 @@ export const affiliateRegValidation = async (
 // ====================================================================================================
 // ====================================================================================================
 
-/*
-    export const userProductValidation = async (req: Request, res: Response, next: NextFunction) =>{
-        const schema = Joi.object({
-            title: Joi.string().required(),
-            image: Joi.string().trim().optional().allow(''),
-            overview: Joi.string().min(1).max(120).trim().required(),
-            price: Joi.number(),
-            videoLink: Joi.string().allow(null).allow(''),
-            details: Joi.string().allow(null).allow(''),
-        });
-        const value = schema.validate(req.body);
-        if (value.error) {
-            const errMsg = await validationCheck(value);
-            return await apiResponse.errorMessage(res, 400, errMsg);
-        }
-        next();
-    };
-*/
 
-// ====================================================================================================
-// ====================================================================================================
-
+    
 /*
     export const userFeedbackValidation =async (req:Request, res:Response, next:NextFunction) => {
             const schema = Joi.object({
@@ -599,6 +508,135 @@ export const redeemCouponCodeValidation = async (req: Request,res: Response,next
     if (value.error) {
         const errMsg = await validationCheck(value);
         return await apiResponse.errorMessage(res,400, errMsg);
+    }
+    next();
+};
+
+// ====================================================================================================
+// ====================================================================================================
+
+export const aboutUsValidation = async (req:Request, res:Response, next:NextFunction) => {
+    const schema = Joi.object({
+        companyName: Joi.string().trim().required(),
+        year: Joi.string().required(),
+        business: Joi.string().allow("").allow(null),
+        aboutUsDetail: Joi.string().allow("").allow(null),
+        image: Joi.string().trim().allow(''),
+    });
+
+    const value = schema.validate(req.body);
+  
+    if (value.error) {
+        const errMsg = await validationCheck(value);
+        return await apiResponse.errorMessage(res,400, errMsg);
+    }
+    next();
+};
+
+// ====================================================================================================
+// ====================================================================================================
+
+export const userProductsValidation = async (req:Request, res:Response, next:NextFunction) =>{
+    const schema = Joi.object({
+        title: Joi.string().max(50).required(),
+        description: Joi.string().min(1).max(80).trim().required(),
+        price: Joi.string().required(),
+        image: Joi.string().optional().allow(''),
+    });
+
+    const value = schema.validate(req.body);
+
+    if (value.error) {
+        const errMsg = await validationCheck(value);
+        return await apiResponse.errorMessage(res, 400, errMsg);
+    }
+    next();
+};
+
+// ====================================================================================================
+// ====================================================================================================
+
+export const purchaseValidation = async (req: Request,res: Response,next: NextFunction) => {
+    
+    const schema = Joi.object({
+        orderType: Joi.string().min(3).max(10).required(),
+        /* coinReedem: Joi.boolean().required(),
+        reedemCoins:{
+            coins: Joi.number().min(200).allow(null).allow('').optional(),
+        },*/
+        deliveryDetails:{
+            name: Joi.string().trim().min(3).max(80).required(),
+            phoneNumber: Joi.string().trim().min(8).max(20).required(),
+            secondaryPhoneNumber: Joi.string().trim().min(8).max(20).allow(''),
+            email : Joi.string().email().max(80).required(),
+            country : Joi.string().trim().required(),
+            locality: Joi.string().normalize().max(50).required(),
+            address: Joi.string().normalize().max(200).required(),
+            pincode: Joi.number().min(999).max(9999999).required(),
+            company: Joi.string().allow(null).allow('').optional(),
+            city: Joi.string().allow(null).allow('').optional(),
+            vat_number: Joi.string().allow(null).allow('').optional(),
+        },
+        /* designSelection: {
+            designType: Joi.string().min(3).max(15).required(),
+            data:{
+                firstName: Joi.string().min(3).max(40).allow(''),
+                lastName: Joi.string().min(3).max(40).allow(''),
+                companyName: Joi.string().min(3).max(80).allow(''),
+                designation: Joi.string().min(3).max(80).allow(''),
+                tagline: Joi.string().min(3).max(120).allow(''),
+                qrCode: Joi.boolean(),
+                companyLogo: Joi.string().min(3).max(300).allow(''),
+                email: Joi.string().email( ).max(80).allow(''),
+                phone: Joi.string().trim().min(8).max(20).allow(''),
+                website: Joi.string().trim().max(80).min(5).allow(''),
+            }
+        },*/
+        paymentInfo:{
+            username: Joi.string().trim().max(50).allow(''),
+            email: Joi.string().email( ).max(80).allow(''),
+            deliveryCharge: Joi.number(),
+            // packageId: Joi.number().integer().required(),
+            // codCharge: Joi.number(),
+            // designCharge: Joi.number(),
+            price_currency_code: Joi.string().min(1).max(81).required(),
+            price: Joi.number().required(),
+            paymentType: Joi.string().min(3).max(150).allow(''),
+            txnId: Joi.string().allow('').allow(null),
+            status: Joi.string().min(1).max(2500)
+        },
+        orderlist: Joi.array()
+        .items({
+            product_id: Joi.number(),
+            qty: Joi.number(),
+            sub_total: Joi.string(),
+        })
+    });
+
+    const value = schema.validate(req.body);
+
+    if (value.error) {
+        const errMsg = await validationCheck(value);
+        return await apiResponse.errorMessage(res,400, errMsg);
+    }
+    next();
+};
+
+// ====================================================================================================
+// ====================================================================================================
+
+export const setProfilePinValidation = async (req:Request, res:Response, next:NextFunction) =>{
+
+    const schema = Joi.object({
+        isPasswordEnable: Joi.boolean().allow(0, 1).required(),
+        securityPin: Joi.number().integer().min(1).required(),
+    });
+
+    const value = schema.validate(req.body);
+
+    if (value.error) {
+        const errMsg = await validationCheck(value);
+        return await apiResponse.errorMessage(res, 400, errMsg);
     }
     next();
 };

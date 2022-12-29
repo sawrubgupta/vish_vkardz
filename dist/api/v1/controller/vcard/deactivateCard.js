@@ -37,7 +37,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deactivateCard = void 0;
 const db_1 = __importDefault(require("../../../../db"));
-const apiRespone = __importStar(require("../../helper/apiResponse"));
+const apiResponse = __importStar(require("../../helper/apiResponse"));
 const deactivateCard = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userId = res.locals.jwt.userId;
@@ -45,15 +45,15 @@ const deactivateCard = (req, res) => __awaiter(void 0, void 0, void 0, function*
         const VALUES = [1, 0, "", "", userId];
         const [rows] = yield db_1.default.query(sql, VALUES);
         if (rows.affectedRows > 0) {
-            return apiRespone.successResponse(res, "Your card is Deactive Now!", null);
+            return apiResponse.successResponse(res, "Your card is Deactive Now!", null);
         }
         else {
-            return apiRespone.errorMessage(res, 400, "Failed to Deactive the card, please try again later !");
+            return apiResponse.errorMessage(res, 400, "Failed to Deactive the card, please try again later !");
         }
     }
     catch (error) {
         console.log(error);
-        return apiRespone.errorMessage(res, 400, "Something went wrong");
+        return apiResponse.errorMessage(res, 400, "Something went wrong");
     }
 });
 exports.deactivateCard = deactivateCard;

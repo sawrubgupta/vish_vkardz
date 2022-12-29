@@ -4,7 +4,7 @@ import * as productController from '../../controller/card/products';
 import * as wishlistContriller from '../../controller/card/wishlist';
 import * as cartController from '../../controller/card/cart';
 import * as couponCodeController from '../../controller/card/coupons';
-// import * as purchaseController from '../../controller/cart/purchase'
+import * as purchaseController from '../../controller/card/purchase';
 // import * as packageController from '../../controller/cart/package';
 
 import {authenticatingToken} from '../../middleware/authorization.controller';
@@ -14,8 +14,7 @@ const cardRouter = Router();
 
 cardRouter.get("/getCategory", productController.getCategories);
 cardRouter.get("/productList", productController.getProductByCategoryId);
-// cardRouter.get("/getSingleProduct", cartController.getSingleProduct);
-// cardRouter.post("/purchase", authenticatingToken, validation.purchaseValidation, purchaseController.purchase);
+cardRouter.post("/purchase", authenticatingToken, validation.purchaseValidation, purchaseController.cardPurchase);
 // cardRouter.post("/shipping_method", authenticatingToken, validation.purchaseValidation, cartController.shipping);
 
 // cardRouter.patch("/updatePackage", authenticatingToken, packageController.updatePackage);

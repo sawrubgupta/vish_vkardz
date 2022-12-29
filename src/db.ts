@@ -11,7 +11,7 @@ const pool = mysql.createPool({
 // const pool = mysql.createPool({
 //   host: "194.31.52.223",
 //   user: "vkar_staging1",
-//   password: "y9wJdr64Lk0by^h!",
+//   password: "GfCudy6C9CGDOd#!",
 //   database: "vkar_staging1"
 // });
 

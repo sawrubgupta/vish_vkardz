@@ -1,5 +1,5 @@
-import pool from '../../../../db';
 import { Request, Response } from "express";
+import pool from '../../../../db';
 import * as apiResponse from '../../helper/apiResponse';
 import * as utility from "../../helper/utility";
 

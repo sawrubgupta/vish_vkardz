@@ -6,8 +6,8 @@ import cardRoute from "./card/card";
 import dashboardRoute from "./dashboard/dashboard";
 import uploadRoute from "../controller/uploadFile/uploadFile";
 import featuresRoute from "./features/features";
+import  profileRoute from "./profile/profile";
 
-// import  profileRoute from "./profile/profile";
 // import staticDataRoute from "./static_data/staticData"
 // import subscriptionRoute from "./subscription/subscription"
 // import orderRoute from "./order/order"
@@ -27,8 +27,8 @@ indexRoute.use("/card", cardRoute);
 indexRoute.use("/uploads", uploadRoute);
 indexRoute.use("/dashboard", dashboardRoute);
 indexRoute.use("/features", featuresRoute);
+indexRoute.use("/profile",profileRoute);
 
-// indexRoute.use("/profile",profileRoute);
 // indexRoute.use("/staticData",staticDataRoute);
 // indexRoute.use("/subscription",subscriptionRoute);
 // indexRoute.use("/order",orderRoute);

@@ -7,7 +7,7 @@ API URL -->>
 Defined API Methods: -
 ---------------------------------------------------------------------------
         users
-    1. policy (get)
+    //1. policy (get)
     2. register (post)
     3. login (post)
     4. forgotPassword (post)
@@ -19,20 +19,70 @@ Defined API Methods: -
     8. activateCard (post)
     9. deactivateCard (get)
     10. getSocialLinks (get)
+    -> updateSocialLinks (patch)
+    -> deleteSocialLink (delete)
 
         card
-    11. getCategory (get)
-    12. productList (get)
+    -> getCategory (get)
+    -> productList (get)
 
     -> addToWishlist (post)
     -> getWishlist (get)
     -> removeFromWishlist (delete)
+
+    -> addCart (post)
+    -> getCart (get)
+    -> removeFromCart (delete)
+    -> updateCartQty (patch)
+
+    -> checkCouponCode (get)
+    -> redeemCoupon (post)
+
+    -> customizeCard (post)
+
+    -> addDeliveryAddress (post)
+    -> getDeliveryAddress (get)
+    -> deleteAddress (delete)
+
+        features
+    -> getUserFeature (get)
+    -> updateFeatures (patch)
+
+    -> aboutUs (post)
+    -> aboutUs (get)
+    -> deleteAboutUs (delete)
+
+    -> addProducts (post)
+    -> getProducts (get)
+    -> updateProduct (patch)
+    -> deleteProduct (delete)
+
+    -> portfolio (post)
+    -> getPortfolio (get)
+    -> deletePortfolio (delete)
+
+    -> getAppointments (get)
+
+    -> enquiryList (get)
+
+    -> getProfile (get)
+    -> updateProfile (patch)
+    -> updateImage (patch)
+
+    -> setProfilePin (post)
+    -> removeProfilePin (delete)
+
+    -> getLayots (get)
+
+    -> home (get)
+    -> mixingData(get)
+  
 ------------------------------------------
 What parameters to be Passed?  
 ------------------------------------------
 
-1. /home/policy?type=
-    type === privacy, refund-policy, disclaimer, terms, faq
+//1. /home/policy?type=
+  //  type === privacy, refund-policy, disclaimer, terms, faq
 
 2. /user/register
     
@@ -79,9 +129,30 @@ What parameters to be Passed?
 
 10. /vcard/getSocialLinks
 
-11. /card/getCategory
+--> /vcard/updateSocialLinks
 
-12. /card/productList?categoryId=
+	socialSites: [
+        {
+            siteId: 1,
+            siteValue: Facebook,
+            orders: 1,
+            siteLabel: Facebook
+        },
+        {
+            siteId: 3,
+		    siteValue: Istagram,
+		    orders: 1,
+		    siteLabel: Istagram
+        }
+	]
+
+--> /vcard/deleteSocialLink?siteId=
+
+    siteId: 1
+
+--> /card/getCategory
+
+--> /card/productList?categoryId=
 
     categoryId: 13
 
@@ -94,3 +165,212 @@ What parameters to be Passed?
 --> /card/removeFromWishlist?productId=
 
     productId: 52
+
+--> /card/addCart
+
+    productId: 52
+    qty: 1
+
+--> /card/getCart
+
+--> /card/removeFromCart?productId=
+
+    productId: 52
+
+--> /card/updateCartQty
+   
+    productId:52,
+    qty:2
+
+--> /card/checkCouponCode?couponCode=
+
+    couponCode: CARDPAY10
+
+--> /card/redeemCoupon
+
+    couponCode: CARDPAY10,
+    totalDiscount: 10
+
+--> /card/customizeCard
+
+    productId: 50,
+    name: Vishal,
+    designation: ,
+    qty: 1,
+    logo:
+
+--> /card/addDeliveryAddress
+
+    name: Vishal Pathriya,
+    addressType: home,
+    phone: 8209003362,
+    address: c-scheme,
+    locality: bus stand,
+    city: jaipur,
+    state: rajasthan, 
+    pincode: 302031
+
+--> /card/getDeliveryAddress
+
+--> /card/deleteAddress?addressId=
+
+    addressId: 1
+
+--> /card/purchaseCard
+
+    orderType: online,
+	deliveryDetails: {
+		name: vishal,
+		phoneNumber: +91 8209003362,
+		email: vishalpathriya29@gmail.com,
+		country: india,
+        city:jaipur,
+		locality: jamdoli,
+		address: agra road,
+		pincode: 302031,
+        vat_number: 
+	},
+	paymentInfo: {
+		username: arpitk,
+		email: name1234@gmail.com,
+		deliveryCharge: 0,
+		price_currency_code: currency_code,
+		price: 193,
+		paymentType: razorpay,
+		txnId: v343hu55r34r,
+		status: 1
+	},
+    orderlist:[{
+        product_id: 7,
+        qty: 5,
+        sub_total: 109
+    },
+    {
+        product_id: 4,
+        qty: 2,
+        sub_total: 100
+    }]
+
+--> /features/getUserFeature
+
+--> /features/updateFeatures
+
+    features:[
+        {
+            featureId: 3,
+            status: 1
+        },
+        {
+            featureId: 5,
+            status: 1
+        },
+        {
+            featureId: 6,
+            status: 1
+        },
+        {
+            featureId: 8,
+            status: 1
+        },
+        {
+            featureId: 10,
+            status: 1
+        },
+        {
+            featureId: 11,
+            status: 1
+        },
+        {
+            featureId: 13,
+            status: 1
+        },
+        {
+            featureId: 14,
+            status: 1
+        },
+        {
+            featureId: 15,
+            status: 1
+        }
+    ]
+
+--> /features/aboutUs
+
+    companyName: appitron,
+    year: 2019,  
+    business: it,
+    aboutUsDetail: about us details,
+    image:
+
+--> /features/aboutUs
+
+--> /features/deleteAboutUs
+
+--> /features/addProducts
+
+    title: title,
+    description: description,
+    price: $300,
+    image:
+
+--> /features/getProducts?page=
+
+    page: 1
+
+--> /features/updateProduct?productId=379
+
+    title: title,
+    description: description,
+    price: $300,
+    image:
+
+--> /features/deleteProduct?productId=
+    
+    productId: 380
+
+--> /features/portfolio
+
+    image: image url
+
+--> /features/getPortfolio?page=1
+
+--> /features/deletePortfolio
+
+    portfolioId: [425, 426]
+
+--> /features/getAppointments?page=1
+
+--> /features/enquiryList?page=1
+
+--> /profile/getProfile
+
+--> /profile/updateProfile
+
+    name: Vishal,
+    designation: ,
+    companyName: ,
+    dialCode: +91,
+    phone: 08209003362,
+    email: vishalpathriya9252@gmail.com,
+    website: ,
+    address: jaipur
+
+--> /profile/updateImage
+
+    profileImage: , 
+    coverImage: 
+
+--> /profile/setProfilePin
+
+    isPasswordEnable:1,
+    securityPin:123456
+
+--> /profile/removeProfilePin
+
+--> /profile/getLayots
+
+--> /dashboard/home?type=ORDER_NOW
+
+    type: ORDER_NOW, CARD_BUY, AFFILIATE, ACTIVATE_CARD, ORDER_UPDATE, ANOTHER_CARD_BUY
+
+--> /dashboard/mixingData

@@ -36,18 +36,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getSocialLinks = void 0;
-const apiRespone = __importStar(require("../../helper/apiResponse"));
+const apiResponse = __importStar(require("../../helper/apiResponse"));
 const db_1 = __importDefault(require("../../../../db"));
 const getSocialLinks = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userId = res.locals.jwt.userId;
         const sql = `SELECT social_sites.id, social_sites.name, social_sites.social_link, social_sites.social_img, social_sites.type, social_sites.status, social_sites.primary_profile, social_sites.icon, social_sites.mobile_icon, vcard_social_sites.value, vcard_social_sites.label, vcard_social_sites.orders FROM social_sites LEFT JOIN vcard_social_sites ON social_sites.id = vcard_social_sites.site_id AND vcard_social_sites.user_id = ${userId} ORDER BY  vcard_social_sites.orders IS NULL ASC`;
         const [socialRows] = yield db_1.default.query(sql);
-        return apiRespone.successResponse(res, "List of all social links.", socialRows);
+        return apiResponse.successResponse(res, "List of all social links.", socialRows);
     }
     catch (error) {
         console.log(error);
-        return apiRespone.errorMessage(res, 400, "Something went wrong");
+        return apiResponse.errorMessage(res, 400, "Something went wrong");
     }
 });
 exports.getSocialLinks = getSocialLinks;

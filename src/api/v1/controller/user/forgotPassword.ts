@@ -10,7 +10,7 @@ export const forgotPassword =async (req:Request, res:Response) => {
         const tempPass:any = utility.randomString(6);
         console.log(tempPass);
         
-        if (!email) return await apiResponse.errorMessage(res, 400, "Email required");
+        if (!email) return apiResponse.errorMessage(res, 400, "Email required");
 
         const emailCheckSql = `SELECT email, id FROM users where email = '${email}' limit 1`;
         const [rows]:any = await pool.query(emailCheckSql);
@@ -26,13 +26,13 @@ export const forgotPassword =async (req:Request, res:Response) => {
                 
                 if (updatePassword.affectedRows > 0) {                    
                     await utility.sendMail(email, "Password Reset", "You have requested a new password here it is: " + tempPass);
-                    return await apiResponse.successResponse(res,"Check your mail inbox for new Password",null );
+                    return apiResponse.successResponse(res,"Check your mail inbox for new Password",null );
                 } else {
-                    return await apiResponse.errorMessage(res,400,"Something Went Wrong, Please Try again later");
+                    return apiResponse.errorMessage(res,400,"Something Went Wrong, Please Try again later");
                 }
             })
         } else {
-            return await apiResponse.errorMessage( res, 400, "Email not registered with us ! ");
+            return apiResponse.errorMessage( res, 400, "Email not registered with us ! ");
         }
     } catch (error) {
         console.log(error);

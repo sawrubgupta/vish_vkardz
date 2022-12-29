@@ -15,4 +15,51 @@ fields of ussername and mobile num and password should be empty ?  after registr
 
 name api's 
 
-    
+28-12-2022
+CREATE TABLE `layout_types` (
+  `id` int(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  `type` VARCHAR(55) not null,
+  `slug` VARCHAR(55) NOT NULL,
+  `status` tinyint NOT NULL DEFAULT 1
+)ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+ALTER TABLE vkard_layouts ADD COLUMN `type_id` int(11) NOT NULL AFTER id;
+
+before 28-12-2022
+CREATE TABLE `wishlist` (
+  `id` int(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `product_id` int(11) NOT NULL,
+  `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP
+)ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+
+CREATE TABLE `cart_details` (
+  `id` int(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `product_id` int(11) NOT NULL,
+  `qty` int(11) NOT NULL DEFAULT 1,
+  `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP
+)ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+ALTER TABLE users ADD COLUMN fcm_token VARCHAR(255) DEFAUlT NULL;
+
+ALTER TABLE customize_card ADD COLUMN user_id int(11) NOT NULL AFTER id;
+ALTER TABLE customize_card ADD COLUMN product_id int(11) NOT NULL AFTER user_id;
+ALTER TABLE customize_card ADD COLUMN qty int(11) NOT NULL AFTER designation;
+
+CREATE TABLE `delivery_addresses` (
+  `id` int(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `address_type` VARCHAR(30) NOT NULL,
+  `name` VARCHAR(255) NOT NULL,
+  `phone` VARCHAR(30) NOT NULL,
+  `address` VARCHAR(255) NOT NULL,
+  `locality` VARCHAR(200) NOT NULL, 
+  `city` VARCHAR(200) NOT NULL,
+  `state` VARCHAR(55) NOT NULL,
+  `pincode` VARCHAR(11) NOT NULL,
+  `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP
+)ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+

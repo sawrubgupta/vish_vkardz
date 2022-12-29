@@ -1,7 +1,7 @@
 "use strict";
 // import admin from "firebase-admin";
 // import {Request, Response, NextFunction} from "express";
-// import * as apiRespone from '../helper/apiResponse';
+// import * as apiResponse from '../helper/apiResponse';
 // import  ServiceAccount  from "../../../";
 // // admin.initializeApp({
 // //     credential: admin.credential.cert("")
@@ -78,7 +78,7 @@
 // //     //   .then((response) => {
 // //     //     // Response is a message ID string.
 // //     //     console.log('Successfully sent message:', response);
-// //     //     return apiRespone.successResponseWithData(res, "Successfully sent message:", null)
+// //     //     return apiResponse.successResponseWithData(res, "Successfully sent message:", null)
 // //     //   })
 // //     //   .catch((error) => {
 // //     //     console.log('Error sending message:', error);

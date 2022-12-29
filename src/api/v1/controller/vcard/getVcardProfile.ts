@@ -1,12 +1,12 @@
 import {Request, Response} from "express";
-import * as apiRespone from '../../helper/apiResponse';
+import * as apiResponse from '../../helper/apiResponse';
 import pool from '../../../../db';
 
 export const getVcardProfile =async (req:Request, res:Response) => {
     try {
         const userId:string = res.locals.jwt.userId;
         if (!userId || userId === "" || userId === undefined) {
-            return apiRespone.errorMessage(res, 404, "User profile not found !");
+            return apiResponse.errorMessage(res, 404, "User profile not found !");
         }
 
         const sql = `SELECT id, username, card_number, full_name, thumb, cover_photo, vcard_layouts,  vcard_bg_color, designation, company_name, display_email, display_dial_code, display_number, website, display_email, address, colors FROM users WHERE id = ${userId} LIMIT 1`;
@@ -18,15 +18,15 @@ export const getVcardProfile =async (req:Request, res:Response) => {
 
             if(socialRows.length > 0) {
                 userData[0].socialSites = socialRows;
-                return apiRespone.successResponse(res, "Get user vcard profile data !", userData[0]);
+                return apiResponse.successResponse(res, "Get user vcard profile data !", userData[0]);
             } else {
                 userData[0].socialSites= null;
-                return apiRespone.successResponse(res, "Get user vcard profile data !", userData[0]);
+                return apiResponse.successResponse(res, "Get user vcard profile data !", userData[0]);
             }
         }
     } catch (error) {
         console.log(error);
-        return apiRespone.errorMessage(res, 400, "Something went wrong");
+        return apiResponse.errorMessage(res, 400, "Something went wrong");
     }
 }
 

@@ -15,7 +15,9 @@ import * as validation from '../../middleware/validation';
 const authRouter = Router();
 
 authRouter.post('/register', validation.registrationValidation, registerController.register);
+authRouter.post('/socialRegister', validation.socialRegistrationValidation, registerController.socialRegister);
 authRouter.post('/login', validation.loginValidation, userController.login);
+authRouter.post('/socialLogin', validation.socialLoginValidation, userController.socialLogin);
 authRouter.post('/forgotPassword', forgotPasswordController.forgotPassword);
 authRouter.patch('/changePassword', authenticatingToken, validation.changePasswordValidation, changePassword.changePassword);
 authRouter.get('/checkUserName', checkUserName.validUserName);

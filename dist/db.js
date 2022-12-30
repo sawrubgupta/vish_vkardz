@@ -12,10 +12,10 @@ require("dotenv/config");
 //   database: process.env.DATABASE || "vkardz_new", //"vkar_vkardz"
 // });
 const pool = mysql2_1.default.createPool({
-    host: "194.31.52.223",
-    user: "vkar_vkardz",
-    password: "sOMAIqlIqrhzp!@4",
-    database: "vkar_vkardz"
+    host: "localhost",
+    user: "root",
+    password: "",
+    database: "vkardz_new"
 });
 pool.getConnection((err, connection) => {
     if (err)

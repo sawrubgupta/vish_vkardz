@@ -39,11 +39,59 @@ export const registrationValidation = async (req: Request, res: Response, next: 
 // ====================================================================================================
 // ====================================================================================================
 
+export const socialRegistrationValidation = async (req: Request, res: Response, next: NextFunction) => {
+    const schema = Joi.object({
+        name: Joi.string().trim().min(3).max(70).trim().required(),  
+        type: Joi.string().trim().required(),
+        socialId: Joi.string().trim().allow(null).allow(''),
+        email: Joi.string().email().max(80).required(),
+        password: Joi.string().min(3).max(30).required().allow(null).allow(''),
+        username: Joi.string().trim().min(2).max(50).required(),
+        country: Joi.number().integer().allow(''),
+        phone: Joi.string().trim().min(8).max(20).trim().required(),
+        country_name : Joi.string().trim().allow(''),
+        dial_code: Joi.string().required(),
+        fcmToken:Joi.string().trim().required(),
+    });
+
+    const value = schema.validate(req.body);
+
+    if (value.error) {
+        const errMsg = await validationCheck(value);
+        return await apiResponse.errorMessage(res,400, errMsg);
+    }
+    next();
+};
+
+// ====================================================================================================
+// ====================================================================================================
+
 export const loginValidation = async (req: Request,res: Response,next: NextFunction) => {
     const schema = Joi.object({
       password: Joi.string().min(3).max(30).required(),
       email: Joi.string().email().required(),
       fcmToken:Joi.string().trim().required(),
+    });
+  
+    const value = schema.validate(req.body);
+  
+    if (value.error) {
+      const errMsg = await validationCheck(value);
+      return await apiResponse.errorMessage(res,400, errMsg);
+    }
+    next();
+  };
+
+// ====================================================================================================
+// ====================================================================================================
+
+export const socialLoginValidation = async (req: Request,res: Response,next: NextFunction) => {
+    const schema = Joi.object({
+      password: Joi.string().min(3).max(30).allow('').allow(null),
+      email: Joi.string().email().required().allow('').allow(null),
+      fcmToken:Joi.string().trim().required(),
+      type: Joi.string().trim().required(),
+      socialId: Joi.string().trim().allow(null).allow(''),
     });
   
     const value = schema.validate(req.body);

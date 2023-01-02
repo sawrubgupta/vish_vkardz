@@ -246,7 +246,6 @@ export const login =async (req:Request, res:Response) => {
             if (isMatch) {
                 const sql = `UPDATE users set login_time = ? where id = ?`;
                 const VALUES = [createdAt, userRows[0].id];
-                console.log(VALUES);
                 
                 const [data]:any = await pool.query(sql, VALUES);
                 if (data.affectedRows > 0) {

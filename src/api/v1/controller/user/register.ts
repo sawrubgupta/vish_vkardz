@@ -125,8 +125,6 @@ export const socialRegister =async (req:Request, res:Response) => {
         let facebookId:any;
         let googleId:any;
         let appleId:any;
-
-        console.log(socialId);
         
         if (type === "email") {
             facebookId = null;

@@ -10,7 +10,8 @@ const card_1 = __importDefault(require("./card/card"));
 const dashboard_1 = __importDefault(require("./dashboard/dashboard"));
 const uploadFile_1 = __importDefault(require("../controller/uploadFile/uploadFile"));
 const features_1 = __importDefault(require("./features/features"));
-// import  profileRoute from "./profile/profile";
+const profile_1 = __importDefault(require("./profile/profile"));
+const invoice_1 = __importDefault(require("./invoice/invoice"));
 // import staticDataRoute from "./static_data/staticData"
 // import subscriptionRoute from "./subscription/subscription"
 // import orderRoute from "./order/order"
@@ -28,7 +29,8 @@ indexRoute.use("/card", card_1.default);
 indexRoute.use("/uploads", uploadFile_1.default);
 indexRoute.use("/dashboard", dashboard_1.default);
 indexRoute.use("/features", features_1.default);
-// indexRoute.use("/profile",profileRoute);
+indexRoute.use("/profile", profile_1.default);
+indexRoute.use("/invoice", invoice_1.default);
 // indexRoute.use("/staticData",staticDataRoute);
 // indexRoute.use("/subscription",subscriptionRoute);
 // indexRoute.use("/order",orderRoute);

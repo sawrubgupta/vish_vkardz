@@ -340,57 +340,25 @@ export const affiliateRegValidation = async (
 // ====================================================================================================
 
 /*  
-    export const activateCardValidation =async (req:Request, res:Response, next:NextFunction) => {
-
-
+export const activateCardValidation =async (req:Request, res:Response, next:NextFunction) => {
         
-            const schema = Joi.object({
-                username : Joi.string().min(1).max(50).trim().required(),
-                code: Joi.number().integer().required()
-            });
+    const schema = Joi.object({
+        username : Joi.string().min(1).max(50).trim().required(),
+        code: Joi.number().integer().required()
+    });
         
-            const value = schema.validate(req.body);
+    const value = schema.validate(req.body);
         
-            if (value.error) {
+    if (value.error) {
             const errMsg = await validationCheck(value);
-            return await apiResponse.errorMessage(res,400, errMsg);
-            }
-            next();
+            return await apiResponse.errorMessage(res,400, errMsg);\
+        }
+        next();
     }
 */
 
 // ====================================================================================================
 // ====================================================================================================
-
-
-
-/*
-    export const cardpurchaseValidation = async (req: Request, res: Response, next: NextFunction) =>{
-        const schema = Joi.object({
-            email: Joi.string().email(),
-            country: Joi.string().trim().required(),
-            phone_number: Joi.string().min(8).max(15).required(),
-            zipcode: Joi.number().min(999).max(9999999).required(),
-            name: Joi.string().trim().min(3).max(70).trim().required(),
-            address:Joi.string().required(),
-            city: Joi.string().required(),
-            company: Joi.string().optional(),
-            vat: Joi.string().optional(),
-            txn_id: Joi.string(),
-
-        });
-        const value = schema.validate(req.body);
-        if (value.error) {
-            const errMsg = await validationCheck(value);
-            return await apiResponse.errorMessage(res, 400, errMsg);
-        }
-        next();
-    };
-*/
-
-// ====================================================================================================
-// ====================================================================================================
-
 
     
 /*

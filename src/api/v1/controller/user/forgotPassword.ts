@@ -44,7 +44,6 @@ export const forgotPassword =async (req:Request, res:Response) => {
     try {
         const email:string = req.body.email;
         const tempPass:any = utility.randomString(6);
-        console.log(tempPass);
         
         if (!email) return apiResponse.errorMessage(res, 400, "Email required");
 

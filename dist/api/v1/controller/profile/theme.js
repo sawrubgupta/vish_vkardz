@@ -35,21 +35,49 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.setting = void 0;
+exports.updateVcardLayout = exports.getLayout = void 0;
 const db_1 = __importDefault(require("../../../../db"));
 const apiResponse = __importStar(require("../../helper/apiResponse"));
-const setting = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const getLayout = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const sql = `SELECT * FROM layout_types`;
+        let [layoutTypeData] = yield db_1.default.query(sql);
+        const sql1 = `SELECT * FROM vkard_layouts`;
+        const [data] = yield db_1.default.query(sql1);
+        let rowIndex = -1;
+        for (const element of layoutTypeData) {
+            rowIndex++;
+            layoutTypeData[rowIndex].layout = [];
+            let dataIndex = -1;
+            for (const e of data) {
+                dataIndex++;
+                if (element.id === e.type_id) {
+                    (layoutTypeData[rowIndex].layout).push(e);
+                }
+            }
+        }
+        return apiResponse.successResponse(res, "Layouts get Succesfully", layoutTypeData);
+    }
+    catch (error) {
+        console.log(error);
+        return apiResponse.errorMessage(res, 400, "Something went wrong");
+    }
+});
+exports.getLayout = getLayout;
+// ====================================================================================================
+// ====================================================================================================
+const updateVcardLayout = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userId = res.locals.jwt.userId;
-        const { pushNotificationEnable, emailNotificationEnable, currencyCode, languageSelection } = req.body;
-        const sql = `UPDATE users SET currency_code = ?, push_notification_enable = ?,email_notification_enable = ?, language_selection = ? where id = ?`;
-        const VALUES = [currencyCode, pushNotificationEnable, emailNotificationEnable, languageSelection, userId];
+        const { profileColor, styleId } = req.body;
+        const sql = `UPDATE users SET vcard_layouts = ?, vcard_bg_color = ? WHERE id = ?`;
+        const VALUES = [styleId, profileColor, userId];
         const [rows] = yield db_1.default.query(sql, VALUES);
         if (rows.affectedRows > 0) {
-            return apiResponse.successResponse(res, "Setting updated successfully !", null);
+            return apiResponse.successResponse(res, "Vcard layout updated successfully !", null);
         }
         else {
-            return apiResponse.errorMessage(res, 400, "Failed to update setting");
+            return apiResponse.errorMessage(res, 400, "Failed to update layout, try again");
         }
     }
     catch (error) {
@@ -57,6 +85,6 @@ const setting = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         return apiResponse.errorMessage(res, 400, "Something went wrong");
     }
 });
-exports.setting = setting;
+exports.updateVcardLayout = updateVcardLayout;
 // ====================================================================================================
 // ====================================================================================================

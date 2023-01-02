@@ -17,10 +17,6 @@ require("dotenv/config");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const development_1 = __importDefault(require("../config/development"));
 const secretKey = development_1.default.secretKey; //process.env.SECRET;
-// function  jwtGenerateKey(userId:any){
-//     const token = jwt.sign({userId}, secretKey)
-//     return token;
-// }
 function authenticatingToken(req, res, next) {
     const authHeaders = req.headers['authorization'];
     const token = authHeaders === null || authHeaders === void 0 ? void 0 : authHeaders.split(" ")[1];
@@ -44,3 +40,5 @@ function authenticatingToken(req, res, next) {
     }));
 }
 exports.authenticatingToken = authenticatingToken;
+// ====================================================================================================
+// ====================================================================================================

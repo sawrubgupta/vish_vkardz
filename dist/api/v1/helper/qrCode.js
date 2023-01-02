@@ -15,11 +15,19 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getQr = void 0;
 const axios_1 = __importDefault(require("axios"));
 const getQr = (username) => __awaiter(void 0, void 0, void 0, function* () {
-    const response = yield (0, axios_1.default)({
-        url: `https://vkardz.com/api/qrCode.php?username=${username}`,
-        method: "get",
-    });
-    return response.data;
+    let result = null;
+    try {
+        const response = yield (0, axios_1.default)({
+            url: `https://vkardz.com/api/qrCode.php?username=${username}`,
+            method: "get",
+        });
+        result = response.data;
+        return result;
+    }
+    catch (error) {
+        result = false;
+        return result;
+    }
 });
 exports.getQr = getQr;
 // ====================================================================================================

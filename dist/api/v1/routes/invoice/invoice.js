@@ -24,9 +24,8 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
-const homeController = __importStar(require("../../controller/dashboard/home"));
-const mixingDataController = __importStar(require("../../controller/dashboard/mixingData"));
-const dashboardRouter = (0, express_1.Router)();
-dashboardRouter.get("/home", homeController.home);
-dashboardRouter.get("/mixingData", mixingDataController.mixingData);
-exports.default = dashboardRouter;
+const invoiceController = __importStar(require("../../controller/invoice/invoice"));
+const authorization_controller_1 = require("../../middleware/authorization.controller");
+const invoiceRouter = (0, express_1.Router)();
+invoiceRouter.get('/invoice', authorization_controller_1.authenticatingToken, invoiceController.invoice);
+exports.default = invoiceRouter;

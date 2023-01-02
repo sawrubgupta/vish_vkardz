@@ -28,15 +28,14 @@ const productController = __importStar(require("../../controller/card/products")
 const wishlistContriller = __importStar(require("../../controller/card/wishlist"));
 const cartController = __importStar(require("../../controller/card/cart"));
 const couponCodeController = __importStar(require("../../controller/card/coupons"));
-// import * as purchaseController from '../../controller/cart/purchase'
+const purchaseController = __importStar(require("../../controller/card/purchase"));
 // import * as packageController from '../../controller/cart/package';
 const authorization_controller_1 = require("../../middleware/authorization.controller");
 const validation = __importStar(require("../../middleware/validation"));
 const cardRouter = (0, express_1.Router)();
 cardRouter.get("/getCategory", productController.getCategories);
 cardRouter.get("/productList", productController.getProductByCategoryId);
-// cardRouter.get("/getSingleProduct", cartController.getSingleProduct);
-// cardRouter.post("/purchase", authenticatingToken, validation.purchaseValidation, purchaseController.purchase);
+cardRouter.post("/purchaseCard", authorization_controller_1.authenticatingToken, validation.purchaseValidation, purchaseController.cardPurchase);
 // cardRouter.post("/shipping_method", authenticatingToken, validation.purchaseValidation, cartController.shipping);
 // cardRouter.patch("/updatePackage", authenticatingToken, packageController.updatePackage);
 // cardRouter.get("/getPackageList", packageController.getPackage);

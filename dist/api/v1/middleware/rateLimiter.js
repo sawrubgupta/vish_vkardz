@@ -7,7 +7,9 @@ exports.rateLimiterUsingThirdParty = void 0;
 const express_rate_limit_1 = __importDefault(require("express-rate-limit"));
 exports.rateLimiterUsingThirdParty = (0, express_rate_limit_1.default)({
     windowMs: 60 * 1000,
-    max: 60,
+    max: 100,
     message: 'Please try again later',
     headers: true,
 });
+// ====================================================================================================
+// ====================================================================================================

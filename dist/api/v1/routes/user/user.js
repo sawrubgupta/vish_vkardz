@@ -36,7 +36,9 @@ const authorization_controller_1 = require("../../middleware/authorization.contr
 const validation = __importStar(require("../../middleware/validation"));
 const authRouter = (0, express_1.Router)();
 authRouter.post('/register', validation.registrationValidation, registerController.register);
+authRouter.post('/socialRegister', validation.socialRegistrationValidation, registerController.socialRegister);
 authRouter.post('/login', validation.loginValidation, userController.login);
+authRouter.post('/socialLogin', validation.socialLoginValidation, userController.socialLogin);
 authRouter.post('/forgotPassword', forgotPasswordController.forgotPassword);
 authRouter.patch('/changePassword', authorization_controller_1.authenticatingToken, validation.changePasswordValidation, changePassword.changePassword);
 authRouter.get('/checkUserName', checkUserName.validUserName);

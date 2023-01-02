@@ -38,39 +38,30 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.changePassword = void 0;
 const apiResponse = __importStar(require("../../helper/apiResponse"));
 const db_1 = __importDefault(require("../../../../db"));
-const bcryptjs_1 = __importDefault(require("bcryptjs"));
+const md5_1 = __importDefault(require("md5"));
 const changePassword = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userId = res.locals.jwt.userId;
         const { oldPassword, newPassword } = req.body;
+        const hash = (0, md5_1.default)(newPassword);
         const sql = `SELECT password from users WHERE id = ${userId}`;
         const [data] = yield db_1.default.query(sql);
-        const hashedPassword = data[0].password;
         if (data.length > 0) {
-            bcryptjs_1.default.compare(oldPassword, hashedPassword, (err, isMatch) => __awaiter(void 0, void 0, void 0, function* () {
-                if (err) {
-                    return apiResponse.errorMessage(res, 400, "Failed to login, Please try again or Contact support team");
+            const oldPassCorrect = (0, md5_1.default)(oldPassword) == data[0].password;
+            if (oldPassCorrect) {
+                const updatePassSql = `Update users Set password = ? where id = ?`;
+                const VALUES = [hash, userId];
+                const [updatePassword] = yield db_1.default.query(updatePassSql, VALUES);
+                if (updatePassword.affectedRows > 0) {
+                    return yield apiResponse.successResponse(res, "Password updated successfully !", null);
                 }
-                if (isMatch) {
-                    bcryptjs_1.default.hash(newPassword, 10, (err, hash) => __awaiter(void 0, void 0, void 0, function* () {
-                        if (err) {
-                            return apiResponse.errorMessage(res, 400, "Something Went Wrong, Contact Support!!");
-                        }
-                        const updatePassSql = `Update users Set password = ? where id = ?`;
-                        const VALUES = [hash, userId];
-                        const [updatePassword] = yield db_1.default.query(updatePassSql, VALUES);
-                        if (updatePassword.affectedRows > 0) {
-                            return yield apiResponse.successResponse(res, "Password updated successfully !", null);
-                        }
-                        else {
-                            return yield apiResponse.errorMessage(res, 400, "Something Went Wrong, Please Try again later");
-                        }
-                    }));
+                else {
+                    return yield apiResponse.errorMessage(res, 400, "Something Went Wrong, Please Try again later");
                 }
-                if (!isMatch) {
-                    return apiResponse.errorMessage(res, 400, "Wrong old password !!");
-                }
-            }));
+            }
+            else {
+                return apiResponse.errorMessage(res, 400, "Wrong old password !!");
+            }
         }
         else {
             return apiResponse.errorMessage(res, 400, "User not found !");
@@ -82,5 +73,52 @@ const changePassword = (req, res) => __awaiter(void 0, void 0, void 0, function*
     }
 });
 exports.changePassword = changePassword;
+// ====================================================================================================
+// ====================================================================================================
+/*
+//use bcrypt
+export const changePassword =async (req:Request, res:Response) => {
+    try {
+        const userId:string = res.locals.jwt.userId;
+        const {oldPassword, newPassword} = req.body;
+
+        const sql = `SELECT password from users WHERE id = ${userId}`;
+        const [data]:any = await pool.query(sql);
+
+        const hashedPassword = data[0].password;
+        if (data.length > 0) {
+            bcrypt.compare(oldPassword, hashedPassword, async(err, isMatch) => {
+                if (err) {
+                    return apiResponse.errorMessage(res, 400, "Failed to login, Please try again or Contact support team")
+                }
+                if (isMatch) {
+                    bcrypt.hash(newPassword, 10, async (err, hash) => {
+                        if (err) {
+                            return apiResponse.errorMessage(res, 400, "Something Went Wrong, Contact Support!!");
+                        }
+                        const updatePassSql = `Update users Set password = ? where id = ?`;
+                        const VALUES = [hash, userId]
+                        const [updatePassword]:any = await pool.query(updatePassSql, VALUES)
+                        
+                        if (updatePassword.affectedRows > 0) {
+                            return await apiResponse.successResponse(res,"Password updated successfully !", null);
+                        } else {
+                            return await apiResponse.errorMessage(res,400,"Something Went Wrong, Please Try again later");
+                        }
+                    })
+                }
+                if (!isMatch) {
+                    return apiResponse.errorMessage(res, 400, "Wrong old password !!");
+                }
+            })
+        } else{
+            return apiResponse.errorMessage(res, 400, "User not found !")
+        }
+    } catch (error) {
+        console.log(error);
+        return apiResponse.errorMessage(res, 400, "Something went wrong");
+    }
+}
+*/
 // ====================================================================================================
 // ====================================================================================================

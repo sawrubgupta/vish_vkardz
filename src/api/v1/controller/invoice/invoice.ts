@@ -16,9 +16,10 @@ export const invoice =async (req:Request, res:Response) => {
         let tr = ``;
         let data:any;
 
-        const sql = `SELECT id, name, txn_id, created_at, address, city, country, pincode, phone_number, payment_type, delivery_charges, price FROM all_payment_info WHERE user_id = ${userId} AND id = ${paymentId}`;
+        const sql = `SELECT id, name, txn_id, created_at, address, city, country, pincode, phone_number, payment_type, delivery_charges, price FROM all_payment_info WHERE user_id = ${userId} AND id =  ${paymentId}`;
         const [paymntDetails]:any = await pool.query(sql);
 
+        let deliveryCharges:number = Number(paymntDetails[0].delivery_charges);
         let paymentMethod:any
         if (paymntDetails[0].payment_type === 1) {
             paymentMethod = 'cod';
@@ -26,23 +27,10 @@ export const invoice =async (req:Request, res:Response) => {
             paymentMethod = 'online';
         }
 
-        const name = paymntDetails[0].name;
-        const orderId = paymntDetails[0].txn_id;
-        const date = paymntDetails[0].date;
-        const address = paymntDetails[0].address;
-        const city = paymntDetails[0].city;
-        const country = paymntDetails[0].country;
-        const pincode = paymntDetails[0].pincode;
-        const phone = paymntDetails[0].phone_number;
-        const deliveryCharges = paymntDetails[0].delivery_charges;
-        const price = paymentMethod[0].price;
-
         const getOrderListQuery = `SELECT products.name, orderlist.qty, orderlist.sub_total, orderlist.created_at FROM orderlist LEFT JOIN products ON products.product_id = orderlist.product_id WHERE orderlist.order_id = ${paymntDetails[0].id}`;
         const [orderData]:any = await pool.query(getOrderListQuery);
-
-        
-        let totalAmount:any;
-
+                
+        let totalAmount:number = 0;
         orderData.forEach((element:any, index:any) => {
             totalAmount = totalAmount + element.sub_total; 
             tr = tr + `<tr>
@@ -55,32 +43,33 @@ export const invoice =async (req:Request, res:Response) => {
           </tr>
           <tr>
             <td height="1" colspan="4" style="border-bottom:1px solid #e4e4e4"></td>
-          </tr>`
+          </tr>`          
         })
 
-        var grandTotals:string = `${totalAmount} + ${deliveryCharges}`;
+        let grandTotals:number = totalAmount + deliveryCharges;        
+        
         data = {
             name: paymntDetails[0].name,
             orderId: paymntDetails[0].txn_id,
-            date: paymntDetails[0].date,
+            date: paymntDetails[0].created_at,
             address: paymntDetails[0].address,
             city: paymntDetails[0].city,
             country: paymntDetails[0].country,
             pincode: paymntDetails[0].pincode,
             phone: paymntDetails[0].phone_number,
-            paymentDate: paymntDetails[0].date,
+            paymentDate: paymntDetails[0].created_at,
             paymentMethod: paymentMethod,
             deliveryCharges: paymntDetails[0].delivery_charges,
             GST: '00.0',
             discount: '00.0',
-            grandTotal: '',
             totalAmount: totalAmount,
-            // grandTotal: grandTotals
+            grandTotal: grandTotals,
+            tr:tr
         }
 
         const templateHtml = fs.readFileSync(path.join('./views', 'invoice.hbs'), 'utf8');
         var template = Handlebars.compile(templateHtml);
-        var html = template(tr);   
+        var html = template(data);   
         const browser = await puppeteer.launch({
         headless: true, 
         args: ['--no-sandbox', '--disable-setuid-sandbox'],
@@ -94,14 +83,11 @@ export const invoice =async (req:Request, res:Response) => {
 
       // Downlaod the PDF
       const pdf = await page.pdf({
-        path: './'+'\\'+"nu"+".pdf",
+        path: './public_html/invoice/'+'\\'+'invoice'+paymentId+".pdf",
         margin: { top: '100px', right: '50px', bottom: '100px', left: '50px' },
         printBackground: true,
         format: 'A4',
     });
-
-    console.log("path", './'+'\\'+"nu"+".pdf");
-    // console.log("pdf path", pdf.path);
     
     // Close the browser instance
     await browser.close();

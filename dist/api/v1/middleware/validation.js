@@ -35,7 +35,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.redeemCouponCodeValidation = exports.deliveryAddressValidation = exports.customizeCardValidation = exports.cartValidation = exports.submitReportValidation = exports.affiliateRegValidation = exports.settingValidation = exports.changePasswordValidation = exports.loginValidation = exports.registrationValidation = void 0;
+exports.setProfilePinValidation = exports.purchaseValidation = exports.userProductsValidation = exports.aboutUsValidation = exports.redeemCouponCodeValidation = exports.deliveryAddressValidation = exports.customizeCardValidation = exports.cartValidation = exports.editSocialLinksValidation = exports.updateProfileValidation = exports.settingValidation = exports.changePasswordValidation = exports.socialLoginValidation = exports.loginValidation = exports.socialRegistrationValidation = exports.registrationValidation = void 0;
 const apiResponse = __importStar(require("../helper/apiResponse"));
 const joi_1 = __importDefault(require("joi"));
 function validationCheck(value) {
@@ -71,6 +71,30 @@ const registrationValidation = (req, res, next) => __awaiter(void 0, void 0, voi
 exports.registrationValidation = registrationValidation;
 // ====================================================================================================
 // ====================================================================================================
+const socialRegistrationValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const schema = joi_1.default.object({
+        name: joi_1.default.string().trim().min(3).max(70).trim().required(),
+        type: joi_1.default.string().trim().required(),
+        socialId: joi_1.default.string().trim().allow(null).allow(''),
+        email: joi_1.default.string().email().max(80).required(),
+        password: joi_1.default.string().min(3).max(30).required().allow(null).allow(''),
+        username: joi_1.default.string().trim().min(2).max(50).required(),
+        country: joi_1.default.number().integer().allow(''),
+        phone: joi_1.default.string().trim().min(8).max(20).trim().required(),
+        country_name: joi_1.default.string().trim().allow(''),
+        dial_code: joi_1.default.string().required(),
+        fcmToken: joi_1.default.string().trim().required(),
+    });
+    const value = schema.validate(req.body);
+    if (value.error) {
+        const errMsg = yield validationCheck(value);
+        return yield apiResponse.errorMessage(res, 400, errMsg);
+    }
+    next();
+});
+exports.socialRegistrationValidation = socialRegistrationValidation;
+// ====================================================================================================
+// ====================================================================================================
 const loginValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const schema = joi_1.default.object({
         password: joi_1.default.string().min(3).max(30).required(),
@@ -85,6 +109,24 @@ const loginValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, fu
     next();
 });
 exports.loginValidation = loginValidation;
+// ====================================================================================================
+// ====================================================================================================
+const socialLoginValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const schema = joi_1.default.object({
+        password: joi_1.default.string().min(3).max(30).allow('').allow(null),
+        email: joi_1.default.string().email().required().allow('').allow(null),
+        fcmToken: joi_1.default.string().trim().required(),
+        type: joi_1.default.string().trim().required(),
+        socialId: joi_1.default.string().trim().allow(null).allow(''),
+    });
+    const value = schema.validate(req.body);
+    if (value.error) {
+        const errMsg = yield validationCheck(value);
+        return yield apiResponse.errorMessage(res, 400, errMsg);
+    }
+    next();
+});
+exports.socialLoginValidation = socialLoginValidation;
 // ====================================================================================================
 // ====================================================================================================
 const changePasswordValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
@@ -119,16 +161,16 @@ const settingValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, 
 exports.settingValidation = settingValidation;
 // ====================================================================================================
 // ====================================================================================================
-const affiliateRegValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+const updateProfileValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const schema = joi_1.default.object({
-        legalName: joi_1.default.string().trim().min(3).max(70).required(),
-        country: joi_1.default.number().integer().required(),
-        phoneNumber: joi_1.default.string().min(8).max(20).required(),
-        formOfPayment: joi_1.default.string().trim().required(),
-        country_name: joi_1.default.string().trim().required(),
-        email: joi_1.default.string()
-            .email()
-            .required(),
+        name: joi_1.default.string().trim().min(3).max(80).trim().required(),
+        designation: joi_1.default.string().min(3).max(80).allow(''),
+        companyName: joi_1.default.string().trim().min(3).max(80).allow(''),
+        dialCode: joi_1.default.string().required(),
+        phone: joi_1.default.string().trim().min(8).max(20).trim().required(),
+        email: joi_1.default.string().email().max(60).required(),
+        website: joi_1.default.string().trim().max(80).min(5).allow(''),
+        address: joi_1.default.string().normalize().max(200).required(),
     });
     const value = schema.validate(req.body);
     if (value.error) {
@@ -137,14 +179,17 @@ const affiliateRegValidation = (req, res, next) => __awaiter(void 0, void 0, voi
     }
     next();
 });
-exports.affiliateRegValidation = affiliateRegValidation;
+exports.updateProfileValidation = updateProfileValidation;
 // ====================================================================================================
 // ====================================================================================================
-const submitReportValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+const editSocialLinksValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const schema = joi_1.default.object({
-        allowReport: joi_1.default.boolean(),
-        phone: joi_1.default.string().min(8).max(20),
-        email: joi_1.default.string().min(5).max(80).email(),
+        socialSites: joi_1.default.array().items({
+            siteId: joi_1.default.number().integer().required(),
+            siteValue: joi_1.default.string().max(100).allow(''),
+            orders: joi_1.default.number().integer(),
+            siteLabel: joi_1.default.string().max(20).allow('')
+        })
     });
     const value = schema.validate(req.body);
     if (value.error) {
@@ -153,34 +198,66 @@ const submitReportValidation = (req, res, next) => __awaiter(void 0, void 0, voi
     }
     next();
 });
-exports.submitReportValidation = submitReportValidation;
+exports.editSocialLinksValidation = editSocialLinksValidation;
 // ====================================================================================================
 // ====================================================================================================
 /*
-    export const updateProfileValidation = async (req: Request,res: Response,next: NextFunction) => {
+export const affiliateRegValidation = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+    
+
+  const schema = Joi.object({
+    legalName: Joi.string().trim().min(3).max(70).required(),
+
+    country: Joi.number().integer().required(),
+
+    phoneNumber: Joi.string().min(8).max(20).required(),
+
+    formOfPayment: Joi.string().trim().required(),
+
+    country_name: Joi.string().trim().required(),
+
+    email: Joi.string()
+      .email( )
+      .required(),
+  });
+
+  const value = schema.validate(req.body);
+
+  if (value.error) {
+    const errMsg = await validationCheck(value);
+    return await apiResponse.errorMessage(res,400, errMsg);
+  }
+  next();
+};
+*/
+// ====================================================================================================
+// ====================================================================================================
+/*
+  export const submitReportValidation = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
  
-    
-        const schema = Joi.object({
-            name: Joi.string().trim().min(3).max(80).trim().required(),
-            username: Joi.string().trim().min(3).max(50).required(),
-            country: Joi.number().integer(),
-            phone: Joi.string().trim().min(8).max(20).required(),
-            country_name : Joi.string().trim().required(),
-            gender: Joi.string().trim().max(9).allow(''),
-            email: Joi.string().email( ).max(60).required(),
-            website: Joi.string().trim().max(50).allow(''),
-            profile_picture : Joi.string().trim().allow(''),
-            dial_code: Joi.string().required()
-        });
-   
-        const value = schema.validate(req.body);
-    
-        if (value.error) {
-        const errMsg = await validationCheck(value);
-        return await apiResponse.errorMessage(res,400, errMsg);
-        }
-        next();
-    };
+  
+    const schema = Joi.object({
+        allowReport: Joi.boolean(),
+      phone: Joi.string().min(8).max(20),
+      email: Joi.string().min(5).max(80).email(),
+    });
+
+    const value = schema.validate(req.body);
+  
+    if (value.error) {
+      const errMsg = await validationCheck(value);
+      return await apiResponse.errorMessage(res,400, errMsg);
+    }
+    next();
+  };
 */
 // ====================================================================================================
 // ====================================================================================================
@@ -225,76 +302,6 @@ exports.submitReportValidation = submitReportValidation;
 // ====================================================================================================
 // ====================================================================================================
 /*
-    export const purchaseValidation = async (req: Request,res: Response,next: NextFunction) => {
-
-        const schema = Joi.object({
-            
-        orderType: Joi.string().min(3).max(10).required(),
-        coinReedem: Joi.boolean().required(),
-        reedemCoins:{
-            coins: Joi.number().min(200).allow(null).allow('').optional(),
-        },
-        deliveryDetails:{
-            name: Joi.string().trim().min(3).max(80).required(),
-            phoneNumber: Joi.string().trim().min(8).max(20).required(),
-            secondaryPhoneNumber: Joi.string().trim().min(8).max(20).allow(''),
-            email : Joi.string().email().max(80).required(),
-            country : Joi.string().trim().required(),
-            locality: Joi.string().normalize().max(50).required(),
-            address: Joi.string().normalize().max(200).required(),
-            zipCode: Joi.number().min(999).max(9999999).required(),
-            company: Joi.string().allow(null).allow('').optional(),
-            city: Joi.string().allow(null).allow('').optional(),
-            vat_number: Joi.string().allow(null).allow('').optional(),
-        },
-        // designSelection: {
-        //     designType: Joi.string().min(3).max(15).required(),
-        //     data:{
-        //         firstName: Joi.string().min(3).max(40).allow(''),
-        //         lastName: Joi.string().min(3).max(40).allow(''),
-        //         companyName: Joi.string().min(3).max(80).allow(''),
-        //         designation: Joi.string().min(3).max(80).allow(''),
-        //         tagline: Joi.string().min(3).max(120).allow(''),
-        //         qrCode: Joi.boolean(),
-        //         companyLogo: Joi.string().min(3).max(300).allow(''),
-        //         email: Joi.string().email( ).max(80).allow(''),
-        //         phone: Joi.string().trim().min(8).max(20).allow(''),
-        //         website: Joi.string().trim().max(80).min(5).allow(''),
-        //     }
-        // },
-        paymentInfo:{
-            username: Joi.string().trim().max(50).allow(''),
-            email: Joi.string().email( ).max(80).allow(''),
-            // packageId: Joi.number().integer().required(),
-            deliveryCharge: Joi.number(),
-            codCharge: Joi.number(),
-            price_currency_code: Joi.string().min(1).max(81).required(),
-            price: Joi.number().required(),
-            designCharge: Joi.number(),
-            paymentType: Joi.string().min(3).max(150).allow(''),
-            txnId: Joi.string(),
-            status: Joi.string().min(1).max(2500)
-        },
-        orderlist: Joi.array()
-        .items({
-            product_id: Joi.number(),
-            qty: Joi.number(),
-            sub_total: Joi.string(),
-        })
-        });
-
-        const value = schema.validate(req.body);
-    
-        if (value.error) {
-        const errMsg = await validationCheck(value);
-        return await apiResponse.errorMessage(res,400, errMsg);
-        }
-        next();
-    };
-*/
-// ====================================================================================================
-// ====================================================================================================
-/*
     export const updateVkardzValidation =async (req:Request, res:Response, next:NextFunction) => {
 
   
@@ -327,94 +334,21 @@ exports.submitReportValidation = submitReportValidation;
 // ====================================================================================================
 // ====================================================================================================
 /*
-    export const activateCardValidation =async (req:Request, res:Response, next:NextFunction) => {
-
-
+export const activateCardValidation =async (req:Request, res:Response, next:NextFunction) => {
         
-            const schema = Joi.object({
-                username : Joi.string().min(1).max(50).trim().required(),
-                code: Joi.number().integer().required()
-            });
+    const schema = Joi.object({
+        username : Joi.string().min(1).max(50).trim().required(),
+        code: Joi.number().integer().required()
+    });
         
-            const value = schema.validate(req.body);
+    const value = schema.validate(req.body);
         
-            if (value.error) {
+    if (value.error) {
             const errMsg = await validationCheck(value);
-            return await apiResponse.errorMessage(res,400, errMsg);
-            }
-            next();
-    }
-*/
-// ====================================================================================================
-// ====================================================================================================
-/*
-    export const editSocialLinksValidation =async (req:Request, res:Response, next:NextFunction) => {
-
-
-        
-            const schema = Joi.object({
-                social_sites:[{
-                    site_id: Joi.number().integer().required(),
-                    site_value: Joi.string().max(100).allow(''),
-                    orders: Joi.number().integer(),
-                    site_label: Joi.string().max(20).allow('')
-                }
-                ]
-            });
-        
-            const value = schema.validate(req.body);
-        
-            if (value.error) {
-            const errMsg = await validationCheck(value);
-            return await apiResponse.errorMessage(res,400, errMsg);
-            }
-            next();
-    }
-*/
-// ====================================================================================================
-// ====================================================================================================
-/*
-    export const cardpurchaseValidation = async (req: Request, res: Response, next: NextFunction) =>{
-        const schema = Joi.object({
-            email: Joi.string().email(),
-            country: Joi.string().trim().required(),
-            phone_number: Joi.string().min(8).max(15).required(),
-            zipcode: Joi.number().min(999).max(9999999).required(),
-            name: Joi.string().trim().min(3).max(70).trim().required(),
-            address:Joi.string().required(),
-            city: Joi.string().required(),
-            company: Joi.string().optional(),
-            vat: Joi.string().optional(),
-            txn_id: Joi.string(),
-
-        });
-        const value = schema.validate(req.body);
-        if (value.error) {
-            const errMsg = await validationCheck(value);
-            return await apiResponse.errorMessage(res, 400, errMsg);
+            return await apiResponse.errorMessage(res,400, errMsg);\
         }
         next();
-    };
-*/
-// ====================================================================================================
-// ====================================================================================================
-/*
-    export const userProductValidation = async (req: Request, res: Response, next: NextFunction) =>{
-        const schema = Joi.object({
-            title: Joi.string().required(),
-            image: Joi.string().trim().optional().allow(''),
-            overview: Joi.string().min(1).max(120).trim().required(),
-            price: Joi.number(),
-            videoLink: Joi.string().allow(null).allow(''),
-            details: Joi.string().allow(null).allow(''),
-        });
-        const value = schema.validate(req.body);
-        if (value.error) {
-            const errMsg = await validationCheck(value);
-            return await apiResponse.errorMessage(res, 400, errMsg);
-        }
-        next();
-    };
+    }
 */
 // ====================================================================================================
 // ====================================================================================================
@@ -566,5 +500,120 @@ const redeemCouponCodeValidation = (req, res, next) => __awaiter(void 0, void 0,
     next();
 });
 exports.redeemCouponCodeValidation = redeemCouponCodeValidation;
+// ====================================================================================================
+// ====================================================================================================
+const aboutUsValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const schema = joi_1.default.object({
+        companyName: joi_1.default.string().trim().required(),
+        year: joi_1.default.string().required(),
+        business: joi_1.default.string().allow("").allow(null),
+        aboutUsDetail: joi_1.default.string().allow("").allow(null),
+        image: joi_1.default.string().trim().allow(''),
+    });
+    const value = schema.validate(req.body);
+    if (value.error) {
+        const errMsg = yield validationCheck(value);
+        return yield apiResponse.errorMessage(res, 400, errMsg);
+    }
+    next();
+});
+exports.aboutUsValidation = aboutUsValidation;
+// ====================================================================================================
+// ====================================================================================================
+const userProductsValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const schema = joi_1.default.object({
+        title: joi_1.default.string().max(50).required(),
+        description: joi_1.default.string().min(1).max(80).trim().required(),
+        price: joi_1.default.string().required(),
+        image: joi_1.default.string().optional().allow(''),
+    });
+    const value = schema.validate(req.body);
+    if (value.error) {
+        const errMsg = yield validationCheck(value);
+        return yield apiResponse.errorMessage(res, 400, errMsg);
+    }
+    next();
+});
+exports.userProductsValidation = userProductsValidation;
+// ====================================================================================================
+// ====================================================================================================
+const purchaseValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const schema = joi_1.default.object({
+        orderType: joi_1.default.string().min(3).max(10).required(),
+        /* coinReedem: Joi.boolean().required(),
+        reedemCoins:{
+            coins: Joi.number().min(200).allow(null).allow('').optional(),
+        },*/
+        deliveryDetails: {
+            name: joi_1.default.string().trim().min(3).max(80).required(),
+            phoneNumber: joi_1.default.string().trim().min(8).max(20).required(),
+            secondaryPhoneNumber: joi_1.default.string().trim().min(8).max(20).allow(''),
+            email: joi_1.default.string().email().max(80).required(),
+            country: joi_1.default.string().trim().required(),
+            locality: joi_1.default.string().normalize().max(50).required(),
+            address: joi_1.default.string().normalize().max(200).required(),
+            pincode: joi_1.default.number().min(999).max(9999999).required(),
+            company: joi_1.default.string().allow(null).allow('').optional(),
+            city: joi_1.default.string().allow(null).allow('').optional(),
+            vat_number: joi_1.default.string().allow(null).allow('').optional(),
+        },
+        /* designSelection: {
+            designType: Joi.string().min(3).max(15).required(),
+            data:{
+                firstName: Joi.string().min(3).max(40).allow(''),
+                lastName: Joi.string().min(3).max(40).allow(''),
+                companyName: Joi.string().min(3).max(80).allow(''),
+                designation: Joi.string().min(3).max(80).allow(''),
+                tagline: Joi.string().min(3).max(120).allow(''),
+                qrCode: Joi.boolean(),
+                companyLogo: Joi.string().min(3).max(300).allow(''),
+                email: Joi.string().email( ).max(80).allow(''),
+                phone: Joi.string().trim().min(8).max(20).allow(''),
+                website: Joi.string().trim().max(80).min(5).allow(''),
+            }
+        },*/
+        paymentInfo: {
+            username: joi_1.default.string().trim().max(50).allow(''),
+            email: joi_1.default.string().email().max(80).allow(''),
+            deliveryCharge: joi_1.default.number(),
+            // packageId: Joi.number().integer().required(),
+            // codCharge: Joi.number(),
+            // designCharge: Joi.number(),
+            price_currency_code: joi_1.default.string().min(1).max(81).required(),
+            price: joi_1.default.number().required(),
+            paymentType: joi_1.default.string().min(3).max(150).allow(''),
+            txnId: joi_1.default.string().allow('').allow(null),
+            status: joi_1.default.string().min(1).max(2500)
+        },
+        orderlist: joi_1.default.array()
+            .items({
+            product_id: joi_1.default.number(),
+            qty: joi_1.default.number(),
+            sub_total: joi_1.default.string(),
+        })
+    });
+    const value = schema.validate(req.body);
+    if (value.error) {
+        const errMsg = yield validationCheck(value);
+        return yield apiResponse.errorMessage(res, 400, errMsg);
+    }
+    next();
+});
+exports.purchaseValidation = purchaseValidation;
+// ====================================================================================================
+// ====================================================================================================
+const setProfilePinValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const schema = joi_1.default.object({
+        isPasswordEnable: joi_1.default.boolean().allow(0, 1).required(),
+        securityPin: joi_1.default.number().integer().min(1).required(),
+    });
+    const value = schema.validate(req.body);
+    if (value.error) {
+        const errMsg = yield validationCheck(value);
+        return yield apiResponse.errorMessage(res, 400, errMsg);
+    }
+    next();
+});
+exports.setProfilePinValidation = setProfilePinValidation;
 // ====================================================================================================
 // ====================================================================================================

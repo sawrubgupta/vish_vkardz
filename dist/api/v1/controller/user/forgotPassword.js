@@ -36,38 +36,33 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.forgotPassword = void 0;
-const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const apiResponse = __importStar(require("../../helper/apiResponse"));
 const db_1 = __importDefault(require("../../../../db"));
 const utility = __importStar(require("../../helper/utility"));
+const md5_1 = __importDefault(require("md5"));
 const forgotPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const email = req.body.email;
         const tempPass = utility.randomString(6);
-        console.log(tempPass);
+        const hash = (0, md5_1.default)(tempPass);
         if (!email)
-            return yield apiResponse.errorMessage(res, 400, "Email required");
+            return apiResponse.errorMessage(res, 400, "Email required");
         const emailCheckSql = `SELECT email, id FROM users where email = '${email}' limit 1`;
         const [rows] = yield db_1.default.query(emailCheckSql);
         if (rows.length > 0) {
-            bcryptjs_1.default.hash(tempPass, 10, (err, hash) => __awaiter(void 0, void 0, void 0, function* () {
-                if (err) {
-                    return apiResponse.errorMessage(res, 400, "Something Went Wrong, Contact Support!!");
-                }
-                const updatePassSql = `Update users Set password = ? where id = ?`;
-                const VALUES = [hash, rows[0].id];
-                const [updatePassword] = yield db_1.default.query(updatePassSql, VALUES);
-                if (updatePassword.affectedRows > 0) {
-                    yield utility.sendMail(email, "Password Reset", "You have requested a new password here it is: " + tempPass);
-                    return yield apiResponse.successResponse(res, "Check your mail inbox for new Password", null);
-                }
-                else {
-                    return yield apiResponse.errorMessage(res, 400, "Something Went Wrong, Please Try again later");
-                }
-            }));
+            const updatePassSql = `Update users Set password = ? where id = ?`;
+            const VALUES = [hash, rows[0].id];
+            const [updatePassword] = yield db_1.default.query(updatePassSql, VALUES);
+            if (updatePassword.affectedRows > 0) {
+                yield utility.sendMail(email, "Password Reset", "You have requested a new password here it is: " + tempPass);
+                return apiResponse.successResponse(res, "Check your mail inbox for new Password", null);
+            }
+            else {
+                return apiResponse.errorMessage(res, 400, "Something Went Wrong, Please Try again later");
+            }
         }
         else {
-            return yield apiResponse.errorMessage(res, 400, "Email not registered with us ! ");
+            return apiResponse.errorMessage(res, 400, "Email not registered with us ! ");
         }
     }
     catch (error) {
@@ -76,5 +71,44 @@ const forgotPassword = (req, res) => __awaiter(void 0, void 0, void 0, function*
     }
 });
 exports.forgotPassword = forgotPassword;
+// ====================================================================================================
+// ====================================================================================================
+/*
+//use bcrypt
+export const forgotPassword =async (req:Request, res:Response) => {
+    try {
+        const email:string = req.body.email;
+        const tempPass:any = utility.randomString(6);
+        
+        if (!email) return apiResponse.errorMessage(res, 400, "Email required");
+
+        const emailCheckSql = `SELECT email, id FROM users where email = '${email}' limit 1`;
+        const [rows]:any = await pool.query(emailCheckSql);
+
+        if (rows.length > 0) {
+            bcrypt.hash(tempPass, 10, async (err, hash) => {
+                if (err) {
+                    return apiResponse.errorMessage(res, 400, "Something Went Wrong, Contact Support!!");
+                }
+                const updatePassSql = `Update users Set password = ? where id = ?`;
+                const VALUES = [hash, rows[0].id]
+                const [updatePassword]:any = await pool.query(updatePassSql, VALUES)
+                
+                if (updatePassword.affectedRows > 0) {
+                    await utility.sendMail(email, "Password Reset", "You have requested a new password here it is: " + tempPass);
+                    return apiResponse.successResponse(res,"Check your mail inbox for new Password",null );
+                } else {
+                    return apiResponse.errorMessage(res,400,"Something Went Wrong, Please Try again later");
+                }
+            })
+        } else {
+            return apiResponse.errorMessage( res, 400, "Email not registered with us ! ");
+        }
+    } catch (error) {
+        console.log(error);
+        return apiResponse.errorMessage(res, 400, "Something went wrong")
+    }
+}
+*/
 // ====================================================================================================
 // ====================================================================================================

@@ -14,7 +14,7 @@ const cardRouter = Router();
 
 cardRouter.get("/getCategory", productController.getCategories);
 cardRouter.get("/productList", productController.getProductByCategoryId);
-cardRouter.post("/purchase", authenticatingToken, validation.purchaseValidation, purchaseController.cardPurchase);
+cardRouter.post("/purchaseCard", authenticatingToken, validation.purchaseValidation, purchaseController.cardPurchase);
 // cardRouter.post("/shipping_method", authenticatingToken, validation.purchaseValidation, cartController.shipping);
 
 // cardRouter.patch("/updatePackage", authenticatingToken, packageController.updatePackage);

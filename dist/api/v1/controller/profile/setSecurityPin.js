@@ -35,21 +35,22 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.setting = void 0;
+exports.removePin = exports.setPin = void 0;
 const db_1 = __importDefault(require("../../../../db"));
 const apiResponse = __importStar(require("../../helper/apiResponse"));
-const setting = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const setPin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userId = res.locals.jwt.userId;
-        const { pushNotificationEnable, emailNotificationEnable, currencyCode, languageSelection } = req.body;
-        const sql = `UPDATE users SET currency_code = ?, push_notification_enable = ?,email_notification_enable = ?, language_selection = ? where id = ?`;
-        const VALUES = [currencyCode, pushNotificationEnable, emailNotificationEnable, languageSelection, userId];
+        const isPasswordEnable = req.body.isPasswordEnable;
+        const securityPin = req.body.securityPin;
+        const sql = `UPDATE users SET is_password_enable = ?, set_password = ? WHERE id = ?`;
+        const VALUES = [isPasswordEnable, securityPin, userId];
         const [rows] = yield db_1.default.query(sql, VALUES);
         if (rows.affectedRows > 0) {
-            return apiResponse.successResponse(res, "Setting updated successfully !", null);
+            return apiResponse.successResponse(res, "Profile Password Added Successfully", null);
         }
         else {
-            return apiResponse.errorMessage(res, 400, "Failed to update setting");
+            return apiResponse.errorMessage(res, 400, "Failed to add profle password");
         }
     }
     catch (error) {
@@ -57,6 +58,26 @@ const setting = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         return apiResponse.errorMessage(res, 400, "Something went wrong");
     }
 });
-exports.setting = setting;
+exports.setPin = setPin;
+// ====================================================================================================
+// ====================================================================================================
+const removePin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const userId = res.locals.jwt.userId;
+        const sql = `UPDATE users SET is_password_enable = 0 WHERE id = ${userId}`;
+        const [rows] = yield db_1.default.query(sql);
+        if (rows.affectedRows > 0) {
+            return apiResponse.successResponse(res, "Profile Pin Remove Successfully", null);
+        }
+        else {
+            return apiResponse.errorMessage(res, 400, "Failed to remove security pin, try again later");
+        }
+    }
+    catch (error) {
+        console.log(error);
+        return apiResponse.errorMessage(res, 400, "Something went wrong");
+    }
+});
+exports.removePin = removePin;
 // ====================================================================================================
 // ====================================================================================================

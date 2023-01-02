@@ -48,6 +48,7 @@ export const cardPurchase =async (req:Request, res:Response) => {
             [rows] = await pool.query(offlineSql, offlineVALUES);
         } 
         
+        const paymentId = rows.insertId;
         let orderListSql:any = `INSERT INTO orderlist(user_id, order_id, product_id, qty, sub_total, created_at) VALUES `;
         let result:any = "";
         
@@ -63,8 +64,14 @@ export const cardPurchase =async (req:Request, res:Response) => {
             }
             const [data]:any = await pool.query(result);
             if (data.affectedRows > 0) {
-                return apiResponse.successResponse(res, "Purchase Successfully!", null);
-            } else {
+                // return apiResponse.successResponse(res, "Purchase Successfully!", null);
+                return res.status(200).json({
+                    status: true,
+                    data: null,
+                    paymentId: paymentId,
+                    message: "Purchase Successfully!"
+                })
+                } else {
                 return apiResponse.errorMessage(res, 400, "Something went wrong,please try again  later or contact our support team");
             }
         } else {

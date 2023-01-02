@@ -5,12 +5,6 @@ import config from "../config/development";
 
 const secretKey:any = config.secretKey; //process.env.SECRET;
 
-// function  jwtGenerateKey(userId:any){
-//     const token = jwt.sign({userId}, secretKey)
-//     return token;
-// }
-
-
 export function authenticatingToken(req:Request, res : Response, next :NextFunction){
 
     const authHeaders = req.headers['authorization'];
@@ -36,3 +30,6 @@ export function authenticatingToken(req:Request, res : Response, next :NextFunct
         next();
     })
 }
+
+// ====================================================================================================
+// ====================================================================================================

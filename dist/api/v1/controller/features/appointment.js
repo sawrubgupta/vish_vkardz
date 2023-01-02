@@ -35,21 +35,49 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.setting = void 0;
+exports.appointmentList = void 0;
 const db_1 = __importDefault(require("../../../../db"));
 const apiResponse = __importStar(require("../../helper/apiResponse"));
-const setting = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const development_1 = __importDefault(require("../../config/development"));
+const appointmentList = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userId = res.locals.jwt.userId;
-        const { pushNotificationEnable, emailNotificationEnable, currencyCode, languageSelection } = req.body;
-        const sql = `UPDATE users SET currency_code = ?, push_notification_enable = ?,email_notification_enable = ?, language_selection = ? where id = ?`;
-        const VALUES = [currencyCode, pushNotificationEnable, emailNotificationEnable, languageSelection, userId];
-        const [rows] = yield db_1.default.query(sql, VALUES);
-        if (rows.affectedRows > 0) {
-            return apiResponse.successResponse(res, "Setting updated successfully !", null);
+        var getPage = req.query.page;
+        var page = parseInt(getPage);
+        if (page === null || page <= 1 || !page) {
+            page = 1;
+        }
+        var page_size = development_1.default.pageSize;
+        const offset = (page - 1) * page_size;
+        const getPageQuery = `SELECT id, start_time, end_time, created_at FROM appointments WHERE user_id = ${userId}`;
+        const [result] = yield db_1.default.query(getPageQuery);
+        const sql = `SELECT id, start_time, end_time, created_at FROM appointments WHERE user_id = ${userId} ORDER BY created_at DESC LIMIT ${page_size} OFFSET ${offset}`;
+        const [rows] = yield db_1.default.query(sql);
+        const getFeatureStatus = `SELECT status FROM users_features WHERE user_id = ${userId} AND feature_id = 10`;
+        const [featureStatus] = yield db_1.default.query(getFeatureStatus);
+        let totalPages = result.length / page_size;
+        let totalPage = Math.ceil(totalPages);
+        if (rows.length > 0) {
+            return res.status(200).json({
+                status: true,
+                data: rows,
+                featureStatus: featureStatus[0].status,
+                totalPage: totalPage,
+                currentPage: page,
+                totalLength: result.length,
+                message: "Data Retrieved Successflly"
+            });
         }
         else {
-            return apiResponse.errorMessage(res, 400, "Failed to update setting");
+            return res.status(200).json({
+                status: true,
+                data: null,
+                featureStatus: featureStatus[0].status,
+                totalPage: totalPage,
+                currentPage: page,
+                totalLength: result.length,
+                message: "No Data Found"
+            });
         }
     }
     catch (error) {
@@ -57,6 +85,6 @@ const setting = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         return apiResponse.errorMessage(res, 400, "Something went wrong");
     }
 });
-exports.setting = setting;
+exports.appointmentList = appointmentList;
 // ====================================================================================================
 // ====================================================================================================

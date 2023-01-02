@@ -35,28 +35,27 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.setting = void 0;
+exports.mixingData = void 0;
 const db_1 = __importDefault(require("../../../../db"));
 const apiResponse = __importStar(require("../../helper/apiResponse"));
-const setting = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const mixingData = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const userId = res.locals.jwt.userId;
-        const { pushNotificationEnable, emailNotificationEnable, currencyCode, languageSelection } = req.body;
-        const sql = `UPDATE users SET currency_code = ?, push_notification_enable = ?,email_notification_enable = ?, language_selection = ? where id = ?`;
-        const VALUES = [currencyCode, pushNotificationEnable, emailNotificationEnable, languageSelection, userId];
-        const [rows] = yield db_1.default.query(sql, VALUES);
-        if (rows.affectedRows > 0) {
-            return apiResponse.successResponse(res, "Setting updated successfully !", null);
-        }
-        else {
-            return apiResponse.errorMessage(res, 400, "Failed to update setting");
-        }
+        const geturls = `SELECT slug, url FROM app_setting WHERE status = 1`;
+        const [url] = yield db_1.default.query(geturls);
+        const appVersionQuery = `SELECT * FROM app_update`;
+        const [appVersionData] = yield db_1.default.query(appVersionQuery);
+        // return apiResponse.successResponse(res, "Data Retrieved Successfully", data);\
+        return res.status(200).json({
+            status: true,
+            url, appVersionData,
+            message: "Data Retrieved Successfully"
+        });
     }
     catch (error) {
         console.log(error);
         return apiResponse.errorMessage(res, 400, "Something went wrong");
     }
 });
-exports.setting = setting;
+exports.mixingData = mixingData;
 // ====================================================================================================
 // ====================================================================================================

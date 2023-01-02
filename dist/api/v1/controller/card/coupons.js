@@ -69,6 +69,12 @@ const couponRedemptions = (req, res) => __awaiter(void 0, void 0, void 0, functi
         const userId = res.locals.jwt.userId;
         const { couponCode, totalDiscount } = req.body;
         const createdAt = utility.dateWithFormat();
+        const checkCouponCodeQuery = `SELECT coupon_code, discount_amount, discount_type FROM coupons WHERE coupon_code = ? AND expiration_date >= ?`;
+        const couponVALUES = [couponCode, createdAt];
+        const [couponrows] = yield db_1.default.query(checkCouponCodeQuery, couponVALUES);
+        if (couponrows.length === 0) {
+            return apiResponse.errorMessage(res, 400, "Invalid Coupon Code!!");
+        }
         const sql = `INSERT INTO coupon_redemptions(customer_id, coupon_code, total_discount, redemption_date) VALUES(?, ?, ?, ?)`;
         const VALUES = [userId, couponCode, totalDiscount, createdAt];
         const [rows] = yield db_1.default.query(sql, VALUES);

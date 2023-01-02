@@ -44,7 +44,7 @@ const getVcardProfile = (req, res) => __awaiter(void 0, void 0, void 0, function
         if (!userId || userId === "" || userId === undefined) {
             return apiResponse.errorMessage(res, 404, "User profile not found !");
         }
-        const sql = `SELECT id, username, card_number, full_name, thumb, cover_photo, vcard_layouts,  vcard_bg_color, designation, company_name, display_email, display_dial_code, display_number, website, display_email, address, colors FROM users WHERE id = ${userId} LIMIT 1`;
+        const sql = `SELECT username, card_number, full_name, thumb, cover_photo, vcard_layouts,  vcard_bg_color, designation, company_name, display_email, display_dial_code, display_number, website, display_email, address, colors FROM users WHERE id = ${userId} LIMIT 1`;
         const [userData] = yield db_1.default.query(sql);
         if (userData.length > 0) {
             const getSocialSiteQyery = `SELECT social_sites.id, social_sites.name, social_sites.social_link, social_sites.social_img, social_sites.type, social_sites.status, social_sites.primary_profile, vcard_social_sites.value, vcard_social_sites.orders FROM social_sites INNER JOIN vcard_social_sites on social_sites.id = vcard_social_sites.site_id AND vcard_social_sites.user_id = ${userId} ORDER BY vcard_social_sites.orders IS NULL ASC`;

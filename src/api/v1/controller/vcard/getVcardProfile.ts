@@ -9,7 +9,7 @@ export const getVcardProfile =async (req:Request, res:Response) => {
             return apiResponse.errorMessage(res, 404, "User profile not found !");
         }
 
-        const sql = `SELECT id, username, card_number, full_name, thumb, cover_photo, vcard_layouts,  vcard_bg_color, designation, company_name, display_email, display_dial_code, display_number, website, display_email, address, colors FROM users WHERE id = ${userId} LIMIT 1`;
+        const sql = `SELECT username, card_number, full_name, thumb, cover_photo, vcard_layouts,  vcard_bg_color, designation, company_name, display_email, display_dial_code, display_number, website, display_email, address, colors FROM users WHERE id = ${userId} LIMIT 1`;
         const [userData]:any = await pool.query(sql);
 
         if (userData.length > 0) {

@@ -36,8 +36,11 @@ export const getLayout =async (req:Request, res:Response) => {
 export const updateVcardLayout =async (req:Request, res:Response) => {
     try {
         const userId:string = res.locals.jwt.userId;
-        const { profileColor, styleId } = req.body;
-
+        const profileColor = req.body.profileColor;
+        let styleId = req.body.styleId;
+        if (!styleId || styleId === "") {
+            styleId = 1;
+        }
         const sql = `UPDATE users SET vcard_layouts = ?, vcard_bg_color = ? WHERE id = ?`;
         const VALUES = [styleId, profileColor, userId];
         const [rows]:any = await pool.query(sql, VALUES);

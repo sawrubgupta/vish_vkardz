@@ -105,7 +105,7 @@ const removeFromCart = (req, res) => __awaiter(void 0, void 0, void 0, function*
         }
         const sql = `DELETE FROM cart_details WHERE user_id = ${userId} AND product_id = ${productId}`;
         const [rows] = yield db_1.default.query(sql);
-        return apiResponse.successResponse(res, "Product remove from wishlist", null);
+        return apiResponse.successResponse(res, "Product remove from cart", null);
     }
     catch (error) {
         console.log(error);

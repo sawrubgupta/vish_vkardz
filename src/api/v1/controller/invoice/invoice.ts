@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import puppeteer from 'puppeteer';
+// import puppeteer from 'puppeteer';
 import Handlebars from "handlebars";
 import fs from "fs";
 import path from 'path';
@@ -11,6 +11,7 @@ import config  from '../../config/development';
 
 export const invoice =async (req:Request, res:Response) => {
     try {
+      /*
         const userId:string = res.locals.jwt.userId;
         const paymentId = req.query.paymentId;
         let tr = ``;
@@ -91,8 +92,8 @@ export const invoice =async (req:Request, res:Response) => {
     
     // Close the browser instance
     await browser.close();
-
-    return apiResponse.successResponse(res, "Data Retrieved Successfully", "path");
+*/
+    return apiResponse.successResponse(res, "Data Retrieved Successfully", "not working");
 
     } catch (error) {
         console.log(error);

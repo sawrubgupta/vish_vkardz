@@ -74,7 +74,7 @@ export const removeFromCart =async (req:Request, res:Response) => {
         const sql = `DELETE FROM cart_details WHERE user_id = ${userId} AND product_id = ${productId}`;
         const [rows]:any = await pool.query(sql);
 
-        return apiResponse.successResponse(res, "Product remove from wishlist", null)
+        return apiResponse.successResponse(res, "Product remove from cart", null)
 
     } catch (error) {
         console.log(error);

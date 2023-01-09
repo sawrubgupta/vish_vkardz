@@ -69,3 +69,23 @@ export const getProductByCategoryId =async (req:Request, res:Response) => {
 
 // ====================================================================================================
 // ====================================================================================================
+
+export const productFaq =async (req:Request, res:Response) => {
+    try {
+        const productId = req.query.productId;
+        const sql = `SELECT id, question, description FROM vcard_product_faq WHERE product_id = ${productId}`;
+        const [rows]:any = await pool.query(sql);
+
+        if (rows.length > 0) {
+            return apiResponse.successResponse(res, "Data Retrieved Successfully", rows);
+        } else {
+            return apiResponse.successResponse(res, "No data found", null);
+        }
+    } catch (error) {
+        console.log(error);
+        return apiResponse.errorMessage(res, 400, "Something went wrong");
+    }
+}
+
+// ====================================================================================================
+// ====================================================================================================

@@ -101,7 +101,7 @@ const removeFromCart = (req, res) => __awaiter(void 0, void 0, void 0, function*
         const userId = res.locals.jwt.userId;
         const productId = req.query.productId;
         if (!productId || productId === "" || productId === undefined) {
-            return apiResponse.errorMessage(res, 401, "productId is required!");
+            return apiResponse.errorMessage(res, 400, "productId is required!");
         }
         const sql = `DELETE FROM cart_details WHERE user_id = ${userId} AND product_id = ${productId}`;
         const [rows] = yield db_1.default.query(sql);

@@ -35,6 +35,7 @@ const validation = __importStar(require("../../middleware/validation"));
 const cardRouter = (0, express_1.Router)();
 cardRouter.get("/getCategory", productController.getCategories);
 cardRouter.get("/productList", productController.getProductByCategoryId);
+cardRouter.get("/productsFaq", productController.productFaq);
 cardRouter.post("/purchaseCard", authorization_controller_1.authenticatingToken, validation.purchaseValidation, purchaseController.cardPurchase);
 // cardRouter.post("/shipping_method", authenticatingToken, validation.purchaseValidation, cartController.shipping);
 // cardRouter.patch("/updatePackage", authenticatingToken, packageController.updatePackage);

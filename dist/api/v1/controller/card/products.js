@@ -35,7 +35,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getProductByCategoryId = exports.getCategories = void 0;
+exports.productFaq = exports.getProductByCategoryId = exports.getCategories = void 0;
 const db_1 = __importDefault(require("../../../../db"));
 const apiResponse = __importStar(require("../../helper/apiResponse"));
 const development_1 = __importDefault(require("../../config/development"));
@@ -99,5 +99,25 @@ const getProductByCategoryId = (req, res) => __awaiter(void 0, void 0, void 0, f
     }
 });
 exports.getProductByCategoryId = getProductByCategoryId;
+// ====================================================================================================
+// ====================================================================================================
+const productFaq = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const productId = req.query.productId;
+        const sql = `SELECT id, question, description FROM vcard_product_faq WHERE product_id = ${productId}`;
+        const [rows] = yield db_1.default.query(sql);
+        if (rows.length > 0) {
+            return apiResponse.successResponse(res, "Data Retrieved Successfully", rows);
+        }
+        else {
+            return apiResponse.successResponse(res, "No data found", null);
+        }
+    }
+    catch (error) {
+        console.log(error);
+        return apiResponse.errorMessage(res, 400, "Something went wrong");
+    }
+});
+exports.productFaq = productFaq;
 // ====================================================================================================
 // ====================================================================================================

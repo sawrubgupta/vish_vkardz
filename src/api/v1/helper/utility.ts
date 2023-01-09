@@ -29,6 +29,19 @@ export function randomString (length: number) {
 // ====================================================================================================
 // ====================================================================================================
 
+export function randomNumber (length: number) {
+	var text = "";
+	var possibleChar = "123456789";
+	for (var i = 0; i < length; i++) {
+		var sup = Math.floor(Math.random() * possibleChar.length);
+		text += i > 0 && sup == i ? "0" : possibleChar.charAt(sup);
+	}
+	return Number(text);
+}
+
+// ====================================================================================================
+// ====================================================================================================
+
 export const englishCheck = (english: any) => {
 	var myRegEx = /[^A-Za-z\d]/;
 	if (myRegEx.test(english)) {

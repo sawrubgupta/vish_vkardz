@@ -31,73 +31,61 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __asyncValues = (this && this.__asyncValues) || function (o) {
+    if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
+    var m = o[Symbol.asyncIterator], i;
+    return m ? m.call(o) : (o = typeof __values === "function" ? __values(o) : o[Symbol.iterator](), i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function () { return this; }, i);
+    function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }
+    function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.couponRedemptions = exports.coupnDiscount = void 0;
+exports.businessHourList = exports.addBusinessHour = void 0;
 const db_1 = __importDefault(require("../../../../db"));
 const apiResponse = __importStar(require("../../helper/apiResponse"));
 const utility = __importStar(require("../../helper/utility"));
-const coupnDiscount = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const addBusinessHour = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, e_1, _b, _c;
     try {
         const userId = res.locals.jwt.userId;
-        const couponCode = req.query.couponCode;
-        if (!couponCode || couponCode === "" || couponCode === undefined) {
-            return apiResponse.errorMessage(res, 400, "Please enter a coupon code");
-        }
         const createdAt = utility.dateWithFormat();
-        const checkCouponCodeQuery = `SELECT coupon_code, discount_amount, discount_type FROM coupons WHERE coupon_code = ? AND expiration_date >= ?`;
-        const VALUES = [couponCode, createdAt];
-        const [rows] = yield db_1.default.query(checkCouponCodeQuery, VALUES);
-        if (rows.length === 0) {
-            return apiResponse.errorMessage(res, 400, "Invalid Coupon Code!!");
-        }
-        else {
-            const chekCodeUsedQuery = `SELECT id FROM coupon_redemptions WHERE coupon_code = ? AND customer_id = ?`;
-            const codeVALUES = [couponCode, userId];
-            const [data] = yield db_1.default.query(chekCodeUsedQuery, codeVALUES);
-            if (data.length > 0) {
-                return apiResponse.errorMessage(res, 400, "This coupon code is already used or has expired");
+        const deleteQuery = `DELETE FROM business_hours WHERE user_id = ${userId}`;
+        const [data] = yield db_1.default.query(deleteQuery);
+        let sql = `INSERT INTO business_hours(user_id, days, start_time, end_time, status, created_at) VALUES `;
+        let result = "";
+        try {
+            for (var _d = true, _e = __asyncValues(req.body.businessHours), _f; _f = yield _e.next(), _a = _f.done, !_a;) {
+                _c = _f.value;
+                _d = false;
+                try {
+                    const businessHourData = _c;
+                    const days = businessHourData.days;
+                    const startTime = businessHourData.startTime;
+                    const endTime = businessHourData.endTime;
+                    const status = businessHourData.status;
+                    sql = sql + ` (${userId}, '${days}', '${startTime}', '${endTime}', '${status}', '${createdAt}'), `;
+                    result = sql.substring(0, sql.lastIndexOf(','));
+                }
+                finally {
+                    _d = true;
+                }
             }
-            else {
-                return apiResponse.successResponse(res, "Coupon Code Verified", rows[0]);
+        }
+        catch (e_1_1) { e_1 = { error: e_1_1 }; }
+        finally {
+            try {
+                if (!_d && !_a && (_b = _e.return)) yield _b.call(_e);
             }
+            finally { if (e_1) throw e_1.error; }
         }
-    }
-    catch (error) {
-        console.log(error);
-        return apiResponse.errorMessage(res, 400, "Something went wrong");
-    }
-});
-exports.coupnDiscount = coupnDiscount;
-// ====================================================================================================
-// ====================================================================================================
-const couponRedemptions = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const userId = res.locals.jwt.userId;
-        const { couponCode, totalDiscount } = req.body;
-        const createdAt = utility.dateWithFormat();
-        const checkCouponCodeQuery = `SELECT coupon_code, discount_amount, discount_type FROM coupons WHERE coupon_code = ? AND expiration_date >= ?`;
-        const couponVALUES = [couponCode, createdAt];
-        const [couponrows] = yield db_1.default.query(checkCouponCodeQuery, couponVALUES);
-        if (couponrows.length === 0) {
-            return apiResponse.errorMessage(res, 400, "Invalid Coupon Code!!");
-        }
-        const chekCodeUsedQuery = `SELECT id FROM coupon_redemptions WHERE coupon_code = ? AND customer_id = ?`;
-        const codeVALUES = [couponCode, userId];
-        const [data] = yield db_1.default.query(chekCodeUsedQuery, codeVALUES);
-        if (data.length > 0) {
-            return apiResponse.errorMessage(res, 400, "This coupon code is invalid or has expired");
-        }
-        const sql = `INSERT INTO coupon_redemptions(customer_id, coupon_code, total_discount, redemption_date) VALUES(?, ?, ?, ?)`;
-        const VALUES = [userId, couponCode, totalDiscount, createdAt];
-        const [rows] = yield db_1.default.query(sql, VALUES);
+        const [rows] = yield db_1.default.query(result);
         if (rows.affectedRows > 0) {
-            return apiResponse.successResponse(res, "Coupon Redeem Sucessfully", null);
+            return yield apiResponse.successResponse(res, "Business Hours Added Successfully", null);
         }
         else {
-            return apiResponse.errorMessage(res, 400, "Failed to reedem coupon");
+            return yield apiResponse.errorMessage(res, 400, "Failed to insert, try again");
         }
     }
     catch (error) {
@@ -105,6 +93,27 @@ const couponRedemptions = (req, res) => __awaiter(void 0, void 0, void 0, functi
         return apiResponse.errorMessage(res, 400, "Something went wrong");
     }
 });
-exports.couponRedemptions = couponRedemptions;
+exports.addBusinessHour = addBusinessHour;
+// ====================================================================================================
+// ====================================================================================================
+const businessHourList = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const userId = res.locals.jwt.userId;
+        const sql = `SELECT * FROM business_hours WHERE user_id = ${userId}`;
+        const [rows] = yield db_1.default.query(sql);
+        if (rows.length > 0) {
+            delete rows[0].user_id;
+            return apiResponse.successResponse(res, "Data Retrieved Successfully", rows);
+        }
+        else {
+            return apiResponse.successResponse(res, "No data found", null);
+        }
+    }
+    catch (error) {
+        console.log(error);
+        return apiResponse.errorMessage(res, 400, "Something went wrong");
+    }
+});
+exports.businessHourList = businessHourList;
 // ====================================================================================================
 // ====================================================================================================

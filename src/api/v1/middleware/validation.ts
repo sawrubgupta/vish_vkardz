@@ -404,31 +404,6 @@ export const enquiryValidation = async(req: Request, res: Response, next: NextFu
 // ====================================================================================================
 // ====================================================================================================
 
-/*
-export const businessHourValidation = async(req: Request, res: Response, next: NextFunction) => {
-    const schema = Joi.object({
-        business_hours: Joi.array().max(7).items(
-            Joi.object({
-                days: Joi.number().required(),
-                start_time: Joi.string().required(),
-                end_time: Joi.string().required(),
-                status: Joi.number().required(),
-            })
-            )
-        })
-        
-
-    const value = schema.validate(req.body);
-    if (value.error) {
-        const errMsg = await validationCheck(value);
-        return await apiResponse.errorMessage(res,400, errMsg);
-    }
-    next();
-}
-*/
-
-// ====================================================================================================
-// ====================================================================================================
 
 /*
 //not used
@@ -576,10 +551,12 @@ export const purchaseValidation = async (req: Request,res: Response,next: NextFu
     
     const schema = Joi.object({
         orderType: Joi.string().min(3).max(10).required(),
-        /* coinReedem: Joi.boolean().required(),
+        coinReedem: Joi.boolean().required().allow(0, 1),
         reedemCoins:{
             coins: Joi.number().min(200).allow(null).allow('').optional(),
-        },*/
+        },
+        isGiftEnable: Joi.boolean().required().allow(0, 1),
+        giftMessage:Joi.string().required().max(200).allow(null).allow(''),
         deliveryDetails:{
             name: Joi.string().trim().min(3).max(80).required(),
             phoneNumber: Joi.string().trim().min(8).max(20).required(),
@@ -619,7 +596,8 @@ export const purchaseValidation = async (req: Request,res: Response,next: NextFu
             price: Joi.number().required(),
             paymentType: Joi.string().min(3).max(150).allow(''),
             txnId: Joi.string().allow('').allow(null),
-            status: Joi.string().min(1).max(2500)
+            status: Joi.string().min(1).max(2500),
+            note: Joi.string().allow('').allow(null)
         },
         orderlist: Joi.array()
         .items({
@@ -656,6 +634,31 @@ export const setProfilePinValidation = async (req:Request, res:Response, next:Ne
     }
     next();
 };
+
+// ====================================================================================================
+// ====================================================================================================
+
+export const businessHourValidation = async(req: Request, res: Response, next: NextFunction) => {
+
+    const schema = Joi.object({
+        businessHours: Joi.array().max(7).items(
+            Joi.object({
+                days: Joi.number().required(),
+                startTime: Joi.string().required(),
+                endTime: Joi.string().required(),
+                status: Joi.number().required(),
+            })
+            )
+        })
+
+    const value = schema.validate(req.body);
+    
+    if (value.error) {
+        const errMsg = await validationCheck(value);
+        return await apiResponse.errorMessage(res,400, errMsg);
+    }
+    next();
+}
 
 // ====================================================================================================
 // ====================================================================================================

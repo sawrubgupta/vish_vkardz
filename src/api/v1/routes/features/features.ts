@@ -6,6 +6,7 @@ import * as productController from '../../controller/features/products';
 import * as gallaryController from '../../controller/features/gallary';
 import * as appointmentController from '../../controller/features/appointment';
 import * as enquiryController from '../../controller/features/enquiry';
+import * as businessHourController from '../../controller/features/businessHour';
 
 import {authenticatingToken} from '../../middleware/authorization.controller';
 import * as validation from '../../middleware/validation';
@@ -23,6 +24,9 @@ featureRouter.post("/addProducts", authenticatingToken, validation.userProductsV
 featureRouter.get("/getProducts", authenticatingToken, productController.getProducts);
 featureRouter.patch("/updateProduct", authenticatingToken, validation.userProductsValidation, productController.updateProduct);
 featureRouter.delete("/deleteProduct", authenticatingToken, productController.deleteProduct);
+
+featureRouter.post("/addBusinessHour", authenticatingToken, validation.businessHourValidation, businessHourController.addBusinessHour);
+featureRouter.get("/businessHour", authenticatingToken, businessHourController.businessHourList);
 
 featureRouter.post("/portfolio", authenticatingToken, gallaryController.gallary);
 featureRouter.get("/getPortfolio", authenticatingToken, gallaryController.getPortfolio);

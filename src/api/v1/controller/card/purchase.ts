@@ -10,18 +10,31 @@ export const cardPurchase =async (req:Request, res:Response) => {
         if (!userId || userId === "" || userId === undefined) {
             return apiResponse.errorMessage(res, 401, "Please login !");
         }
+        // const isReturnPolicyAccepted = req.body.isReturnPolicyAccepted;
+        // if (isReturnPolicyAccepted === 0) {
+        //     return apiResponse.errorMessage(res, 400, "Please Accept return policy");
+        // }
         const createdAt = utility.dateWithFormat();
         var paymentType = '';
-        const { orderType } = req.body;
+        const { orderType, isGiftEnable, giftMessage } = req.body;
         if (orderType !== "online" && orderType !== "offline") {
             return apiResponse.errorMessage(res, 400, "Order type not define");
         }
-        const coinReedem = req.body.coinReedem;
+        // let reedemCoinStatus = req.body.coinReedem;
+        // let coins = req.body.reedemCoins.coins;
         const deliveryDetails = req.body.deliveryDetails;
         const paymentInfo = req.body.paymentInfo;
         const orderlist = req.body.orderlist;
-        let rows:any
+        let rows:any;
 
+        // if (reedemCoinStatus === true) {
+        //     if (coins > 400) {
+        //         coins = 400;
+        //     }
+        //     const reedemCoinQuery = `INSERT INTO reedem_coins (user_id, coins, created_at) VALUES (?, ?, ?)`
+        //     const coinVALUES = [userId, coins, createdAt];
+        //     const [coinRows]:any = await pool.query(reedemCoinQuery, coinVALUES);
+        // }
         if (orderType === "online") {
             if (paymentInfo.paymentType === "stripe") {
                 paymentType = '2';
@@ -33,8 +46,8 @@ export const cardPurchase =async (req:Request, res:Response) => {
                 paymentType = '1';
             }
 
-            const sql = `INSERT INTO all_payment_info(txn_id, user_id, username, email, currency_code, price, name, phone_number, locality, country, city, address, pincode, contact_info, delivery_charges, payment_type, vat_num, status, created_at, approve_time) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-            const VALUES = [paymentInfo.txnId, userId, paymentInfo.username, paymentInfo.email, paymentInfo.price_currency_code, paymentInfo.price, deliveryDetails.name, deliveryDetails.phoneNumber, deliveryDetails.locality, deliveryDetails.country, deliveryDetails.city, deliveryDetails.address, deliveryDetails.pincode, deliveryDetails.email, paymentInfo.deliveryCharge, paymentType, deliveryDetails.vat_number, paymentInfo.status, createdAt, '0000-00-00 00:00:00'];
+            const sql = `INSERT INTO all_payment_info(txn_id, user_id, username, email, currency_code, price, name, phone_number, locality, country, city, address, pincode, contact_info, delivery_charges, payment_type, vat_num, note, is_gift_enable, gift_message, status, created_at, approve_time) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+            const VALUES = [paymentInfo.txnId, userId, paymentInfo.username, paymentInfo.email, paymentInfo.price_currency_code, paymentInfo.price, deliveryDetails.name, deliveryDetails.phoneNumber, deliveryDetails.locality, deliveryDetails.country, deliveryDetails.city, deliveryDetails.address, deliveryDetails.pincode, deliveryDetails.email, paymentInfo.deliveryCharge, paymentType, deliveryDetails.vat_number, paymentInfo.note, isGiftEnable, giftMessage, paymentInfo.status, createdAt, '0000-00-00 00:00:00'];
             [rows] = await pool.query(sql, VALUES);
 
         } else {
@@ -43,8 +56,8 @@ export const cardPurchase =async (req:Request, res:Response) => {
             const offlineTrx = 'op-' + randomAlhpa + '-' + randomNum;
             const paymentType = 1;
 
-            const offlineSql = `INSERT INTO all_payment_info(user_id, txn_id, username, email, currency_code, price, name, phone_number, locality, country, city, address, pincode, contact_info, delivery_charges, payment_type, vat_num, status, created_at, approve_time) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-            const offlineVALUES = [userId, offlineTrx, paymentInfo.username, paymentInfo.email, paymentInfo.price_currency_code, paymentInfo.price, deliveryDetails.name, deliveryDetails.phoneNumber, deliveryDetails.locality, deliveryDetails.country, deliveryDetails.city, deliveryDetails.address, deliveryDetails.pincode, deliveryDetails.email, paymentInfo.deliveryCharge, paymentType, deliveryDetails.vat_number, paymentInfo.status, createdAt, '0000-00-00 00:00:00'];
+            const offlineSql = `INSERT INTO all_payment_info(user_id, txn_id, username, email, currency_code, price, name, phone_number, locality, country, city, address, pincode, contact_info, delivery_charges, payment_type, vat_num, note, is_gift_enable, gift_message, status, created_at, approve_time) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+            const offlineVALUES = [userId, offlineTrx, paymentInfo.username, paymentInfo.email, paymentInfo.price_currency_code, paymentInfo.price, deliveryDetails.name, deliveryDetails.phoneNumber, deliveryDetails.locality, deliveryDetails.country, deliveryDetails.city, deliveryDetails.address, deliveryDetails.pincode, deliveryDetails.email, paymentInfo.deliveryCharge, paymentType, deliveryDetails.vat_number, paymentInfo.note, isGiftEnable, giftMessage, paymentInfo.status, createdAt, '0000-00-00 00:00:00'];
             [rows] = await pool.query(offlineSql, offlineVALUES);
         } 
         

@@ -11,7 +11,7 @@ export const gallary =async (req:Request, res:Response) => {
         const createdAt = utility.dateWithFormat();
         const image = req.body.image;
         if (!image || image === "" || image === undefined) {
-            return apiResponse.errorMessage(res, 401, "Please Upload Image");
+            return apiResponse.errorMessage(res, 400, "Please Upload Image");
         }
 
         const sql = `INSERT INTO portfolio(user_id, image, thumb, status, created_at) VALUES(?, ?, ?, ?, ?)`;

@@ -68,7 +68,7 @@ export const removeFromCart =async (req:Request, res:Response) => {
         const userId:string = res.locals.jwt.userId;
         const productId = req.query.productId;
         if (!productId || productId === "" || productId === undefined) {
-            return apiResponse.errorMessage(res, 401, "productId is required!");
+            return apiResponse.errorMessage(res, 400, "productId is required!");
         }
 
         const sql = `DELETE FROM cart_details WHERE user_id = ${userId} AND product_id = ${productId}`;

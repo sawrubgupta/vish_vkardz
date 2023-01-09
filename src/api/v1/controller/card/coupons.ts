@@ -6,6 +6,7 @@ import * as utility from "../../helper/utility";
 
 export const coupnDiscount =async (req:Request, res:Response) => {
     try {
+        const userId = res.locals.jwt.userId;
         const couponCode = req.query.couponCode;
         if (!couponCode || couponCode === "" || couponCode === undefined) {
             return apiResponse.errorMessage(res, 400, "Please enter a coupon code");
@@ -20,7 +21,15 @@ export const coupnDiscount =async (req:Request, res:Response) => {
         if (rows.length === 0) {
             return apiResponse.errorMessage(res, 400, "Invalid Coupon Code!!");
         } else {
-            return apiResponse.successResponse(res, "Coupon Code Verified", rows[0]);
+            const chekCodeUsedQuery = `SELECT id FROM coupon_redemptions WHERE coupon_code = ? AND customer_id = ?`;
+            const codeVALUES = [couponCode, userId];
+            const [data]:any = await pool.query(chekCodeUsedQuery, codeVALUES);
+
+            if (data.length > 0) {
+                return apiResponse.errorMessage(res, 400, "This coupon code is already used or has expired")
+            } else {
+                return apiResponse.successResponse(res, "Coupon Code Verified", rows[0]);
+            }
         }
 
     } catch (error) {
@@ -44,6 +53,14 @@ export const couponRedemptions =async (req:Request, res:Response) => {
         
         if (couponrows.length === 0) {
             return apiResponse.errorMessage(res, 400, "Invalid Coupon Code!!");
+        }
+
+        const chekCodeUsedQuery = `SELECT id FROM coupon_redemptions WHERE coupon_code = ? AND customer_id = ?`;
+        const codeVALUES = [couponCode, userId];
+        const [data]:any = await pool.query(chekCodeUsedQuery, codeVALUES);
+
+        if (data.length > 0) {
+            return apiResponse.errorMessage(res, 400, "This coupon code is invalid or has expired")
         }
 
         const sql = `INSERT INTO coupon_redemptions(customer_id, coupon_code, total_discount, redemption_date) VALUES(?, ?, ?, ?)`;

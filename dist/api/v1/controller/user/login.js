@@ -86,7 +86,7 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             }
         }
         else {
-            return apiResponse.errorMessage(res, 404, "Unfortunately, Email and Password is incorrect !");
+            return apiResponse.errorMessage(res, 400, "Unfortunately, Email and Password is incorrect !");
         }
     }
     catch (error) {
@@ -144,7 +144,7 @@ const socialLogin = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
                 }
             }
             else {
-                return apiResponse.errorMessage(res, 404, "Unfortunately, Email and Password is incorrect !");
+                return apiResponse.errorMessage(res, 400, "Unfortunately, Email and Password is incorrect !");
             }
         }
         else if (type === "facebook") {

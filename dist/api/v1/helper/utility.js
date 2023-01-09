@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.jwtGenerate = exports.sendMail = exports.extendedDateWithFormat = exports.dateWithFormat = exports.validateEmail = exports.englishCheck = exports.randomString = exports.maxChecker = void 0;
+exports.jwtGenerate = exports.sendMail = exports.extendedDateWithFormat = exports.dateWithFormat = exports.validateEmail = exports.englishCheck = exports.randomNumber = exports.randomString = exports.maxChecker = void 0;
 const moment_1 = __importDefault(require("moment"));
 const nodemailer_1 = __importDefault(require("nodemailer"));
 const development_1 = __importDefault(require("../config/development"));
@@ -40,6 +40,18 @@ function randomString(length) {
     return text;
 }
 exports.randomString = randomString;
+// ====================================================================================================
+// ====================================================================================================
+function randomNumber(length) {
+    var text = "";
+    var possibleChar = "123456789";
+    for (var i = 0; i < length; i++) {
+        var sup = Math.floor(Math.random() * possibleChar.length);
+        text += i > 0 && sup == i ? "0" : possibleChar.charAt(sup);
+    }
+    return Number(text);
+}
+exports.randomNumber = randomNumber;
 // ====================================================================================================
 // ====================================================================================================
 const englishCheck = (english) => {

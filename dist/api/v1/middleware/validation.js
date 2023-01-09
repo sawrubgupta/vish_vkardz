@@ -35,7 +35,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.setProfilePinValidation = exports.purchaseValidation = exports.userProductsValidation = exports.aboutUsValidation = exports.redeemCouponCodeValidation = exports.deliveryAddressValidation = exports.customizeCardValidation = exports.cartValidation = exports.editSocialLinksValidation = exports.updateProfileValidation = exports.settingValidation = exports.changePasswordValidation = exports.socialLoginValidation = exports.loginValidation = exports.socialRegistrationValidation = exports.registrationValidation = void 0;
+exports.businessHourValidation = exports.setProfilePinValidation = exports.purchaseValidation = exports.userProductsValidation = exports.aboutUsValidation = exports.redeemCouponCodeValidation = exports.deliveryAddressValidation = exports.customizeCardValidation = exports.cartValidation = exports.editSocialLinksValidation = exports.updateProfileValidation = exports.settingValidation = exports.changePasswordValidation = exports.socialLoginValidation = exports.loginValidation = exports.socialRegistrationValidation = exports.registrationValidation = void 0;
 const apiResponse = __importStar(require("../helper/apiResponse"));
 const joi_1 = __importDefault(require("joi"));
 function validationCheck(value) {
@@ -392,30 +392,6 @@ export const enquiryValidation = async(req: Request, res: Response, next: NextFu
 // ====================================================================================================
 // ====================================================================================================
 /*
-export const businessHourValidation = async(req: Request, res: Response, next: NextFunction) => {
-    const schema = Joi.object({
-        business_hours: Joi.array().max(7).items(
-            Joi.object({
-                days: Joi.number().required(),
-                start_time: Joi.string().required(),
-                end_time: Joi.string().required(),
-                status: Joi.number().required(),
-            })
-            )
-        })
-        
-
-    const value = schema.validate(req.body);
-    if (value.error) {
-        const errMsg = await validationCheck(value);
-        return await apiResponse.errorMessage(res,400, errMsg);
-    }
-    next();
-}
-*/
-// ====================================================================================================
-// ====================================================================================================
-/*
 //not used
 export const wishlistValidation = async(req: Request, res: Response, next: NextFunction) => {
     const schema = Joi.object({
@@ -540,10 +516,12 @@ exports.userProductsValidation = userProductsValidation;
 const purchaseValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const schema = joi_1.default.object({
         orderType: joi_1.default.string().min(3).max(10).required(),
-        /* coinReedem: Joi.boolean().required(),
-        reedemCoins:{
-            coins: Joi.number().min(200).allow(null).allow('').optional(),
-        },*/
+        coinReedem: joi_1.default.boolean().required().allow(0, 1),
+        reedemCoins: {
+            coins: joi_1.default.number().min(200).allow(null).allow('').optional(),
+        },
+        isGiftEnable: joi_1.default.boolean().required().allow(0, 1),
+        giftMessage: joi_1.default.string().required().max(200).allow(null).allow(''),
         deliveryDetails: {
             name: joi_1.default.string().trim().min(3).max(80).required(),
             phoneNumber: joi_1.default.string().trim().min(8).max(20).required(),
@@ -583,7 +561,8 @@ const purchaseValidation = (req, res, next) => __awaiter(void 0, void 0, void 0,
             price: joi_1.default.number().required(),
             paymentType: joi_1.default.string().min(3).max(150).allow(''),
             txnId: joi_1.default.string().allow('').allow(null),
-            status: joi_1.default.string().min(1).max(2500)
+            status: joi_1.default.string().min(1).max(2500),
+            note: joi_1.default.string().allow('').allow(null)
         },
         orderlist: joi_1.default.array()
             .items({
@@ -615,5 +594,24 @@ const setProfilePinValidation = (req, res, next) => __awaiter(void 0, void 0, vo
     next();
 });
 exports.setProfilePinValidation = setProfilePinValidation;
+// ====================================================================================================
+// ====================================================================================================
+const businessHourValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const schema = joi_1.default.object({
+        businessHours: joi_1.default.array().max(7).items(joi_1.default.object({
+            days: joi_1.default.number().required(),
+            startTime: joi_1.default.string().required(),
+            endTime: joi_1.default.string().required(),
+            status: joi_1.default.number().required(),
+        }))
+    });
+    const value = schema.validate(req.body);
+    if (value.error) {
+        const errMsg = yield validationCheck(value);
+        return yield apiResponse.errorMessage(res, 400, errMsg);
+    }
+    next();
+});
+exports.businessHourValidation = businessHourValidation;
 // ====================================================================================================
 // ====================================================================================================

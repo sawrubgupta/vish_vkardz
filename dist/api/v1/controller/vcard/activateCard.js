@@ -42,7 +42,7 @@ const apiResponse = __importStar(require("../../helper/apiResponse"));
 const activateCard = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userId = res.locals.jwt.userId;
-        if (userId === undefined) {
+        if (userId === undefined || !userId) {
             return apiResponse.errorMessage(res, 400, "Please re-login!!");
         }
         const justDate = utility.dateWithFormat();

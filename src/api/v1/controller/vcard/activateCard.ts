@@ -6,7 +6,7 @@ import * as apiResponse from '../../helper/apiResponse';
 export const activateCard =async (req:Request, res:Response) => {
     try {
         const userId:string = res.locals.jwt.userId;
-        if (userId === undefined) {
+        if (userId === undefined || !userId) {
             return apiResponse.errorMessage(res, 400, "Please re-login!!")
         }
         const justDate = utility.dateWithFormat();

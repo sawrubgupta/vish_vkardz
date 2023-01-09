@@ -55,7 +55,7 @@ export const login =async (req:Request, res:Response) => {
                 return apiResponse.errorMessage(res, 400, "Failed to login, try again")
             }
         } else {
-            return apiResponse.errorMessage(res, 404, "Unfortunately, Email and Password is incorrect !");
+            return apiResponse.errorMessage(res, 400, "Unfortunately, Email and Password is incorrect !");
         }
     } catch (error) {
         console.log(error);
@@ -117,7 +117,7 @@ export const socialLogin =async (req:Request, res:Response) => {
                     return apiResponse.errorMessage(res, 400, "Failed to login, try again")
                 }
             } else {
-                return apiResponse.errorMessage(res, 404, "Unfortunately, Email and Password is incorrect !");
+                return apiResponse.errorMessage(res, 400, "Unfortunately, Email and Password is incorrect !");
             }
         } else if (type === "facebook") {
            const sql = `SELECT username FROM users WHERE facebook_id = '${socialId}' LIMIT 1`;

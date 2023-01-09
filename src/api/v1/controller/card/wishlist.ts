@@ -13,7 +13,7 @@ export const addToWishlist =async (req:Request, res:Response) => {
         const createdAt = utility.dateWithFormat();
         const productId = req.query.productId;
         if (!productId || productId === "" || productId === undefined) {
-            return apiResponse.errorMessage(res, 401, "productId is required!");
+            return apiResponse.errorMessage(res, 400, "productId is required!");
         }
 
         const sql = `INSERT INTO wishlist(user_id, product_id, created_at) VALUES(?, ?, ?)`;
@@ -84,7 +84,7 @@ export const removeFromWishlist =async (req:Request, res:Response) => {
         const userId:string = res.locals.jwt.userId;
         const productId = req.query.productId;
         if (!productId || productId === "" || productId === undefined) {
-            return apiResponse.errorMessage(res, 401, "productId is required!");
+            return apiResponse.errorMessage(res, 400, "productId is required!");
         }
 
         const sql = `DELETE FROM wishlist WHERE user_id = ${userId} AND product_id = ${productId}`;

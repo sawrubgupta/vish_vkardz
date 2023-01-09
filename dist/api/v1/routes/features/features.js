@@ -30,6 +30,7 @@ const productController = __importStar(require("../../controller/features/produc
 const gallaryController = __importStar(require("../../controller/features/gallary"));
 const appointmentController = __importStar(require("../../controller/features/appointment"));
 const enquiryController = __importStar(require("../../controller/features/enquiry"));
+const businessHourController = __importStar(require("../../controller/features/businessHour"));
 const authorization_controller_1 = require("../../middleware/authorization.controller");
 const validation = __importStar(require("../../middleware/validation"));
 const featureRouter = (0, express_1.Router)();
@@ -42,6 +43,8 @@ featureRouter.post("/addProducts", authorization_controller_1.authenticatingToke
 featureRouter.get("/getProducts", authorization_controller_1.authenticatingToken, productController.getProducts);
 featureRouter.patch("/updateProduct", authorization_controller_1.authenticatingToken, validation.userProductsValidation, productController.updateProduct);
 featureRouter.delete("/deleteProduct", authorization_controller_1.authenticatingToken, productController.deleteProduct);
+featureRouter.post("/addBusinessHour", authorization_controller_1.authenticatingToken, validation.businessHourValidation, businessHourController.addBusinessHour);
+featureRouter.get("/businessHour", authorization_controller_1.authenticatingToken, businessHourController.businessHourList);
 featureRouter.post("/portfolio", authorization_controller_1.authenticatingToken, gallaryController.gallary);
 featureRouter.get("/getPortfolio", authorization_controller_1.authenticatingToken, gallaryController.getPortfolio);
 featureRouter.delete("/deletePortfolio", authorization_controller_1.authenticatingToken, gallaryController.deleteImage);

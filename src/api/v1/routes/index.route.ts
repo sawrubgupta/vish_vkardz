@@ -8,10 +8,11 @@ import uploadRoute from "../controller/uploadFile/uploadFile";
 import featuresRoute from "./features/features";
 import profileRoute from "./profile/profile";
 import invoiceRoute from "./invoice/invoice";
+import orderRoute from "./order/order"
+import referralRoute from "./referral/refer";
 
 // import staticDataRoute from "./static_data/staticData"
 // import subscriptionRoute from "./subscription/subscription"
-// import orderRoute from "./order/order"
 // import vkardzRoute from "./vkardz/vkardz"
 // import affiliateRoute from "./affiliate/affiliate";
 // import cardRoute from "./cart/card";
@@ -30,10 +31,11 @@ indexRoute.use("/dashboard", dashboardRoute);
 indexRoute.use("/features", featuresRoute);
 indexRoute.use("/profile",profileRoute);
 indexRoute.use("/invoice", invoiceRoute);
+indexRoute.use("/order",orderRoute);
+indexRoute.use("/refer", referralRoute);
 
 // indexRoute.use("/staticData",staticDataRoute);
 // indexRoute.use("/subscription",subscriptionRoute);
-// indexRoute.use("/order",orderRoute);
 // indexRoute.use("/vkardz",vkardzRoute);
 // indexRoute.use("/affiliate", affiliateRoute);
 // // indexRoute.use("/aboutUs", aboutusRoute);

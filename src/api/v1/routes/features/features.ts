@@ -33,7 +33,11 @@ featureRouter.get("/getPortfolio", authenticatingToken, gallaryController.getPor
 featureRouter.delete("/deletePortfolio", authenticatingToken, gallaryController.deleteImage);
 
 featureRouter.get("/getAppointments", authenticatingToken, appointmentController.appointmentList);
+featureRouter.delete("/deleteAppointment", authenticatingToken, appointmentController.deleteAppointment);
+featureRouter.post("/manageAppointment", authenticatingToken, appointmentController.manageAppointment);
 
 featureRouter.get("/enquiryList", authenticatingToken, enquiryController.enquiryList);
+featureRouter.delete("/deleteEnquiry", authenticatingToken, enquiryController.deleteEnquiry);
+featureRouter.post("/replyEnquiry", authenticatingToken, enquiryController.replyEnquiry);
 
 export default featureRouter;

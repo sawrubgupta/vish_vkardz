@@ -16,10 +16,10 @@ export const appointmentList =async (req:Request, res:Response) => {
         var page_size: any = config.pageSize;       
         const offset = (page - 1 ) * page_size;
 
-        const getPageQuery = `SELECT id, start_time, end_time, created_at FROM appointments WHERE user_id = ${userId}`;
+        const getPageQuery = `SELECT id, title, email, ap_date, ap_time, status, created_at FROM my_appointments WHERE user_id = ${userId}`;
         const [result]:any= await pool.query(getPageQuery);
 
-        const sql = `SELECT id, start_time, end_time, created_at FROM appointments WHERE user_id = ${userId} ORDER BY created_at DESC LIMIT ${page_size} OFFSET ${offset}`;
+        const sql = `SELECT id, title, email, ap_date, ap_time, created_at FROM my_appointments WHERE user_id = ${userId} ORDER BY created_at DESC LIMIT ${page_size} OFFSET ${offset}`;
         const [rows]:any = await pool.query(sql);
 
         const getFeatureStatus = `SELECT status FROM users_features WHERE user_id = ${userId} AND feature_id = 10`;
@@ -48,6 +48,56 @@ export const appointmentList =async (req:Request, res:Response) => {
                 totalLength: result.length,
                 message: "No Data Found"
             })
+        }
+    } catch (error) {
+        console.log(error);
+        return apiResponse.errorMessage(res, 400, "Something went wrong");
+    }
+}
+
+// ====================================================================================================
+// ====================================================================================================
+
+export const deleteAppointment =async (req:Request, res:Response) => {
+    try {
+        const userId:string = res.locals.jwt.userId;
+        const appointmentId = req.body.appointmentId;
+
+        const sql = `DELETE FROM my_appointments WHERE user_id = ? AND id = ?`;
+        const VALUES = [userId, appointmentId];
+        const [rows]:any = await pool.query(sql, VALUES);
+
+        return apiResponse.successResponse(res, "Appointment deleted successfully", null)
+    } catch (error) {
+        console.log(error);
+        return apiResponse.errorMessage(res, 400, "Something went wrong");
+    }
+}
+
+// ====================================================================================================
+// ====================================================================================================
+
+export const manageAppointment =async (req:Request, res:Response) => {
+    try {
+        const userId:string = res.locals.jwt.userId;
+        const appointmentId = req.body.appointmentId;
+        const status = req.body.status;
+
+        const getppointmentQuery = `SELECT title AS name, email, ap_date, ap_time, status, created_at FROM my_appointments WHERE user_id = ${userId} AND id = ${appointmentId} LIMIT 1`;
+        const [appointmentData]:any = await pool.query(getppointmentQuery);
+
+        const sql = `UPDATE my_appointments SET status = ? WHERE user_id = ? AND id = ?`;
+        const VALUES = [status, userId, appointmentId];
+        const [rows]:any = await pool.query(sql, VALUES);
+
+        if (rows.affectedRows > 0) {
+            const email = appointmentData[0].email;
+            const name = appointmentData[0].name
+    
+            await utility.sendMail(email, "Appointment", `${name}, Your appointment was ${status}`);
+            return apiResponse.successResponse(res, "success", null);
+        } else {
+            return apiResponse.errorMessage(res, 400, "Please try again later!!")
         }
     } catch (error) {
         console.log(error);

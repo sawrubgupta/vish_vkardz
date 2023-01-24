@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import pool from '../../../../db';
 import * as apiResponse from '../../helper/apiResponse';
 import * as utility from "../../helper/utility";
-
+import * as notify from "../../helper/notification"
 
 export const cardPurchase =async (req:Request, res:Response) => {
     try {
@@ -77,6 +77,18 @@ export const cardPurchase =async (req:Request, res:Response) => {
             }
             const [data]:any = await pool.query(result);
             if (data.affectedRows > 0) {
+                const getFcm = `SELECT fcm_token FROM users WHERE id = ${userId}`;
+                const [rows]:any = await pool.query(getFcm);
+             
+                let fcm:any;
+                for (const ele of rows) {
+                    fcm = [ele.fcm_token];
+                }
+                var notificationData = {
+                    title:"Order Completion",
+                    body:`Your order received successfully`
+                }
+                const result = await notify.fcmSend(notificationData, fcm, null)
                 // return apiResponse.successResponse(res, "Purchase Successfully!", null);
                 return res.status(200).json({
                     status: true,

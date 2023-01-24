@@ -8,7 +8,7 @@ import * as apiResponse from '../../helper/apiResponse';
 import * as utility from "../../helper/utility";
 import config  from '../../config/development';
 
-
+// not used
 export const invoice =async (req:Request, res:Response) => {
     try {
       /*

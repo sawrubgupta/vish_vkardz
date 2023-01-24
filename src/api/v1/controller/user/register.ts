@@ -8,7 +8,7 @@ import md5 from "md5";
 
 export const register =async (req:Request, res:Response) => {
     try {
-        const { name, email, password, username, dial_code, phone, country, country_name } = req.body;
+        const { name, email, password, username, dial_code, phone, country, fcmToken } = req.body;
         const justDate = utility.dateWithFormat();
         const endDate = utility.extendedDateWithFormat("yearly");
         const qrData = await getQr(username);
@@ -17,10 +17,16 @@ export const register =async (req:Request, res:Response) => {
         let featureStatus:number;
         let featureResult:any;
         const hash = md5(password);
+        let referralCode:any;
+        referralCode = utility.randomString(6);
 
-        const checkUser = `Select email, phone, username from users where email = ? || phone = ? || username = ? limit 1`;
-        const checkUserVALUES = [email, phone, username];
+        const checkUser = `Select email, phone, username, referral_code from users where email = ? || phone = ? || username = ? || referral_code = ? limit 1`;
+        const checkUserVALUES = [email, phone, username, referralCode];
         const [rows]:any = await pool.query(checkUser, checkUserVALUES);
+
+        if (rows[0].referral_code === referralCode) {
+            referralCode = utility.randomString(6);
+        }
 
         const dupli = [];
         if (rows.length > 0) {
@@ -47,8 +53,8 @@ export const register =async (req:Request, res:Response) => {
         const [packageFound]:any = await pool.query(checkPackageQuery);
         if (packageFound.length > 0) {
 
-            const sql = `Insert into users(name, full_name, email, display_email, password, username, dial_code, qr_code, phone, display_dial_code, display_number, country, offer_coin, quick_active_status, is_deactived, is_verify, is_payment, is_active, is_expired, post_time, start_date, login_time, end_date, account_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-            const VALUES = [name, name, email, email, hash, username, dial_code, qrData.data, phone, dial_code, phone, country, 100, 1, 0, 1, 1, 1, 0, justDate, justDate, justDate, endDate, packageFound[0].id];                    
+            const sql = `Insert into users(name, full_name, email, display_email, password, username, dial_code, qr_code, phone, display_dial_code, display_number, country, referral_code, offer_coin, quick_active_status, is_deactived, is_verify, is_payment, is_active, is_expired, post_time, start_date, login_time, end_date, fcm_token, account_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+            const VALUES = [name, name, email, email, hash, username, dial_code, qrData.data, phone, dial_code, phone, country, referralCode, 100, 1, 0, 1, 1, 1, 0, justDate, justDate, justDate, endDate, fcmToken, packageFound[0].id];                    
             const [userData]:any = await pool.query(sql, VALUES);
     
             if (userData.affectedRows > 0) {
@@ -113,12 +119,14 @@ export const register =async (req:Request, res:Response) => {
 
 export const socialRegister =async (req:Request, res:Response) => {
     try {
-        const { name, type, socialId, email, password, username, dial_code, phone, country, country_name } = req.body;
+        const { name, type, socialId, email, password, username, dial_code, phone, country, fcmToken } = req.body;
         const justDate = utility.dateWithFormat();
         const endDate = utility.extendedDateWithFormat("yearly");
         const qrData = await getQr(username);
         let vcardLink = `https://vkardz.com/`;
         const hash = md5(password);
+        let referralCode:any;
+        referralCode = utility.randomString(6);
         let uName;
         let featureStatus:number;
         let featureResult:any;
@@ -146,8 +154,8 @@ export const socialRegister =async (req:Request, res:Response) => {
             return apiResponse.errorMessage(res, 400, "Wrong type passed !");
         }
 
-        const emailSql = `SELECT * FROM users where email = ? or username = ? or phone = ? or facebook_id = ? or google_id = ? or apple_id = ? LIMIT 1`;
-        const emailValues = [email, username, phone, socialId, socialId, socialId]
+        const emailSql = `SELECT * FROM users where email = ? or username = ? or phone = ? or facebook_id = ? or google_id = ? or apple_id = ? or referral_code = ? LIMIT 1`;
+        const emailValues = [email, username, phone, socialId, socialId, socialId, referralCode]
         const [data]:any = await pool.query(emailSql, emailValues);
 
         const dupli = [];
@@ -180,8 +188,8 @@ export const socialRegister =async (req:Request, res:Response) => {
             });
         }
 
-        const sql = `INSERT INTO users(name, full_name, email, display_email, password, username, dial_code, qr_code, phone, display_dial_code, display_number, country, offer_coin, quick_active_status, is_deactived, is_verify, is_payment, is_active, is_expired, post_time, start_date, login_time, end_date, account_type, facebook_id, google_id, apple_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-        const VALUES = [name, name, email, email, hash, username, dial_code, qrData.data, phone, dial_code, phone, country, 100, 1, 0, 1, 1, 1, 0, justDate, justDate, justDate, endDate, 16, facebookId, googleId, appleId];                    
+        const sql = `INSERT INTO users(name, full_name, email, display_email, password, username, dial_code, qr_code, phone, display_dial_code, display_number, country, referral_code, offer_coin, quick_active_status, is_deactived, is_verify, is_payment, is_active, is_expired, post_time, start_date, login_time, end_date, account_type, fcm_token, facebook_id, google_id, apple_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+        const VALUES = [name, name, email, email, hash, username, dial_code, qrData.data, phone, dial_code, phone, country, referralCode, 100, 1, 0, 1, 1, 1, 0, justDate, justDate, justDate, endDate, 16, fcmToken, facebookId, googleId, appleId];                    
         const [userData]:any = await pool.query(sql, VALUES);
 
         if (userData.affectedRows > 0) {

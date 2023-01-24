@@ -57,3 +57,48 @@ export const enquiryList =async (req:Request, res:Response) => {
 
 // ====================================================================================================
 // ====================================================================================================
+
+export const deleteEnquiry =async (req:Request, res:Response) => {
+    try {
+        const userId:string = res.locals.jwt.userId;
+        const enquiryId = req.body.enquiryId;
+
+        const sql = `DELETE FROM user_contacts WHERE user_id = ? AND id = ?`;
+        const VALUES = [userId, enquiryId]
+        const [rows]:any = await pool.query(sql, VALUES)
+
+        return apiResponse.successResponse(res, "Enquiry Deleted Successfuly", null);
+    } catch (error) {
+        console.log(error);
+        return apiResponse.errorMessage(res, 400, "Something ent wrong");
+    }
+}
+
+// ====================================================================================================
+// ====================================================================================================
+
+export const replyEnquiry =async (req:Request, res:Response) => {
+    try {
+        const userId:string = res.locals.jwt.userId;
+        const enquiryId = req.body.enquiryId;
+        const message = req.body.message;
+
+        const sql = `SELECT email FROM user_contacts WHERE user_id = ? AND id = ? LIMIT 1`;
+        const VALUES = [userId, enquiryId];
+        const [rows]:any = await pool.query(sql, VALUES);
+
+        if (rows.length > 0) {
+            const email = rows[0].email
+            await utility.sendMail(email, "testing subject", message);
+            return apiResponse.successResponse(res, "Email Sent Successfully", null);
+        } else {
+            return apiResponse.errorMessage(res, 400, "Enquiry not found");
+        }
+    } catch (error) {
+        console.log(error);
+        return apiResponse.errorMessage(res, 400, "Something went wrong");
+    }
+}
+
+// ====================================================================================================
+// ====================================================================================================

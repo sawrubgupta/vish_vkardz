@@ -15,6 +15,74 @@ fields of ussername and mobile num and password should be empty ?  after registr
 
 name api's 
 
+
+
+database changes:
+
+30-01-2023
+CREATE TABLE `product_rating` (
+  `id` int(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `product_id` int(11) not null,
+  `rating` int(5) NOT NULL,
+  `message` text default NULL,
+  `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP
+)ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+22-01-2023
+ALTER TABLE product_type ADD COLUMN image VARCHAR(255) DEFAULT NULL AFTER pro_cat_slug;
+
+13-01-2022
+ALTER TABLE my_appointments ADD COLUMN status VARCHAR(25) DEFAULT NULL AFTER message;
+
+12-01-2022
+ALTER TABLE users ADD COLUMN referral_code VARCHAR(25) DEFAULT NULL AFTER account_type
+
+CREATE TABLE `referrals` (
+  `id` int(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `referrer_user_id` int(11) NOT NULL,
+  `refer_code` VARCHAR(25) NOT NULL,
+  `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP
+)ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+
+09-01-2022
+ALTER TABLE all_payment_info ADD COLUMN gift_message VARCHAR(250) DEFAULT NULL AFTER is_gift_enable;
+
+
+06-01-2022
+ALTER TABLE all_payment_info ADD COLUMN is_gift_enable tinyint NOT NULL DEFAULT 0 AFTER note;
+
+ALTER TABLE products ADD COLUMN is_todays_deal tinyint not null DEFAULT 0 AFTER alt_title;
+
+04-01-2022
+ALTER TABLE all_payment_info ADD COLUMN note text DEFAULT NULL AFTER payment_type
+
+CREATE TABLE `vcard_product_faq` (
+  `id` int(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  `product_id` int(11) not null,
+  `question` text NOT NULL,
+  `description` text NOT NULL,
+  `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP
+)ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+30-12-2022
+ALTER TABLE users ADD COLUMN facebook_id varchar(200) DEFAULT NULL
+ALTER TABLE users ADD COLUMN google_id varchar(200) DEFAULT NULL
+ALTER TABLE users ADD COLUMN apple_id varchar(200) DEFAULT NULL
+
+29-12-2022
+CREATE TABLE `app_setting` (
+  `id` int(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  `name` VARCHAR(55) NOT NULL,
+  `slug` VARCHAR(55) NOT NULL,
+  `url` VARCHAR(200) NOT NULL,
+  `status` tinyint NOT NULL DEFAULT 1
+)ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+INSERT INTO `app_setting`(`name`, `slug`, `url`) VALUES ('Image','image','https://www.vkardz.com/'),('Terms & Condition','tnc','https://vkardz.com/terms-conditions'),('Privacy Policy','privacy','https://vkardz.com/pages/privacy-policy'),('Disclaimer','disclaimer','https://vkardz.com/pages/disclaimer'),('Refund','refund','https://vkardz.com/pages/refund'),('FAQ','faq','https://vkardz.com/pages/faq'),('Website','website','https://www.vkardz.com/'),('Contact Us','contactus','https://vkardz.com/contacts/')
+
 28-12-2022
 CREATE TABLE `layout_types` (
   `id` int(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
@@ -25,7 +93,14 @@ CREATE TABLE `layout_types` (
 
 ALTER TABLE vkard_layouts ADD COLUMN `type_id` int(11) NOT NULL AFTER id;
 
-before 28-12-2022
+UPDATE vkard_layouts SET type_id = 1 WHERE id IN (1,2)
+UPDATE vkard_layouts SET type_id = 2 WHERE id IN (3,4)
+UPDATE vkard_layouts SET type_id = 3 WHERE id IN (5,6,7)
+UPDATE vkard_layouts SET type_id = 4 WHERE id IN (8)
+UPDATE vkard_layouts SET type_id = 5 WHERE id IN (10,11,12,13)
+
+before 28-12-2022 ==>
+
 CREATE TABLE `wishlist` (
   `id` int(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
   `user_id` int(11) NOT NULL,

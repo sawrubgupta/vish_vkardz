@@ -21,7 +21,9 @@ export const forgotPassword =async (req:Request, res:Response) => {
             const VALUES = [hash, rows[0].id];
             const [updatePassword]:any = await pool.query(updatePassSql, VALUES);
             if (updatePassword.affectedRows > 0) {                    
-                await utility.sendMail(email, "Password Reset", "You have requested a new password here it is: " + tempPass);
+                const result:any = await utility.sendMail(email, "Password Reset", "You have requested a new password here it is: " + tempPass);
+                if (result === false) return apiResponse.errorMessage(res, 400, "Failed to send mail");
+                
                 return apiResponse.successResponse(res,"Check your mail inbox for new Password",null );
             } else {
                 return apiResponse.errorMessage(res,400,"Something Went Wrong, Please Try again later");

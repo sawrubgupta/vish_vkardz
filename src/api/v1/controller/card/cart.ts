@@ -14,11 +14,11 @@ export const addToCart =async (req:Request, res:Response) => {
         const qty = req.body.qty;
         const createdAt = utility.dateWithFormat();
 
-        const checkCartPoducts = `SELECT * FROM cart_details WHERE user_id = ${userId} AND product_id = ${productId}`;
-        const [rows]:any = await pool.query(checkCartPoducts);
+        const checkCartPoducts = `SELECT id FROM cart_details WHERE user_id = ${userId} AND product_id = ${productId} limit 1`;
+        const [cartRows]:any = await pool.query(checkCartPoducts);
 
-        if (rows.length > 0) {
-            return apiResponse.errorMessage(res, 400, "Product already added in cart")
+        if (cartRows.length > 0) {
+            return apiResponse.errorMessage(res, 400, "Product already added in cart!")
         } else {
             const addCartQuery = `INSERT INTO cart_details(user_id, product_id, qty, created_at) VALUES(?, ?, ?, ?)`;
             const VALUES = [userId, productId, qty, createdAt];

@@ -3,12 +3,12 @@ import 'dotenv/config';
 export default {
     smtp:{
         name:"noreply@vkardz.com",
-        host:"mail.vkardz.com", //process.env.SMTP_HOST, 
+        host:"mail.appitronsolutions.com", //process.env.SMTP_HOST, 
         secure: true,//true
         port: 465,//465
         auth: {
-            user: "noreply@vkardz.com", //process.env.SMTP_USER, 
-            pass: "7)W}(-$8-yz$", //process.env.SMTP_PASSWORD, 
+            user: "vishal@appitronsolutions.com", //process.env.SMTP_USER, 
+            pass: "vishal123456", //process.env.SMTP_PASSWORD, 
         },  // here it goes
         tls: {
             rejectUnauthorized: false

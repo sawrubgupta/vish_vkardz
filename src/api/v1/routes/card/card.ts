@@ -5,6 +5,7 @@ import * as wishlistContriller from '../../controller/card/wishlist';
 import * as cartController from '../../controller/card/cart';
 import * as couponCodeController from '../../controller/card/coupons';
 import * as purchaseController from '../../controller/card/purchase';
+import * as ratingController from '../../controller/card/rating';
 // import * as packageController from '../../controller/cart/package';
 
 import {authenticatingToken} from '../../middleware/authorization.controller';
@@ -37,6 +38,10 @@ cardRouter.delete("/deleteAddress", authenticatingToken, cartController.deleteDa
 
 cardRouter.get("/checkCouponCode", authenticatingToken, couponCodeController.coupnDiscount);
 cardRouter.post("/redeemCoupon", authenticatingToken, couponCodeController.couponRedemptions);
+
+cardRouter.post("/productRating", authenticatingToken, validation.productRatingValidation, ratingController.productRating);
+cardRouter.get("/productReviews", ratingController.reviewList);
+cardRouter.patch("/updateReview", authenticatingToken, validation.productRatingValidation, ratingController.updateProductReviews);
 
 export default cardRouter;
 

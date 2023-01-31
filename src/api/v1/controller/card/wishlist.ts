@@ -16,15 +16,23 @@ export const addToWishlist =async (req:Request, res:Response) => {
             return apiResponse.errorMessage(res, 400, "productId is required!");
         }
 
-        const sql = `INSERT INTO wishlist(user_id, product_id, created_at) VALUES(?, ?, ?)`;
-        const VALUES = [userId, productId, createdAt]
-        const [rows]:any = await pool.query(sql, VALUES);
+        const checkCartPoducts = `SELECT id FROM wishlist WHERE user_id = ${userId} AND product_id = ${productId} limit 1`;
+        const [wishlistRows]:any = await pool.query(checkCartPoducts);
 
-        if (rows.affectedRows > 0) {
-            return apiResponse.successResponse(res, "Product added to wishlist", null);
+        if (wishlistRows.length > 0) {
+            return apiResponse.errorMessage(res, 400, "Product already added in wishlist!!");
         } else {
-            return apiResponse.errorMessage(res, 400, "Failed to add product in wishlist, try again");
+            const sql = `INSERT INTO wishlist(user_id, product_id, created_at) VALUES(?, ?, ?)`;
+            const VALUES = [userId, productId, createdAt]
+            const [rows]:any = await pool.query(sql, VALUES);
+    
+            if (rows.affectedRows > 0) {
+                return apiResponse.successResponse(res, "Product added to wishlist", null);
+            } else {
+                return apiResponse.errorMessage(res, 400, "Failed to add product in wishlist, try again");
+            }    
         }
+
     } catch (error) {
         console.log(error);
         return apiResponse.errorMessage(res, 400, "Something went wrong");

@@ -662,3 +662,24 @@ export const businessHourValidation = async(req: Request, res: Response, next: N
 
 // ====================================================================================================
 // ====================================================================================================
+
+
+export const productRatingValidation = async(req: Request, res: Response, next: NextFunction) => {
+
+    const schema = Joi.object({
+        productId: Joi.number().required(),
+        rating: Joi.number().required(),
+        message: Joi.string().allow('').allow(null)
+    })
+
+    const value = schema.validate(req.body);
+    
+    if (value.error) {
+        const errMsg = await validationCheck(value);
+        return await apiResponse.errorMessage(res,400, errMsg);
+    }
+    next();
+}
+
+// ====================================================================================================
+// ====================================================================================================

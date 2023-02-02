@@ -47,9 +47,9 @@ export const updateSocialLinks = async (req:Request, res:Response) => {
             }
         }
         if (data.affectedRows > 0) {
-            return apiResponse.successResponse(res, "Scial link updated successflly", null);
+            return apiResponse.successResponse(res, "Social links updated successfully", null);
         } else {
-            return apiResponse.errorMessage(res, 400, "Failed to update social link, try again later");
+            return apiResponse.errorMessage(res, 400, "Failed to update social link, try again later!");
         }        
 
     } catch (error) {

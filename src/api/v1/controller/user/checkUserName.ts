@@ -30,3 +30,29 @@ export const validUserName =async (req:Request, res:Response) => {
 
 // ====================================================================================================
 // ====================================================================================================
+
+export const checkEmail =async (req:Request, res:Response) => {
+    try {
+        const email = req.query.email;
+        let emailExist:any;
+        if (!email || email === null) {
+            return apiResponse.errorMessage(res, 400, "Enter Valid Email.");
+        }
+        const checkEmailQuery = `Select email from users where email = '${email}' limit 1`;
+        const [rows]:any = await pool.query(checkEmailQuery);
+
+        if (rows.length > 0) {
+            emailExist = 1
+            return apiResponse.successResponse(res, "Email Id already exist!", emailExist);
+        } else {
+            emailExist = 0
+            return apiResponse.successResponse(res, "Email Id Not Registered!", emailExist);
+        }
+    } catch (error) {
+        console.log(error);
+        return apiResponse.errorMessage(res, 400, "Something went wrong");
+    }
+}
+
+// ====================================================================================================
+// ====================================================================================================

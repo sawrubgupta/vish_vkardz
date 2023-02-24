@@ -6,6 +6,7 @@ import { rateLimiterUsingThirdParty } from './api/v1/middleware/rateLimiter';
 import compression from "compression";
 import morgan from 'morgan';
 import helmet from 'helmet';
+import fs from 'fs';
 
 export default function (app: Express) {
     app.use(cors());
@@ -16,9 +17,9 @@ export default function (app: Express) {
     app.set('view engine', 'hbs');
     app.use(morgan('dev'));
   
-    // app.use(morgan('common', {
-    //     stream: fs.createWriteStream(__dirname+ '/access.log', {flags: 'a'})
-    // }));
+    app.use(morgan('common', {
+        stream: fs.createWriteStream(__dirname+ '/access.log', {flags: 'a'})
+    }));
     
     app.use(express.static(__dirname+"./public_html"))
     app.use('/api',rateLimiterUsingThirdParty, apiRouter);

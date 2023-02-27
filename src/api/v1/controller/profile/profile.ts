@@ -25,8 +25,12 @@ export const getProfile =async (req:Request, res:Response) => {
             const getCardQuery = `SELECT products.slug, products.product_image, products.image_back, products.image_other FROM products LEFT JOIN orderlist ON products.product_id = orderlist.product_id WHERE orderlist.user_id = ${userId}`;
             const [cardData]:any = await pool.query(getCardQuery);
 
+            const getThemes = `SELECT users.themes as themeId, vkard_layouts.vkard_style, vkard_layouts.image FROM users LEFT JOIN vkard_layouts ON users.themes = vkard_layouts.id WHERE users.id = ${userId} LIMIT 1`;
+            const [themeData]:any = await pool.query(getThemes);
+
             userRows[0].social_sites = socialRows || [];
             userRows[0].cardData = cardData || [];
+            userRows[0].activeTheme = themeData[0] || {};
 
             return apiResponse.successResponse(res, "Get user profile data!", userRows[0]);
         } else {

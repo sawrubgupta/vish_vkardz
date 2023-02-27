@@ -2,15 +2,40 @@ import { Request, Response, NextFunction } from "express";
 import * as apiResponse from '../../helper/apiResponse';
 import pool from '../../../../db';
 import * as utility from "../../helper/utility";
+import config  from '../../config/development';
 
 export const getSocialLinks =async (req:Request, res:Response) => {
     try {
         const userId: string = res.locals.jwt.userId;
+        let keyword = req.query.keyword;
 
-        const sql = `SELECT social_sites.id, social_sites.name, social_sites.social_link, social_sites.social_img, social_sites.type, social_sites.status, social_sites.primary_profile, social_sites.icon, social_sites.mobile_icon, vcard_social_sites.value, vcard_social_sites.label, vcard_social_sites.orders FROM social_sites LEFT JOIN vcard_social_sites ON social_sites.id = vcard_social_sites.site_id AND vcard_social_sites.user_id = ${userId} ORDER BY  vcard_social_sites.orders IS NULL ASC`;
+        // var getPage:any = req.query.page;
+        // var page = parseInt(getPage);
+        // if (page === null || page <= 1 || !page ) {
+        //     page = 1;
+        // }
+        // var page_size: any = config.pageSize;       
+        // const offset = (page - 1 ) * page_size;
+
+        // const getPageQuery = `SELECT social_sites.id, vcard_social_sites.value FROM social_sites LEFT JOIN vcard_social_sites ON social_sites.id = vcard_social_sites.site_id WHERE vcard_social_sites.user_id = ${userId} AND social_sites.name LIKE '%${keyword}%'`;
+        // const [result]:any= await pool.query(getPageQuery);
+
+        const sql = `SELECT social_sites.id, social_sites.name, social_sites.social_link, social_sites.social_img, social_sites.type, social_sites.status, social_sites.primary_profile, social_sites.icon, social_sites.mobile_icon, vcard_social_sites.value, vcard_social_sites.label, vcard_social_sites.orders FROM social_sites LEFT JOIN vcard_social_sites ON social_sites.id = vcard_social_sites.site_id WHERE vcard_social_sites.user_id = ${userId} AND social_sites.name LIKE '%${keyword}%' ORDER BY vcard_social_sites.value DESC, vcard_social_sites.orders IS NULL ASC`
+        //  limit ${page_size} offset ${offset}`;
         const [socialRows]:any = await pool.query(sql); 
         
+        // let totalPages:any = result.length/page_size;
+        // let totalPage = Math.ceil(totalPages);
+
         return apiResponse.successResponse(res, "List of all social links.", socialRows);
+        // return res.status(200).json({
+        //     status: true,
+        //     data: socialRows,
+        //     totalPage: totalPage,
+        //     currentPage: page,
+        //     totalLength: result.length,
+        //     message: "List of all social links."
+        // })
     } catch (error) {
         console.log(error);
         return apiResponse.errorMessage(res, 400, "Something went wrong");

@@ -47,7 +47,7 @@ export const socialRegistrationValidation = async (req: Request, res: Response, 
         email: Joi.string().email().max(80).required(),
         password: Joi.string().min(3).max(30).required().allow(null).allow(''),
         username: Joi.string().trim().min(2).max(50).required(),
-        country: Joi.number().integer().allow(''),
+        country: Joi.number().integer().required(),
         phone: Joi.string().trim().min(8).max(20).trim().required(),
         country_name : Joi.string().trim().allow(''),
         dial_code: Joi.string().required(),
@@ -172,13 +172,29 @@ export const updateProfileValidation =async (req:Request, res:Response, next:Nex
 export const editSocialLinksValidation =async (req:Request, res:Response, next:NextFunction) => {
     
     const schema = Joi.object({
-        socialSites: Joi.array().items({
-            siteId: Joi.number().integer().required(),
-            siteValue: Joi.string().max(100).allow(''),
-            orders: Joi.number().integer(),
-            siteLabel: Joi.string().max(20).allow('')
-        })
-    });
+        siteId: Joi.number().integer().required(),
+        siteValue: Joi.string().max(100).allow(''),
+        orders: Joi.number().integer(),
+        siteLabel: Joi.string().max(20).allow('')
+    })
+
+    const value = schema.validate(req.body);
+
+    if (value.error) {
+        const errMsg = await validationCheck(value);
+        return await apiResponse.errorMessage(res,400, errMsg);
+    }
+    next();
+}
+
+// ====================================================================================================
+// ====================================================================================================
+
+export const switchAccountValidation =async (req:Request, res:Response, next:NextFunction) => {
+    
+    const schema = Joi.object({
+        isPrivate: Joi.boolean().allow(0, 1).required(),
+    })
 
     const value = schema.validate(req.body);
 
@@ -532,7 +548,7 @@ export const userProductsValidation = async (req:Request, res:Response, next:Nex
         title: Joi.string().max(50).required(),
         description: Joi.string().min(1).max(80).trim().required(),
         price: Joi.string().required(),
-        image: Joi.string().optional().allow(''),
+        image: Joi.string().required(),
     });
 
     const value = schema.validate(req.body);
@@ -674,6 +690,46 @@ export const productRatingValidation = async(req: Request, res: Response, next: 
 
     const value = schema.validate(req.body);
     
+    if (value.error) {
+        const errMsg = await validationCheck(value);
+        return await apiResponse.errorMessage(res,400, errMsg);
+    }
+    next();
+}
+
+// ====================================================================================================
+// ====================================================================================================
+
+export const primaryProfileValidation = async(req: Request, res: Response, next: NextFunction) => {
+
+    const schema = Joi.object({
+        primaryProfileSlug: Joi.string().required(),
+    })
+
+    const value = schema.validate(req.body);
+    
+    if (value.error) {
+        const errMsg = await validationCheck(value);
+        return await apiResponse.errorMessage(res,400, errMsg);
+    }
+    next();
+}
+
+// ====================================================================================================
+// ====================================================================================================
+
+export const updatePackageValidation =async (req:Request, res:Response, next:NextFunction) => {
+    
+    const schema = Joi.object({
+        txnId: Joi.string().required(),
+        priceCurrencyCode: Joi.string().required(),
+        price: Joi.number().required(),
+        paymentType: Joi.string().required(),
+        status: Joi.string().required()
+    })
+
+    const value = schema.validate(req.body);
+
     if (value.error) {
         const errMsg = await validationCheck(value);
         return await apiResponse.errorMessage(res,400, errMsg);

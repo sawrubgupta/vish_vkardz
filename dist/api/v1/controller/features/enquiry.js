@@ -35,9 +35,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.enquiryList = void 0;
+exports.replyEnquiry = exports.deleteEnquiry = exports.enquiryList = void 0;
 const db_1 = __importDefault(require("../../../../db"));
 const apiResponse = __importStar(require("../../helper/apiResponse"));
+const utility = __importStar(require("../../helper/utility"));
 const development_1 = __importDefault(require("../../config/development"));
 const enquiryList = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -49,9 +50,9 @@ const enquiryList = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         }
         var page_size = development_1.default.pageSize;
         const offset = (page - 1) * page_size;
-        const getPageQuery = `SELECT id, name, email, phone_num, msg FROM user_contacts WHERE user_id = ${userId}`;
+        const getPageQuery = `SELECT id, name, email, phone_num, msg, created_at FROM user_contacts WHERE user_id = ${userId}`;
         const [result] = yield db_1.default.query(getPageQuery);
-        const sql = `SELECT id, name, email, phone_num, msg FROM user_contacts WHERE user_id = ${userId} ORDER BY id DESC LIMIT ${page_size} OFFSET ${offset}`;
+        const sql = `SELECT id, name, email, phone_num, msg, created_at FROM user_contacts WHERE user_id = ${userId} ORDER BY id DESC LIMIT ${page_size} OFFSET ${offset}`;
         const [rows] = yield db_1.default.query(sql);
         const getFeatureStatus = `SELECT status FROM users_features WHERE user_id = ${userId} AND feature_id = 11`;
         const [featureStatus] = yield db_1.default.query(getFeatureStatus);
@@ -86,5 +87,47 @@ const enquiryList = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     }
 });
 exports.enquiryList = enquiryList;
+// ====================================================================================================
+// ====================================================================================================
+const deleteEnquiry = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const userId = res.locals.jwt.userId;
+        const enquiryId = req.body.enquiryId;
+        const sql = `DELETE FROM user_contacts WHERE user_id = ? AND id = ?`;
+        const VALUES = [userId, enquiryId];
+        const [rows] = yield db_1.default.query(sql, VALUES);
+        return apiResponse.successResponse(res, "Enquiry Deleted Successfuly", null);
+    }
+    catch (error) {
+        console.log(error);
+        return apiResponse.errorMessage(res, 400, "Something ent wrong");
+    }
+});
+exports.deleteEnquiry = deleteEnquiry;
+// ====================================================================================================
+// ====================================================================================================
+const replyEnquiry = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const userId = res.locals.jwt.userId;
+        const enquiryId = req.body.enquiryId;
+        const message = req.body.message;
+        const sql = `SELECT email FROM user_contacts WHERE user_id = ? AND id = ? LIMIT 1`;
+        const VALUES = [userId, enquiryId];
+        const [rows] = yield db_1.default.query(sql, VALUES);
+        if (rows.length > 0) {
+            const email = rows[0].email;
+            yield utility.sendMail(email, "testing subject", message);
+            return apiResponse.successResponse(res, "Email Sent Successfully", null);
+        }
+        else {
+            return apiResponse.errorMessage(res, 400, "Enquiry not found");
+        }
+    }
+    catch (error) {
+        console.log(error);
+        return apiResponse.errorMessage(res, 400, "Something went wrong");
+    }
+});
+exports.replyEnquiry = replyEnquiry;
 // ====================================================================================================
 // ====================================================================================================

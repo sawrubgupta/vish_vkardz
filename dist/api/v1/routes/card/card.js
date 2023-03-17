@@ -29,6 +29,7 @@ const wishlistContriller = __importStar(require("../../controller/card/wishlist"
 const cartController = __importStar(require("../../controller/card/cart"));
 const couponCodeController = __importStar(require("../../controller/card/coupons"));
 const purchaseController = __importStar(require("../../controller/card/purchase"));
+const ratingController = __importStar(require("../../controller/card/rating"));
 // import * as packageController from '../../controller/cart/package';
 const authorization_controller_1 = require("../../middleware/authorization.controller");
 const validation = __importStar(require("../../middleware/validation"));
@@ -53,4 +54,7 @@ cardRouter.get("/getDeliveryAddress", authorization_controller_1.authenticatingT
 cardRouter.delete("/deleteAddress", authorization_controller_1.authenticatingToken, cartController.deleteDaliveryAddress);
 cardRouter.get("/checkCouponCode", authorization_controller_1.authenticatingToken, couponCodeController.coupnDiscount);
 cardRouter.post("/redeemCoupon", authorization_controller_1.authenticatingToken, couponCodeController.couponRedemptions);
+cardRouter.post("/productRating", authorization_controller_1.authenticatingToken, validation.productRatingValidation, ratingController.productRating);
+cardRouter.get("/productReviews", ratingController.reviewList);
+cardRouter.patch("/updateReview", authorization_controller_1.authenticatingToken, validation.productRatingValidation, ratingController.updateProductReviews);
 exports.default = cardRouter;

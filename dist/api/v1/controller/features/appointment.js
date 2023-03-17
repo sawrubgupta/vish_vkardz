@@ -35,9 +35,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.appointmentList = void 0;
+exports.manageAppointment = exports.deleteAppointment = exports.appointmentList = void 0;
 const db_1 = __importDefault(require("../../../../db"));
 const apiResponse = __importStar(require("../../helper/apiResponse"));
+const utility = __importStar(require("../../helper/utility"));
 const development_1 = __importDefault(require("../../config/development"));
 const appointmentList = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -49,9 +50,9 @@ const appointmentList = (req, res) => __awaiter(void 0, void 0, void 0, function
         }
         var page_size = development_1.default.pageSize;
         const offset = (page - 1) * page_size;
-        const getPageQuery = `SELECT id, start_time, end_time, created_at FROM appointments WHERE user_id = ${userId}`;
+        const getPageQuery = `SELECT id, title, email, ap_date, ap_time, status, created_at FROM my_appointments WHERE user_id = ${userId}`;
         const [result] = yield db_1.default.query(getPageQuery);
-        const sql = `SELECT id, start_time, end_time, created_at FROM appointments WHERE user_id = ${userId} ORDER BY created_at DESC LIMIT ${page_size} OFFSET ${offset}`;
+        const sql = `SELECT id, title, email, ap_date, ap_time, status, created_at FROM my_appointments WHERE user_id = ${userId} ORDER BY created_at DESC LIMIT ${page_size} OFFSET ${offset}`;
         const [rows] = yield db_1.default.query(sql);
         const getFeatureStatus = `SELECT status FROM users_features WHERE user_id = ${userId} AND feature_id = 10`;
         const [featureStatus] = yield db_1.default.query(getFeatureStatus);
@@ -86,5 +87,50 @@ const appointmentList = (req, res) => __awaiter(void 0, void 0, void 0, function
     }
 });
 exports.appointmentList = appointmentList;
+// ====================================================================================================
+// ====================================================================================================
+const deleteAppointment = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const userId = res.locals.jwt.userId;
+        const appointmentId = req.body.appointmentId;
+        const sql = `DELETE FROM my_appointments WHERE user_id = ? AND id = ?`;
+        const VALUES = [userId, appointmentId];
+        const [rows] = yield db_1.default.query(sql, VALUES);
+        return apiResponse.successResponse(res, "Appointment deleted successfully", null);
+    }
+    catch (error) {
+        console.log(error);
+        return apiResponse.errorMessage(res, 400, "Something went wrong");
+    }
+});
+exports.deleteAppointment = deleteAppointment;
+// ====================================================================================================
+// ====================================================================================================
+const manageAppointment = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const userId = res.locals.jwt.userId;
+        const appointmentId = req.body.appointmentId;
+        const status = req.body.status;
+        const getppointmentQuery = `SELECT title AS name, email, ap_date, ap_time, status, created_at FROM my_appointments WHERE user_id = ${userId} AND id = ${appointmentId} LIMIT 1`;
+        const [appointmentData] = yield db_1.default.query(getppointmentQuery);
+        const sql = `UPDATE my_appointments SET status = ? WHERE user_id = ? AND id = ?`;
+        const VALUES = [status, userId, appointmentId];
+        const [rows] = yield db_1.default.query(sql, VALUES);
+        if (rows.affectedRows > 0) {
+            const email = appointmentData[0].email;
+            const name = appointmentData[0].name;
+            yield utility.sendMail(email, "Appointment", `${name}, Your appointment was ${status}`);
+            return apiResponse.successResponse(res, "success", null);
+        }
+        else {
+            return apiResponse.errorMessage(res, 400, "Please try again later!!");
+        }
+    }
+    catch (error) {
+        console.log(error);
+        return apiResponse.errorMessage(res, 400, "Something went wrong");
+    }
+});
+exports.manageAppointment = manageAppointment;
 // ====================================================================================================
 // ====================================================================================================

@@ -19,7 +19,7 @@ export const appointmentList =async (req:Request, res:Response) => {
         const getPageQuery = `SELECT id, title, email, ap_date, ap_time, status, created_at FROM my_appointments WHERE user_id = ${userId}`;
         const [result]:any= await pool.query(getPageQuery);
 
-        const sql = `SELECT id, title, email, ap_date, ap_time, created_at FROM my_appointments WHERE user_id = ${userId} ORDER BY created_at DESC LIMIT ${page_size} OFFSET ${offset}`;
+        const sql = `SELECT id, title, email, ap_date, ap_time, status, created_at FROM my_appointments WHERE user_id = ${userId} ORDER BY created_at DESC LIMIT ${page_size} OFFSET ${offset}`;
         const [rows]:any = await pool.query(sql);
 
         const getFeatureStatus = `SELECT status FROM users_features WHERE user_id = ${userId} AND feature_id = 10`;

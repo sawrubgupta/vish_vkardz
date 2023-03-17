@@ -12,9 +12,12 @@ const uploadFile_1 = __importDefault(require("../controller/uploadFile/uploadFil
 const features_1 = __importDefault(require("./features/features"));
 const profile_1 = __importDefault(require("./profile/profile"));
 const invoice_1 = __importDefault(require("./invoice/invoice"));
+const order_1 = __importDefault(require("./order/order"));
+const refer_1 = __importDefault(require("./referral/refer"));
+const follow_1 = __importDefault(require("./follower/follow"));
+const package_1 = __importDefault(require("./service/package"));
 // import staticDataRoute from "./static_data/staticData"
 // import subscriptionRoute from "./subscription/subscription"
-// import orderRoute from "./order/order"
 // import vkardzRoute from "./vkardz/vkardz"
 // import affiliateRoute from "./affiliate/affiliate";
 // import cardRoute from "./cart/card";
@@ -31,9 +34,12 @@ indexRoute.use("/dashboard", dashboard_1.default);
 indexRoute.use("/features", features_1.default);
 indexRoute.use("/profile", profile_1.default);
 indexRoute.use("/invoice", invoice_1.default);
+indexRoute.use("/order", order_1.default);
+indexRoute.use("/refer", refer_1.default);
+indexRoute.use("/userFollow", follow_1.default);
+indexRoute.use("/service", package_1.default);
 // indexRoute.use("/staticData",staticDataRoute);
 // indexRoute.use("/subscription",subscriptionRoute);
-// indexRoute.use("/order",orderRoute);
 // indexRoute.use("/vkardz",vkardzRoute);
 // indexRoute.use("/affiliate", affiliateRoute);
 // // indexRoute.use("/aboutUs", aboutusRoute);

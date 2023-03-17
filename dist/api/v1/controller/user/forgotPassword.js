@@ -54,7 +54,9 @@ const forgotPassword = (req, res) => __awaiter(void 0, void 0, void 0, function*
             const VALUES = [hash, rows[0].id];
             const [updatePassword] = yield db_1.default.query(updatePassSql, VALUES);
             if (updatePassword.affectedRows > 0) {
-                yield utility.sendMail(email, "Password Reset", "You have requested a new password here it is: " + tempPass);
+                const result = yield utility.sendMail(email, "Password Reset", "You have requested a new password here it is: " + tempPass);
+                if (result === false)
+                    return apiResponse.errorMessage(res, 400, "Failed to send mail");
                 return apiResponse.successResponse(res, "Check your mail inbox for new Password", null);
             }
             else {

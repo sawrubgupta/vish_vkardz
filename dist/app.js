@@ -10,6 +10,7 @@ const rateLimiter_1 = require("./api/v1/middleware/rateLimiter");
 const compression_1 = __importDefault(require("compression"));
 const morgan_1 = __importDefault(require("morgan"));
 const helmet_1 = __importDefault(require("helmet"));
+const fs_1 = __importDefault(require("fs"));
 function default_1(app) {
     app.use((0, cors_1.default)());
     app.use(express_1.default.json());
@@ -18,9 +19,9 @@ function default_1(app) {
     app.use(express_1.default.urlencoded({ extended: false, limit: '1gb' }));
     app.set('view engine', 'hbs');
     app.use((0, morgan_1.default)('dev'));
-    // app.use(morgan('common', {
-    //     stream: fs.createWriteStream(__dirname+ '/access.log', {flags: 'a'})
-    // }));
+    app.use((0, morgan_1.default)('common', {
+        stream: fs_1.default.createWriteStream(__dirname + '/access.log', { flags: 'a' })
+    }));
     app.use(express_1.default.static(__dirname + "./public_html"));
     app.use('/api', rateLimiter_1.rateLimiterUsingThirdParty, api_index_routes_1.default);
     app.use('*', (req, res) => {

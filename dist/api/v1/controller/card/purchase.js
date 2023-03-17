@@ -46,6 +46,7 @@ exports.cardPurchase = void 0;
 const db_1 = __importDefault(require("../../../../db"));
 const apiResponse = __importStar(require("../../helper/apiResponse"));
 const utility = __importStar(require("../../helper/utility"));
+const notify = __importStar(require("../../helper/notification"));
 const cardPurchase = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, e_1, _b, _c;
     try {
@@ -134,6 +135,17 @@ const cardPurchase = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             }
             const [data] = yield db_1.default.query(result);
             if (data.affectedRows > 0) {
+                const getFcm = `SELECT fcm_token FROM users WHERE id = ${userId}`;
+                const [rows] = yield db_1.default.query(getFcm);
+                let fcm;
+                for (const ele of rows) {
+                    fcm = [ele.fcm_token];
+                }
+                var notificationData = {
+                    title: "Order Completion",
+                    body: `Your order received successfully`
+                };
+                const result = yield notify.fcmSend(notificationData, fcm, null);
                 // return apiResponse.successResponse(res, "Purchase Successfully!", null);
                 return res.status(200).json({
                     status: true,

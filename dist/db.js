@@ -9,7 +9,8 @@ const pool = mysql2_1.default.createPool({
     host: process.env.DB_HOST || "localhost",
     user: process.env.DB_USER || "root",
     password: process.env.DB_PASSWORD || "",
-    database: process.env.DATABASE || "vkardz_new", //"vkar_vkardz"
+    database: process.env.DATABASE || "vkardz_new",
+    connectTimeout: 10000
 });
 // const pool = mysql.createPool({
 //   host: "194.31.52.223",

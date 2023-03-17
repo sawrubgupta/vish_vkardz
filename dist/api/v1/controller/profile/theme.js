@@ -71,9 +71,9 @@ const updateVcardLayout = (req, res) => __awaiter(void 0, void 0, void 0, functi
         const userId = res.locals.jwt.userId;
         const profileColor = req.body.profileColor;
         let styleId = req.body.styleId;
-        if (!styleId || styleId === "") {
-            styleId = 1;
-        }
+        // if (!styleId || styleId === "") {
+        //     styleId = 1;
+        // }
         const sql = `UPDATE users SET vcard_layouts = ?, vcard_bg_color = ? WHERE id = ?`;
         const VALUES = [styleId, profileColor, userId];
         const [rows] = yield db_1.default.query(sql, VALUES);

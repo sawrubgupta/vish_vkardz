@@ -27,6 +27,9 @@ const express_1 = require("express");
 const profileController = __importStar(require("../../controller/profile/profile"));
 const setPinController = __importStar(require("../../controller/profile/setSecurityPin"));
 const themeController = __importStar(require("../../controller/profile/theme"));
+const primaryProfileController = __importStar(require("../../controller/profile/primaryProfile"));
+const switchAccountController = __importStar(require("../../controller/profile/privateAccount"));
+const searchController = __importStar(require("../../controller/profile/searchUser"));
 const authorization_controller_1 = require("../../middleware/authorization.controller");
 const validation = __importStar(require("../../middleware/validation"));
 const profileRouter = (0, express_1.Router)();
@@ -37,4 +40,8 @@ profileRouter.post("/setProfilePin", authorization_controller_1.authenticatingTo
 profileRouter.delete("/removeProfilePin", authorization_controller_1.authenticatingToken, setPinController.removePin);
 profileRouter.get("/getLayots", themeController.getLayout);
 profileRouter.patch("/updateVcardLayout", authorization_controller_1.authenticatingToken, themeController.updateVcardLayout);
+profileRouter.post('/addPrimaryProfile', authorization_controller_1.authenticatingToken, validation.primaryProfileValidation, primaryProfileController.setPrimaryProfile);
+profileRouter.get('/getPrimrySites', authorization_controller_1.authenticatingToken, primaryProfileController.getPrimarySite);
+profileRouter.post('/switchAccount', authorization_controller_1.authenticatingToken, validation.switchAccountValidation, switchAccountController.switchToPublic);
+profileRouter.get('/searchUser', searchController.search);
 exports.default = profileRouter;

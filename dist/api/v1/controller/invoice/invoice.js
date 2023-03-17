@@ -34,6 +34,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.invoice = void 0;
 const apiResponse = __importStar(require("../../helper/apiResponse"));
+// not used
 const invoice = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         /*

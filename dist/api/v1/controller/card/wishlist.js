@@ -51,14 +51,21 @@ const addToWishlist = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         if (!productId || productId === "" || productId === undefined) {
             return apiResponse.errorMessage(res, 400, "productId is required!");
         }
-        const sql = `INSERT INTO wishlist(user_id, product_id, created_at) VALUES(?, ?, ?)`;
-        const VALUES = [userId, productId, createdAt];
-        const [rows] = yield db_1.default.query(sql, VALUES);
-        if (rows.affectedRows > 0) {
-            return apiResponse.successResponse(res, "Product added to wishlist", null);
+        const checkCartPoducts = `SELECT id FROM wishlist WHERE user_id = ${userId} AND product_id = ${productId} limit 1`;
+        const [wishlistRows] = yield db_1.default.query(checkCartPoducts);
+        if (wishlistRows.length > 0) {
+            return apiResponse.errorMessage(res, 400, "Product already added in wishlist!!");
         }
         else {
-            return apiResponse.errorMessage(res, 400, "Failed to add product in wishlist, try again");
+            const sql = `INSERT INTO wishlist(user_id, product_id, created_at) VALUES(?, ?, ?)`;
+            const VALUES = [userId, productId, createdAt];
+            const [rows] = yield db_1.default.query(sql, VALUES);
+            if (rows.affectedRows > 0) {
+                return apiResponse.successResponse(res, "Product added to wishlist", null);
+            }
+            else {
+                return apiResponse.errorMessage(res, 400, "Failed to add product in wishlist, try again");
+            }
         }
     }
     catch (error) {
@@ -82,9 +89,9 @@ const getWishlist = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         }
         var page_size = development_1.default.pageSize;
         const offset = (page - 1) * page_size;
-        const getPageQuery = `SELECT wishlist.product_id FROM products LEFT JOIN wishlist on wishlist.product_id = products.product_id LEFT JOIN product_price ON products.product_id = product_price.product_id WHERE wishlist.user_id = ${userId}`;
+        const getPageQuery = `SELECT wishlist.product_id, AVG(COALESCE(product_rating.rating, 0)) AS averageRating FROM products LEFT JOIN wishlist on wishlist.product_id = products.product_id LEFT JOIN product_price ON products.product_id = product_price.product_id LEFT JOIN product_rating ON products.product_id = product_rating.product_id WHERE wishlist.user_id = ${userId} GROUP BY products.product_id`;
         const [result] = yield db_1.default.query(getPageQuery);
-        const wishlistQuery = `SELECT wishlist.product_id, products.name, products.slug, products.description, products.price, products.mrp_price, products.discount_percent, products.product_image, products.image_back, products.image_other, products.material, products.bg_color, products.print, products.dimention, products.weight, products.thickness, products.alt_title, product_price.usd_selling_price, product_price.usd_mrp_price, product_price.aed_selling_price, product_price.aed_mrp_price, product_price.inr_selling_price, product_price.inr_mrp_price, product_price.qar_selling_price, product_price.qar_mrp_price, wishlist.created_at FROM products LEFT JOIN wishlist on wishlist.product_id = products.product_id LEFT JOIN product_price ON products.product_id = product_price.product_id WHERE wishlist.user_id = ${userId} ORDER BY created_at desc limit ${page_size} offset ${offset}`;
+        const wishlistQuery = `SELECT wishlist.product_id, products.name, products.slug, products.description, products.price, products.mrp_price, products.discount_percent, products.product_image, products.image_back, products.image_other, products.material, products.bg_color, products.print, products.dimention, products.weight, products.thickness, products.alt_title, product_price.usd_selling_price, product_price.usd_mrp_price, product_price.aed_selling_price, product_price.aed_mrp_price, product_price.inr_selling_price, product_price.inr_mrp_price, product_price.qar_selling_price, product_price.qar_mrp_price, COUNT(product_rating.id) AS totalRating, AVG(COALESCE(product_rating.rating, 0)) AS averageRating, wishlist.created_at FROM products LEFT JOIN wishlist on wishlist.product_id = products.product_id LEFT JOIN product_price ON products.product_id = product_price.product_id LEFT JOIN product_rating ON products.product_id = product_rating.product_id WHERE wishlist.user_id = ${userId} GROUP BY products.product_id ORDER BY created_at desc limit ${page_size} offset ${offset}`;
         const [rows] = yield db_1.default.query(wishlistQuery);
         let totalPages = result.length / page_size;
         let totalPage = Math.ceil(totalPages);

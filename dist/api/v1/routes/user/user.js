@@ -42,6 +42,7 @@ authRouter.post('/socialLogin', validation.socialLoginValidation, userController
 authRouter.post('/forgotPassword', forgotPasswordController.forgotPassword);
 authRouter.patch('/changePassword', authorization_controller_1.authenticatingToken, validation.changePasswordValidation, changePassword.changePassword);
 authRouter.get('/checkUserName', checkUserName.validUserName);
+authRouter.get('/checkEmail', checkUserName.checkEmail);
 authRouter.get('/getCountryList', countryListController.countryList);
 authRouter.post('/setting', authorization_controller_1.authenticatingToken, validation.settingValidation, settingController.setting);
 // authRouter.delete('/deleteAccount', rateLimiterUsingThirdParty, authenticatingToken, deleteAccountController.deleteAccount);

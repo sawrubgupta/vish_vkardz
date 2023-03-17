@@ -100,6 +100,7 @@ exports.extendedDateWithFormat = extendedDateWithFormat;
 // ====================================================================================================
 // ====================================================================================================
 const sendMail = (email, subject, message) => __awaiter(void 0, void 0, void 0, function* () {
+    let result;
     try {
         // create reusable transporter object using the default SMTP transport
         let transporter = nodemailer_1.default.createTransport(development_1.default.smtp);
@@ -111,14 +112,17 @@ const sendMail = (email, subject, message) => __awaiter(void 0, void 0, void 0, 
             text: message,
             html: "", // html body
         });
+        result = info.messageId;
         console.log("Message sent: %s", info.messageId);
         console.log("Preview URL: %s", nodemailer_1.default.getTestMessageUrl(info));
         // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
     }
     catch (err) {
-        console.log("djdn", err);
+        console.log("error", err);
+        result = false;
         throw err;
     }
+    return result;
 });
 exports.sendMail = sendMail;
 // ====================================================================================================

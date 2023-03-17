@@ -106,7 +106,63 @@ const businessHourList = (req, res) => __awaiter(void 0, void 0, void 0, functio
             return apiResponse.successResponse(res, "Data Retrieved Successfully", rows);
         }
         else {
-            return apiResponse.successResponse(res, "No data found", null);
+            let data = [{
+                    "id": null,
+                    "days": 0,
+                    "start_time": "00.00",
+                    "end_time": "00.00",
+                    "status": 0,
+                    "created_at": null
+                },
+                {
+                    "id": null,
+                    "days": 1,
+                    "start_time": "00.00",
+                    "end_time": "00.00",
+                    "status": 0,
+                    "created_at": null
+                },
+                {
+                    "id": null,
+                    "days": 2,
+                    "start_time": "00.00",
+                    "end_time": "00.00",
+                    "status": 0,
+                    "created_at": null
+                },
+                {
+                    "id": null,
+                    "days": 3,
+                    "start_time": "00.00",
+                    "end_time": "00.00",
+                    "status": 0,
+                    "created_at": null
+                },
+                {
+                    "id": null,
+                    "days": 4,
+                    "start_time": "00.00",
+                    "end_time": "00.00",
+                    "status": 0,
+                    "created_at": null
+                },
+                {
+                    "id": null,
+                    "days": 5,
+                    "start_time": "00.00",
+                    "end_time": "00.00",
+                    "status": 0,
+                    "created_at": null
+                },
+                {
+                    "id": null,
+                    "days": 6,
+                    "start_time": "00.00",
+                    "end_time": "00.00",
+                    "status": 0,
+                    "created_at": null
+                }];
+            return apiResponse.successResponse(res, "No data found", data);
         }
     }
     catch (error) {

@@ -49,12 +49,15 @@ const getProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         if (userRows.length > 0) {
             delete userRows[0].id;
             delete userRows[0].password;
-            const getSocialSiteQuery = `SELECT social_sites.id, social_sites.name, social_sites.social_link, social_sites.social_img, social_sites.type, social_sites.status, social_sites.primary_profile, vcard_social_sites.value, vcard_social_sites.label, vcard_social_sites.orders FROM social_sites LEFT JOIN vcard_social_sites ON social_sites.id = vcard_social_sites.site_id AND vcard_social_sites.user_id = ${userId} ORDER BY  vcard_social_sites.orders ASC LIMIT 6`;
+            const getSocialSiteQuery = `SELECT social_sites.id, social_sites.name, social_sites.social_link, social_sites.social_img, social_sites.type, social_sites.status, social_sites.primary_profile, vcard_social_sites.value, vcard_social_sites.label, vcard_social_sites.orders FROM social_sites LEFT JOIN vcard_social_sites ON social_sites.id = vcard_social_sites.site_id AND vcard_social_sites.user_id = ${userId} HAVING vcard_social_sites.value IS NOT NULL ORDER BY vcard_social_sites.value DESC, vcard_social_sites.orders IS NULL ASC LIMIT 6`;
             const [socialRows] = yield db_1.default.query(getSocialSiteQuery);
             const getCardQuery = `SELECT products.slug, products.product_image, products.image_back, products.image_other FROM products LEFT JOIN orderlist ON products.product_id = orderlist.product_id WHERE orderlist.user_id = ${userId}`;
             const [cardData] = yield db_1.default.query(getCardQuery);
+            const getThemes = `SELECT users.themes as themeId, vkard_layouts.vkard_style, vkard_layouts.image FROM users LEFT JOIN vkard_layouts ON users.vcard_layouts = vkard_layouts.id WHERE users.id = ${userId} LIMIT 1`;
+            const [themeData] = yield db_1.default.query(getThemes);
             userRows[0].social_sites = socialRows || [];
             userRows[0].cardData = cardData || [];
+            userRows[0].activeTheme = themeData[0] || {};
             return apiResponse.successResponse(res, "Get user profile data!", userRows[0]);
         }
         else {

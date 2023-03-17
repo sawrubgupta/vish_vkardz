@@ -19,6 +19,38 @@ name api's
 
 database changes:
 
+14-03-2023
+ALTER TABLE user_contacts ADD COLUMN created_at datetime not null DEFAULT CURRENT_TIMESTAMP;
+
+28-02-2023
+CREATE TABLE `service_buy_payment_info` (
+  `id` int(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  `txn_id` varchar(255) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `package` varchar(255) DEFAULT NULL,
+  `currency_code` varchar(30) NOT NULL DEFAULT 'aed',
+  `price` double NOT NULL,
+  `payment_type` int(11) NOT NULL DEFAULT 1,
+  `invoice_url` varchar(300) DEFAULT NULL,
+  `status` varchar(55) DEFAULT NULL,
+  `start_date` datetime NOT NULL DEFAULT current_timestamp,
+  `end_date` datetime NOT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp,  
+  `approve_time` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+27-02-2023
+ALTER TABLE users ADD COLUMN is_private tinyint NOT NULL DEFAULT 1 AFTER primary_profile_link;
+
+CREATE TABLE `user_followers` (
+  `id` int(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `follower_id` int(11) NOT NULL,
+  `followed_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+
 30-01-2023
 CREATE TABLE `product_rating` (
   `id` int(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,

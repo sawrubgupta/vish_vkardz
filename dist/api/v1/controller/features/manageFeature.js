@@ -50,16 +50,19 @@ const getFeatureByUserId = (req, res) => __awaiter(void 0, void 0, void 0, funct
         const userId = res.locals.jwt.userId;
         const sql = `SELECT users_features.feature_id, features.features, features.slug, users_features.status FROM features LEFT JOIN users_features ON features.id = users_features.feature_id WHERE users_features.user_id = ${userId} AND features.id IN (3, 5, 6, 8, 10, 11, 13, 14, 15)`;
         const [rows] = yield db_1.default.query(sql);
-        if (rows.length > 0) {
-            return apiResponse.successResponse(res, "User Features Get Successfully", rows);
-        }
-        else {
-            return apiResponse.successResponse(res, "No data found", null);
-        }
+        const avgFeatureSql = `SELECT users_features.feature_id, features.features, features.slug, users_features.status FROM features LEFT JOIN users_features ON features.id = users_features.feature_id WHERE users_features.user_id = ${userId} AND features.id IN (3, 5, 6, 8, 10, 11) AND users_features.status = 1`;
+        const [avgRows] = yield db_1.default.query(avgFeatureSql);
+        const avgActiveFeature = (avgRows.length / 6) * 100;
+        // return apiResponse.successResponse(res, "User Features Get Successfully", rows);
+        return res.status(200).json({
+            status: true,
+            data: rows, avgActiveFeature,
+            message: "User Features Get Successfully"
+        });
     }
     catch (error) {
         console.log(error);
-        return apiResponse.errorMessage(res, 400, "Somehing went wrong");
+        return apiResponse.errorMessage(res, 400, "Something went wrong");
     }
 });
 exports.getFeatureByUserId = getFeatureByUserId;

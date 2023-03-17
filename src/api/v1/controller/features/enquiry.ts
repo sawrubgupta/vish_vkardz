@@ -16,10 +16,10 @@ export const enquiryList =async (req:Request, res:Response) => {
         var page_size: any = config.pageSize;       
         const offset = (page - 1 ) * page_size;
 
-        const getPageQuery = `SELECT id, name, email, phone_num, msg FROM user_contacts WHERE user_id = ${userId}`;
+        const getPageQuery = `SELECT id, name, email, phone_num, msg, created_at FROM user_contacts WHERE user_id = ${userId}`;
         const [result]:any= await pool.query(getPageQuery);
 
-        const sql = `SELECT id, name, email, phone_num, msg FROM user_contacts WHERE user_id = ${userId} ORDER BY id DESC LIMIT ${page_size} OFFSET ${offset}`;
+        const sql = `SELECT id, name, email, phone_num, msg, created_at FROM user_contacts WHERE user_id = ${userId} ORDER BY id DESC LIMIT ${page_size} OFFSET ${offset}`;
         const [rows]:any = await pool.query(sql);
 
         const getFeatureStatus = `SELECT status FROM users_features WHERE user_id = ${userId} AND feature_id = 11`;

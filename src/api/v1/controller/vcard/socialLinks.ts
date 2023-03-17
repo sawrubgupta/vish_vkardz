@@ -49,28 +49,22 @@ export const updateSocialLinks = async (req:Request, res:Response) => {
     try {
         const userId:string = res.locals.jwt.userId;
         const createdAt = utility.dateWithFormat();
-
+        const { siteId, siteValue, orders, siteLabel } = req.body;
         let data:any
-        let updateQuery = `UPDATE vcard_social_sites SET orders = ?, label = ?, value = ? WHERE user_id = ? AND site_id = ?`;
-        let insertQuery = `INSERT INTO vcard_social_sites (user_id, site_id, orders, label, value, created_at) VALUES(?, ?, ?, ?, ?, ?)`
 
-        for await (const socialSiteItem of req.body.socialSites) {
-            const siteId =  socialSiteItem.siteId;
-            const siteValue =  socialSiteItem.siteValue;
-            const orders =  socialSiteItem.orders;
-            const siteLabel =  socialSiteItem.siteLabel;
+        const sql = `SELECT id From vcard_social_sites WHERE user_id = ${userId} AND site_id = ${siteId}`;
+        const [socialRows]:any = await pool.query(sql)
 
-            const sql = `SELECT * From vcard_social_sites WHERE user_id = ${userId} AND site_id = ${siteId}`;
-            const [socialRows]:any = await pool.query(sql)
-
-            if (socialRows.length > 0) {
-                const VALUES = [orders, siteLabel, siteValue, userId, siteId];
-                [data] = await pool.query(updateQuery, VALUES);
-            } else {
-                const VALUES = [userId, siteId, orders, siteLabel, siteValue, createdAt];
-                [data] = await pool.query(insertQuery, VALUES);
-            }
+        if (socialRows.length > 0) {
+            const updateQuery = `UPDATE vcard_social_sites SET orders = ?, label = ?, value = ? WHERE user_id = ? AND site_id = ?`;
+            const VALUES = [orders, siteLabel, siteValue, userId, siteId];
+            [data] = await pool.query(updateQuery, VALUES);
+        } else {
+            const insertQuery = `INSERT INTO vcard_social_sites (user_id, site_id, orders, label, value, created_at) VALUES(?, ?, ?, ?, ?, ?)`
+            const VALUES = [userId, siteId, orders, siteLabel, siteValue, createdAt];
+            [data] = await pool.query(insertQuery, VALUES);
         }
+        
         if (data.affectedRows > 0) {
             return apiResponse.successResponse(res, "Social links updated successfully", null);
         } else {

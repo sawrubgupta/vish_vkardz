@@ -49,5 +49,9 @@ featureRouter.post("/portfolio", authorization_controller_1.authenticatingToken,
 featureRouter.get("/getPortfolio", authorization_controller_1.authenticatingToken, gallaryController.getPortfolio);
 featureRouter.delete("/deletePortfolio", authorization_controller_1.authenticatingToken, gallaryController.deleteImage);
 featureRouter.get("/getAppointments", authorization_controller_1.authenticatingToken, appointmentController.appointmentList);
+featureRouter.delete("/deleteAppointment", authorization_controller_1.authenticatingToken, appointmentController.deleteAppointment);
+featureRouter.post("/manageAppointment", authorization_controller_1.authenticatingToken, appointmentController.manageAppointment);
 featureRouter.get("/enquiryList", authorization_controller_1.authenticatingToken, enquiryController.enquiryList);
+featureRouter.delete("/deleteEnquiry", authorization_controller_1.authenticatingToken, enquiryController.deleteEnquiry);
+featureRouter.post("/replyEnquiry", authorization_controller_1.authenticatingToken, enquiryController.replyEnquiry);
 exports.default = featureRouter;

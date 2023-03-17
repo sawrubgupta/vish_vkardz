@@ -35,7 +35,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.validUserName = void 0;
+exports.checkEmail = exports.validUserName = void 0;
 const db_1 = __importDefault(require("../../../../db"));
 const utility = __importStar(require("../../helper/utility"));
 const apiResponse = __importStar(require("../../helper/apiResponse"));
@@ -64,5 +64,31 @@ const validUserName = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     }
 });
 exports.validUserName = validUserName;
+// ====================================================================================================
+// ====================================================================================================
+const checkEmail = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const email = req.query.email;
+        let emailExist;
+        if (!email || email === null) {
+            return apiResponse.errorMessage(res, 400, "Enter Valid Email.");
+        }
+        const checkEmailQuery = `Select email from users where email = '${email}' limit 1`;
+        const [rows] = yield db_1.default.query(checkEmailQuery);
+        if (rows.length > 0) {
+            emailExist = 1;
+            return apiResponse.successResponse(res, "Email Id already exist!", emailExist);
+        }
+        else {
+            emailExist = 0;
+            return apiResponse.successResponse(res, "Email Id Not Registered!", emailExist);
+        }
+    }
+    catch (error) {
+        console.log(error);
+        return apiResponse.errorMessage(res, 400, "Something went wrong");
+    }
+});
+exports.checkEmail = checkEmail;
 // ====================================================================================================
 // ====================================================================================================

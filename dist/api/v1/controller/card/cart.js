@@ -48,10 +48,10 @@ const addToCart = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const productId = req.body.productId;
         const qty = req.body.qty;
         const createdAt = utility.dateWithFormat();
-        const checkCartPoducts = `SELECT * FROM cart_details WHERE user_id = ${userId} AND product_id = ${productId}`;
-        const [rows] = yield db_1.default.query(checkCartPoducts);
-        if (rows.length > 0) {
-            return apiResponse.errorMessage(res, 400, "Product already added in cart");
+        const checkCartPoducts = `SELECT id FROM cart_details WHERE user_id = ${userId} AND product_id = ${productId} limit 1`;
+        const [cartRows] = yield db_1.default.query(checkCartPoducts);
+        if (cartRows.length > 0) {
+            return apiResponse.errorMessage(res, 400, "Product already added in cart!");
         }
         else {
             const addCartQuery = `INSERT INTO cart_details(user_id, product_id, qty, created_at) VALUES(?, ?, ?, ?)`;
@@ -79,7 +79,7 @@ const getCart = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         if (!userId || userId === "" || userId === undefined) {
             return apiResponse.errorMessage(res, 401, "Please login !");
         }
-        const cartQuery = `SELECT cart_details.product_id, cart_details.qty, products.name, products.slug, products.description, products.price, products.mrp_price, products.discount_percent, products.product_image, products.image_back, products.image_other, products.material, products.bg_color, products.print, products.dimention, products.weight, products.thickness, products.alt_title, product_price.usd_selling_price, product_price.usd_mrp_price, product_price.aed_selling_price, product_price.aed_mrp_price, product_price.inr_selling_price, product_price.inr_mrp_price, product_price.qar_selling_price, product_price.qar_mrp_price, cart_details.created_at FROM products LEFT JOIN cart_details on cart_details.product_id = products.product_id LEFT JOIN product_price ON products.product_id = product_price.product_id WHERE cart_details.user_id = ${userId} ORDER BY created_at DESC`;
+        const cartQuery = `SELECT cart_details.product_id, cart_details.qty, products.name, products.slug, products.description, products.price, products.mrp_price, products.discount_percent, products.product_image, products.image_back, products.image_other, products.material, products.bg_color, products.print, products.dimention, products.weight, products.thickness, products.alt_title, product_price.usd_selling_price, product_price.usd_mrp_price, product_price.aed_selling_price, product_price.aed_mrp_price, product_price.inr_selling_price, product_price.inr_mrp_price, product_price.qar_selling_price, product_price.qar_mrp_price, COUNT(product_rating.id) AS totalRating, AVG(COALESCE(product_rating.rating, 0)) AS averageRating, cart_details.created_at FROM products LEFT JOIN cart_details on cart_details.product_id = products.product_id LEFT JOIN product_price ON products.product_id = product_price.product_id LEFT JOIN product_rating ON products.product_id = product_rating.product_id WHERE cart_details.user_id = ${userId} GROUP BY products.product_id ORDER BY created_at DESC`;
         const [rows] = yield db_1.default.query(cartQuery);
         if (rows.length > 0) {
             return apiResponse.successResponse(res, "Cart list are here!", rows);

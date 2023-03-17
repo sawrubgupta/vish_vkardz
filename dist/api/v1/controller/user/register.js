@@ -43,7 +43,7 @@ const qrCode_1 = require("../../helper/qrCode");
 const md5_1 = __importDefault(require("md5"));
 const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { name, email, password, username, dial_code, phone, country, country_name } = req.body;
+        const { name, email, password, username, dial_code, phone, country, fcmToken } = req.body;
         const justDate = utility.dateWithFormat();
         const endDate = utility.extendedDateWithFormat("yearly");
         const qrData = yield (0, qrCode_1.getQr)(username);
@@ -52,9 +52,14 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         let featureStatus;
         let featureResult;
         const hash = (0, md5_1.default)(password);
-        const checkUser = `Select email, phone, username from users where email = ? || phone = ? || username = ? limit 1`;
-        const checkUserVALUES = [email, phone, username];
+        let referralCode;
+        referralCode = utility.randomString(6);
+        const checkUser = `Select email, phone, username, referral_code from users where email = ? || phone = ? || username = ? || referral_code = ? limit 1`;
+        const checkUserVALUES = [email, phone, username, referralCode];
         const [rows] = yield db_1.default.query(checkUser, checkUserVALUES);
+        if (rows[0].referral_code === referralCode) {
+            referralCode = utility.randomString(6);
+        }
         const dupli = [];
         if (rows.length > 0) {
             if (rows[0].email === email) {
@@ -77,8 +82,8 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const checkPackageQuery = `Select * from features_type where status = 1 && slug = 'pro' `;
         const [packageFound] = yield db_1.default.query(checkPackageQuery);
         if (packageFound.length > 0) {
-            const sql = `Insert into users(name, full_name, email, display_email, password, username, dial_code, qr_code, phone, display_dial_code, display_number, country, offer_coin, quick_active_status, is_deactived, is_verify, is_payment, is_active, is_expired, post_time, start_date, login_time, end_date, account_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-            const VALUES = [name, name, email, email, hash, username, dial_code, qrData.data, phone, dial_code, phone, country, 100, 1, 0, 1, 1, 1, 0, justDate, justDate, justDate, endDate, packageFound[0].id];
+            const sql = `Insert into users(name, full_name, email, display_email, password, username, dial_code, qr_code, phone, display_dial_code, display_number, country, referral_code, offer_coin, quick_active_status, is_deactived, is_verify, is_payment, is_active, is_expired, post_time, start_date, login_time, end_date, fcm_token, account_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+            const VALUES = [name, name, email, email, hash, username, dial_code, qrData.data, phone, dial_code, phone, country, referralCode, 100, 1, 0, 1, 1, 1, 0, justDate, justDate, justDate, endDate, fcmToken, packageFound[0].id];
             const [userData] = yield db_1.default.query(sql, VALUES);
             if (userData.affectedRows > 0) {
                 const getUserName = `SELECT * FROM users WHERE id = ${userData.insertId} LIMIT 1`;
@@ -146,12 +151,15 @@ exports.register = register;
 // ====================================================================================================
 const socialRegister = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { name, type, socialId, email, password, username, dial_code, phone, country, country_name } = req.body;
+        const { name, type, socialId, email, password, username, dial_code, phone, country, fcmToken } = req.body;
         const justDate = utility.dateWithFormat();
         const endDate = utility.extendedDateWithFormat("yearly");
         const qrData = yield (0, qrCode_1.getQr)(username);
         let vcardLink = `https://vkardz.com/`;
+        const primaryProfileLink = (vcardLink) + (username);
         const hash = (0, md5_1.default)(password);
+        let referralCode;
+        referralCode = utility.randomString(6);
         let uName;
         let featureStatus;
         let featureResult;
@@ -181,8 +189,8 @@ const socialRegister = (req, res) => __awaiter(void 0, void 0, void 0, function*
         else {
             return apiResponse.errorMessage(res, 400, "Wrong type passed !");
         }
-        const emailSql = `SELECT * FROM users where email = ? or username = ? or phone = ? or facebook_id = ? or google_id = ? or apple_id = ? LIMIT 1`;
-        const emailValues = [email, username, phone, socialId, socialId, socialId];
+        const emailSql = `SELECT * FROM users where email = ? or username = ? or phone = ? or facebook_id = ? or google_id = ? or apple_id = ? or referral_code = ? LIMIT 1`;
+        const emailValues = [email, username, phone, socialId, socialId, socialId, referralCode];
         const [data] = yield db_1.default.query(emailSql, emailValues);
         const dupli = [];
         if (data.length > 0) {
@@ -212,8 +220,8 @@ const socialRegister = (req, res) => __awaiter(void 0, void 0, void 0, function*
                 message: msg,
             });
         }
-        const sql = `INSERT INTO users(name, full_name, email, display_email, password, username, dial_code, qr_code, phone, display_dial_code, display_number, country, offer_coin, quick_active_status, is_deactived, is_verify, is_payment, is_active, is_expired, post_time, start_date, login_time, end_date, account_type, facebook_id, google_id, apple_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-        const VALUES = [name, name, email, email, hash, username, dial_code, qrData.data, phone, dial_code, phone, country, 100, 1, 0, 1, 1, 1, 0, justDate, justDate, justDate, endDate, 16, facebookId, googleId, appleId];
+        const sql = `INSERT INTO users(name, full_name, email, display_email, password, username, dial_code, qr_code, phone, display_dial_code, display_number, country, referral_code, offer_coin, quick_active_status, is_deactived, is_verify, is_payment, is_active, is_expired, post_time, start_date, login_time, end_date, account_type, primary_profile_slug, primary_profile_link, fcm_token, facebook_id, google_id, apple_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+        const VALUES = [name, name, email, email, hash, username, dial_code, qrData.data, phone, dial_code, phone, country, referralCode, 100, 1, 0, 1, 1, 1, 0, justDate, justDate, justDate, endDate, 16, 'vcard', primaryProfileLink, fcmToken, facebookId, googleId, appleId];
         const [userData] = yield db_1.default.query(sql, VALUES);
         if (userData.affectedRows > 0) {
             const getUserName = `SELECT * FROM users WHERE id = ${userData.insertId} LIMIT 1`;
@@ -243,9 +251,9 @@ const socialRegister = (req, res) => __awaiter(void 0, void 0, void 0, function*
             }
             const [userFeatureData] = yield db_1.default.query(featureResult);
             userRows[0].share_url = vcardProfileLink;
+            let token = yield utility.jwtGenerate(userRows[0].id);
             delete userRows[0].password;
             delete userRows[0].id;
-            let token = yield utility.jwtGenerate(userRows[0].id);
             return res.status(200).json({
                 status: true,
                 token,

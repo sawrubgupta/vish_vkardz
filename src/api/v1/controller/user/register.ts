@@ -222,9 +222,9 @@ export const socialRegister =async (req:Request, res:Response) => {
             const [userFeatureData]:any = await pool.query(featureResult);
             userRows[0].share_url= vcardProfileLink;
 
+            let token = await utility.jwtGenerate(userRows[0].id);
             delete userRows[0].password;
             delete userRows[0].id;
-            let token = await utility.jwtGenerate(userRows[0].id);
             return res.status(200).json({
                 status: true,
                 token,

@@ -4,12 +4,12 @@ require("dotenv/config");
 exports.default = {
     smtp: {
         name: "noreply@vkardz.com",
-        host: "mail.vkardz.com",
+        host: "mail.appitronsolutions.com",
         secure: true,
         port: 465,
         auth: {
-            user: "noreply@vkardz.com",
-            pass: "7)W}(-$8-yz$", //process.env.SMTP_PASSWORD, 
+            user: "vishal@appitronsolutions.com",
+            pass: "vishal123456", //process.env.SMTP_PASSWORD, 
         },
         tls: {
             rejectUnauthorized: false

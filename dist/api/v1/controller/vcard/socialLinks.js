@@ -31,13 +31,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __asyncValues = (this && this.__asyncValues) || function (o) {
-    if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
-    var m = o[Symbol.asyncIterator], i;
-    return m ? m.call(o) : (o = typeof __values === "function" ? __values(o) : o[Symbol.iterator](), i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function () { return this; }, i);
-    function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }
-    function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -49,9 +42,30 @@ const utility = __importStar(require("../../helper/utility"));
 const getSocialLinks = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userId = res.locals.jwt.userId;
-        const sql = `SELECT social_sites.id, social_sites.name, social_sites.social_link, social_sites.social_img, social_sites.type, social_sites.status, social_sites.primary_profile, social_sites.icon, social_sites.mobile_icon, vcard_social_sites.value, vcard_social_sites.label, vcard_social_sites.orders FROM social_sites LEFT JOIN vcard_social_sites ON social_sites.id = vcard_social_sites.site_id AND vcard_social_sites.user_id = ${userId} ORDER BY  vcard_social_sites.orders IS NULL ASC`;
+        let keyword = req.query.keyword;
+        // var getPage:any = req.query.page;
+        // var page = parseInt(getPage);
+        // if (page === null || page <= 1 || !page ) {
+        //     page = 1;
+        // }
+        // var page_size: any = config.pageSize;       
+        // const offset = (page - 1 ) * page_size;
+        // const getPageQuery = `SELECT social_sites.id, vcard_social_sites.value FROM social_sites LEFT JOIN vcard_social_sites ON social_sites.id = vcard_social_sites.site_id WHERE vcard_social_sites.user_id = ${userId} AND social_sites.name LIKE '%${keyword}%'`;
+        // const [result]:any= await pool.query(getPageQuery);
+        const sql = `SELECT social_sites.id, social_sites.name, social_sites.social_link, social_sites.social_img, social_sites.type, social_sites.status, social_sites.primary_profile, social_sites.icon, social_sites.mobile_icon, vcard_social_sites.value, vcard_social_sites.label, vcard_social_sites.orders FROM social_sites LEFT JOIN vcard_social_sites ON social_sites.id = vcard_social_sites.site_id WHERE vcard_social_sites.user_id = ${userId} AND social_sites.name LIKE '%${keyword}%' ORDER BY vcard_social_sites.value DESC, vcard_social_sites.orders IS NULL ASC`;
+        //  limit ${page_size} offset ${offset}`;
         const [socialRows] = yield db_1.default.query(sql);
+        // let totalPages:any = result.length/page_size;
+        // let totalPage = Math.ceil(totalPages);
         return apiResponse.successResponse(res, "List of all social links.", socialRows);
+        // return res.status(200).json({
+        //     status: true,
+        //     data: socialRows,
+        //     totalPage: totalPage,
+        //     currentPage: page,
+        //     totalLength: result.length,
+        //     message: "List of all social links."
+        // })
     }
     catch (error) {
         console.log(error);
@@ -62,51 +76,28 @@ exports.getSocialLinks = getSocialLinks;
 // ====================================================================================================
 // ====================================================================================================
 const updateSocialLinks = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, e_1, _b, _c;
     try {
         const userId = res.locals.jwt.userId;
         const createdAt = utility.dateWithFormat();
+        const { siteId, siteValue, orders, siteLabel } = req.body;
         let data;
-        let updateQuery = `UPDATE vcard_social_sites SET orders = ?, label = ?, value = ? WHERE user_id = ? AND site_id = ?`;
-        let insertQuery = `INSERT INTO vcard_social_sites (user_id, site_id, orders, label, value, created_at) VALUES(?, ?, ?, ?, ?, ?)`;
-        try {
-            for (var _d = true, _e = __asyncValues(req.body.socialSites), _f; _f = yield _e.next(), _a = _f.done, !_a;) {
-                _c = _f.value;
-                _d = false;
-                try {
-                    const socialSiteItem = _c;
-                    const siteId = socialSiteItem.siteId;
-                    const siteValue = socialSiteItem.siteValue;
-                    const orders = socialSiteItem.orders;
-                    const siteLabel = socialSiteItem.siteLabel;
-                    const sql = `SELECT * From vcard_social_sites WHERE user_id = ${userId} AND site_id = ${siteId}`;
-                    const [socialRows] = yield db_1.default.query(sql);
-                    if (socialRows.length > 0) {
-                        const VALUES = [orders, siteLabel, siteValue, userId, siteId];
-                        [data] = yield db_1.default.query(updateQuery, VALUES);
-                    }
-                    else {
-                        const VALUES = [userId, siteId, orders, siteLabel, siteValue, createdAt];
-                        [data] = yield db_1.default.query(insertQuery, VALUES);
-                    }
-                }
-                finally {
-                    _d = true;
-                }
-            }
-        }
-        catch (e_1_1) { e_1 = { error: e_1_1 }; }
-        finally {
-            try {
-                if (!_d && !_a && (_b = _e.return)) yield _b.call(_e);
-            }
-            finally { if (e_1) throw e_1.error; }
-        }
-        if (data.affectedRows > 0) {
-            return apiResponse.successResponse(res, "Scial link updated successflly", null);
+        const sql = `SELECT id From vcard_social_sites WHERE user_id = ${userId} AND site_id = ${siteId}`;
+        const [socialRows] = yield db_1.default.query(sql);
+        if (socialRows.length > 0) {
+            const updateQuery = `UPDATE vcard_social_sites SET orders = ?, label = ?, value = ? WHERE user_id = ? AND site_id = ?`;
+            const VALUES = [orders, siteLabel, siteValue, userId, siteId];
+            [data] = yield db_1.default.query(updateQuery, VALUES);
         }
         else {
-            return apiResponse.errorMessage(res, 400, "Failed to update social link, try again later");
+            const insertQuery = `INSERT INTO vcard_social_sites (user_id, site_id, orders, label, value, created_at) VALUES(?, ?, ?, ?, ?, ?)`;
+            const VALUES = [userId, siteId, orders, siteLabel, siteValue, createdAt];
+            [data] = yield db_1.default.query(insertQuery, VALUES);
+        }
+        if (data.affectedRows > 0) {
+            return apiResponse.successResponse(res, "Social links updated successfully", null);
+        }
+        else {
+            return apiResponse.errorMessage(res, 400, "Failed to update social link, try again later!");
         }
     }
     catch (error) {

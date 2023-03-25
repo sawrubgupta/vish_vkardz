@@ -48,7 +48,7 @@ const apiResponse = __importStar(require("../../helper/apiResponse"));
 const getFeatureByUserId = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userId = res.locals.jwt.userId;
-        const sql = `SELECT users_features.feature_id, features.features, features.slug, users_features.status FROM features LEFT JOIN users_features ON features.id = users_features.feature_id WHERE users_features.user_id = ${userId} AND features.id IN (3, 5, 6, 8, 10, 11, 13, 14, 15)`;
+        const sql = `SELECT users_features.feature_id, features.features, features.slug, users_features.status FROM features LEFT JOIN users_features ON features.id = users_features.feature_id WHERE users_features.user_id = ${userId} AND features.id IN (3, 5, 6, 8, 10, 11)`;
         const [rows] = yield db_1.default.query(sql);
         const avgFeatureSql = `SELECT users_features.feature_id, features.features, features.slug, users_features.status FROM features LEFT JOIN users_features ON features.id = users_features.feature_id WHERE users_features.user_id = ${userId} AND features.id IN (3, 5, 6, 8, 10, 11) AND users_features.status = 1`;
         const [avgRows] = yield db_1.default.query(avgFeatureSql);

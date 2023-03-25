@@ -15,6 +15,7 @@ export const coupnDiscount =async (req:Request, res:Response) => {
         
         const checkCouponCodeQuery = `SELECT coupon_code, discount_amount, discount_type FROM coupons WHERE coupon_code = ? AND expiration_date >= ?`;
         const VALUES = [couponCode, createdAt];
+        console.log(VALUES);
         
         const [rows]:any = await pool.query(checkCouponCodeQuery, VALUES);
         

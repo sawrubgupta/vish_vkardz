@@ -31,9 +31,17 @@ export const cancelOrder =async (req:Request, res:Response) => {
         const userId:string = res.locals.jwt.userId;
         const orderId = req.body.orderId;
 
+        const checkOrder = `SELECT status FROM all_payment_info WHERE user_id = ${userId} AND id = ${orderId} LIMIT 1`;
+        const [orderRows]:any = await pool.query(checkOrder);
+        if (orderRows.status === 'dele') {
+            
+        } else {
+            
+        }
         const sql = `UPDATE all_payment_info SET status = 'canceled' WHERE user_id = ${userId} AND id = ${orderId}`;
         const [rows]:any = await pool.query(sql);
 
+        
         return apiResponse.successResponse(res, "your order was canceled!!", null);
     } catch (error) {
         console.log(error);

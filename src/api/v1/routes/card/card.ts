@@ -8,13 +8,13 @@ import * as purchaseController from '../../controller/card/purchase';
 import * as ratingController from '../../controller/card/rating';
 // import * as packageController from '../../controller/cart/package';
 
-import {authenticatingToken} from '../../middleware/authorization.controller';
+import {authenticatingToken, tempAuthenticatingToken} from '../../middleware/authorization.controller';
 import * as validation from '../../middleware/validation';
 
 const cardRouter = Router();
 
 cardRouter.get("/getCategory", productController.getCategories);
-cardRouter.get("/productList", productController.getProductByCategoryId);
+cardRouter.get("/productList", tempAuthenticatingToken, productController.getProductByCategoryId);
 cardRouter.get("/productsFaq", productController.productFaq);
 cardRouter.post("/purchaseCard", authenticatingToken, validation.purchaseValidation, purchaseController.cardPurchase);
 // cardRouter.post("/shipping_method", authenticatingToken, validation.purchaseValidation, cartController.shipping);
@@ -33,8 +33,10 @@ cardRouter.patch("/updateCartQty", authenticatingToken, validation.cartValidatio
 
 cardRouter.post("/customizeCard", authenticatingToken, validation.customizeCardValidation, cartController.addCostmizeCard);
 cardRouter.post("/addDeliveryAddress", authenticatingToken, validation.deliveryAddressValidation, cartController.addDeliveryAddresess);
+cardRouter.patch("/updateDeliveryAddress", authenticatingToken, validation.updateDdeliveryAddressValidation, cartController.updateDeliveryAddresess);
 cardRouter.get("/getDeliveryAddress", authenticatingToken, cartController.getDeliveryAddresses);
 cardRouter.delete("/deleteAddress", authenticatingToken, cartController.deleteDaliveryAddress);
+cardRouter.post("/defaultAddress", authenticatingToken, cartController.defaultAddres);
 
 cardRouter.get("/checkCouponCode", authenticatingToken, couponCodeController.coupnDiscount);
 cardRouter.post("/redeemCoupon", authenticatingToken, couponCodeController.couponRedemptions);

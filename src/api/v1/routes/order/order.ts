@@ -10,6 +10,6 @@ const orderRouter = Router();
 
 orderRouter.get("/getTransactions", authenticatingToken, transactionController.transactionHistory);
 orderRouter.get("/orderList", authenticatingToken, orderController.orderHistory);
-orderRouter.get("/cancelOrder", authenticatingToken, orderController.cancelOrder);
+orderRouter.post("/cancelOrder", authenticatingToken, orderController.cancelOrder);
 
 export default orderRouter;

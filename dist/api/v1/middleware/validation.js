@@ -35,7 +35,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updatePackageValidation = exports.primaryProfileValidation = exports.productRatingValidation = exports.businessHourValidation = exports.setProfilePinValidation = exports.purchaseValidation = exports.userProductsValidation = exports.aboutUsValidation = exports.redeemCouponCodeValidation = exports.deliveryAddressValidation = exports.customizeCardValidation = exports.cartValidation = exports.switchAccountValidation = exports.editSocialLinksValidation = exports.updateProfileValidation = exports.settingValidation = exports.changePasswordValidation = exports.socialLoginValidation = exports.loginValidation = exports.socialRegistrationValidation = exports.registrationValidation = void 0;
+exports.updatePackageValidation = exports.primaryProfileValidation = exports.productRatingValidation = exports.businessHourValidation = exports.setProfilePinValidation = exports.purchaseValidation = exports.userProductsValidation = exports.aboutUsValidation = exports.redeemCouponCodeValidation = exports.updateDdeliveryAddressValidation = exports.deliveryAddressValidation = exports.customizeCardValidation = exports.cartValidation = exports.switchAccountValidation = exports.editSocialLinksValidation = exports.updateProfileValidation = exports.settingValidation = exports.changePasswordValidation = exports.socialLoginValidation = exports.loginValidation = exports.socialRegistrationValidation = exports.registrationValidation = void 0;
 const apiResponse = __importStar(require("../helper/apiResponse"));
 const joi_1 = __importDefault(require("joi"));
 function validationCheck(value) {
@@ -475,6 +475,28 @@ const deliveryAddressValidation = (req, res, next) => __awaiter(void 0, void 0, 
 exports.deliveryAddressValidation = deliveryAddressValidation;
 // ====================================================================================================
 // ====================================================================================================
+const updateDdeliveryAddressValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const schema = joi_1.default.object({
+        addressId: joi_1.default.number().integer().required(),
+        name: joi_1.default.string().trim().max(70).trim().required(),
+        addressType: joi_1.default.string().required(),
+        phone: joi_1.default.string().trim().min(8).max(20).trim().required(),
+        address: joi_1.default.string().normalize().max(200).required(),
+        locality: joi_1.default.string().normalize().max(100).required(),
+        city: joi_1.default.string().required(),
+        state: joi_1.default.string().required(),
+        pincode: joi_1.default.number().min(999).max(9999999).required(),
+    });
+    const value = schema.validate(req.body);
+    if (value.error) {
+        const errMsg = yield validationCheck(value);
+        return yield apiResponse.errorMessage(res, 400, errMsg);
+    }
+    next();
+});
+exports.updateDdeliveryAddressValidation = updateDdeliveryAddressValidation;
+// ====================================================================================================
+// ====================================================================================================
 const redeemCouponCodeValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const schema = joi_1.default.object({
         couponCode: joi_1.default.string().trim().required(),
@@ -513,7 +535,7 @@ const userProductsValidation = (req, res, next) => __awaiter(void 0, void 0, voi
         title: joi_1.default.string().max(50).required(),
         description: joi_1.default.string().min(1).max(80).trim().required(),
         price: joi_1.default.string().required(),
-        image: joi_1.default.string().optional().allow(''),
+        image: joi_1.default.string().required(),
     });
     const value = schema.validate(req.body);
     if (value.error) {

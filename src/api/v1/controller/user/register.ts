@@ -128,6 +128,13 @@ export const socialRegister =async (req:Request, res:Response) => {
         const hash = md5(password);
         let referralCode:any;
         referralCode = utility.randomString(6);
+
+        const referSql = `SELECT * FROM users where referral_code = '${referralCode}' LIMIT 1`;
+        const [referRows]:any = await pool.query(referSql);
+        if (referRows.length > 0) {
+            referralCode = utility.randomString(6);
+        }
+
         let uName;
         let featureStatus:number;
         let featureResult:any;
@@ -155,7 +162,7 @@ export const socialRegister =async (req:Request, res:Response) => {
             return apiResponse.errorMessage(res, 400, "Wrong type passed !");
         }
 
-        const emailSql = `SELECT * FROM users where email = ? or username = ? or phone = ? or facebook_id = ? or google_id = ? or apple_id = ? or referral_code = ? LIMIT 1`;
+        const emailSql = `SELECT * FROM users where email = ? or username = ? or phone = ? or facebook_id = ? or google_id = ? or apple_id = ? LIMIT 1`;
         const emailValues = [email, username, phone, socialId, socialId, socialId, referralCode]
         const [data]:any = await pool.query(emailSql, emailValues);
 

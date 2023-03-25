@@ -6,7 +6,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const api_index_routes_1 = __importDefault(require("./api/api.index.routes"));
 const cors_1 = __importDefault(require("cors"));
-const rateLimiter_1 = require("./api/v1/middleware/rateLimiter");
 const compression_1 = __importDefault(require("compression"));
 const morgan_1 = __importDefault(require("morgan"));
 const helmet_1 = __importDefault(require("helmet"));
@@ -23,7 +22,7 @@ function default_1(app) {
         stream: fs_1.default.createWriteStream(__dirname + '/access.log', { flags: 'a' })
     }));
     app.use(express_1.default.static(__dirname + "./public_html"));
-    app.use('/api', rateLimiter_1.rateLimiterUsingThirdParty, api_index_routes_1.default);
+    app.use('/api', api_index_routes_1.default);
     app.use('*', (req, res) => {
         res.status(404).json({
             message: 'Resource not available'

@@ -93,6 +93,22 @@ const getWishlist = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         const [result] = yield db_1.default.query(getPageQuery);
         const wishlistQuery = `SELECT wishlist.product_id, products.name, products.slug, products.description, products.price, products.mrp_price, products.discount_percent, products.product_image, products.image_back, products.image_other, products.material, products.bg_color, products.print, products.dimention, products.weight, products.thickness, products.alt_title, product_price.usd_selling_price, product_price.usd_mrp_price, product_price.aed_selling_price, product_price.aed_mrp_price, product_price.inr_selling_price, product_price.inr_mrp_price, product_price.qar_selling_price, product_price.qar_mrp_price, COUNT(product_rating.id) AS totalRating, AVG(COALESCE(product_rating.rating, 0)) AS averageRating, wishlist.created_at FROM products LEFT JOIN wishlist on wishlist.product_id = products.product_id LEFT JOIN product_price ON products.product_id = product_price.product_id LEFT JOIN product_rating ON products.product_id = product_rating.product_id WHERE wishlist.user_id = ${userId} GROUP BY products.product_id ORDER BY created_at desc limit ${page_size} offset ${offset}`;
         const [rows] = yield db_1.default.query(wishlistQuery);
+        const cartQuery = `SELECT product_id FROM cart_details WHERE user_id = ${userId}`;
+        const [cartRows] = yield db_1.default.query(cartQuery);
+        rows.forEach((element, index) => {
+            if (cartRows.length === 0) {
+                rows[index].isAddedToCart = false;
+            }
+            for (const cartData of cartRows) {
+                if (cartData.product_id === element.product_id) {
+                    rows[index].isAddedToCart = true;
+                    break;
+                }
+                else {
+                    rows[index].isAddedToCart = false;
+                }
+            }
+        });
         let totalPages = result.length / page_size;
         let totalPage = Math.ceil(totalPages);
         if (rows.length > 0) {

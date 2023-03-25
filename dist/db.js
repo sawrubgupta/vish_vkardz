@@ -6,11 +6,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mysql2_1 = __importDefault(require("mysql2"));
 require("dotenv/config");
 const pool = mysql2_1.default.createPool({
-    host: process.env.DB_HOST || "localhost",
-    user: process.env.DB_USER || "root",
-    password: process.env.DB_PASSWORD || "",
+    host: process.env.HOST || "localhost",
+    user: process.env.USER || "root",
+    password: process.env.PASSWORD || "",
     database: process.env.DATABASE || "vkardz_new",
-    connectTimeout: 10000
+    //connectTimeout: 10000,
+    connectionLimit: 100
+    /**
+     * The maximum number of connection requests the pool will queue before returning an error from getConnection. If set to 0, there
+     * is no limit to the number of queued connection requests. (Default: 0)
+     */
+    //      queueLimit?: ;
 });
 // const pool = mysql.createPool({
 //   host: "194.31.52.223",

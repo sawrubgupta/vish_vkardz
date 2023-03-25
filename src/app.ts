@@ -22,7 +22,7 @@ export default function (app: Express) {
     }));
     
     app.use(express.static(__dirname+"./public_html"))
-    app.use('/api',rateLimiterUsingThirdParty, apiRouter);
+    app.use('/api', apiRouter);
     app.use('*', (req, res) => {
         res.status(404).json({
             message: 'Resource not available'

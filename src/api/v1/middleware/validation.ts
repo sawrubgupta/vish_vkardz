@@ -504,6 +504,31 @@ export const deliveryAddressValidation = async (req: Request,res: Response, next
 // ====================================================================================================
 // ====================================================================================================
 
+export const updateDdeliveryAddressValidation = async (req: Request,res: Response, next:NextFunction) => {
+    const schema = Joi.object({
+        addressId: Joi.number().integer().required(),
+        name: Joi.string().trim().max(70).trim().required(),
+        addressType: Joi.string().required(),
+        phone: Joi.string().trim().min(8).max(20).trim().required(),
+        address: Joi.string().normalize().max(200).required(),
+        locality: Joi.string().normalize().max(100).required(),
+        city: Joi.string().required(),
+        state: Joi.string().required(),
+        pincode: Joi.number().min(999).max(9999999).required(),
+    });
+
+    const value = schema.validate(req.body);
+  
+    if (value.error) {
+        const errMsg = await validationCheck(value);
+        return await apiResponse.errorMessage(res,400, errMsg);
+    }
+    next();
+};
+
+// ====================================================================================================
+// ====================================================================================================
+
 export const redeemCouponCodeValidation = async (req: Request,res: Response,next: NextFunction) => {
     const schema = Joi.object({
         couponCode: Joi.string().trim().required(),

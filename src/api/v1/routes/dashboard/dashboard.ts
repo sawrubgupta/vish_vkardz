@@ -10,6 +10,7 @@ import {authenticatingToken, tempAuthenticatingToken} from '../../middleware/aut
 const dashboardRouter = Router();
 
 dashboardRouter.get("/home", tempAuthenticatingToken, homeController.home);
+dashboardRouter.get("/bestSellerProducts", tempAuthenticatingToken, homeController.bestSellerProducts);
 dashboardRouter.get("/mixingData", mixingDataController.mixingData);
 dashboardRouter.get("/DealsOfTheDay", dealsController.dealOfTheDay);
 

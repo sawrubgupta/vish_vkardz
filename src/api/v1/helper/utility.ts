@@ -82,6 +82,9 @@ export const extendedDateWithFormat = (type: string) => {
 	} else if (type === "monthly" || type === "trial" || type === "month") {
 		date.setMonth(date.getMonth() + 1);
 		endDate = moment(date).format("YYYY-MM-DD HH:mm:ss");
+	} else if (type === "weekly" || type === "week") {
+		date.setDate(date.getDate() + 7);
+		endDate = moment(date).format("YYYY-MM-DD HH:mm:ss");
 	}
 	return endDate;
 };

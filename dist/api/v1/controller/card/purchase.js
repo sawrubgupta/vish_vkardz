@@ -91,8 +91,8 @@ const cardPurchase = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             else {
                 paymentType = '1';
             }
-            const sql = `INSERT INTO all_payment_info(txn_id, user_id, username, email, currency_code, price, name, phone_number, locality, country, city, address, pincode, contact_info, delivery_charges, payment_type, vat_num, note, is_gift_enable, gift_message, status, created_at, approve_time) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-            const VALUES = [paymentInfo.txnId, userId, paymentInfo.username, paymentInfo.email, paymentInfo.price_currency_code, paymentInfo.price, deliveryDetails.name, deliveryDetails.phoneNumber, deliveryDetails.locality, deliveryDetails.country, deliveryDetails.city, deliveryDetails.address, deliveryDetails.pincode, deliveryDetails.email, paymentInfo.deliveryCharge, paymentType, deliveryDetails.vat_number, paymentInfo.note, isGiftEnable, giftMessage, paymentInfo.status, createdAt, '0000-00-00 00:00:00'];
+            const sql = `INSERT INTO all_payment_info(txn_id, user_id, username, email, currency_code, price, name, phone_number, locality, country, city, address, pincode, contact_info, delivery_charges, payment_type, vat_num, note, is_gift_enable, gift_message, coupon_discount, gst_amount, status, created_at, approve_time) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+            const VALUES = [paymentInfo.txnId, userId, paymentInfo.username, paymentInfo.email, paymentInfo.price_currency_code, paymentInfo.price, deliveryDetails.name, deliveryDetails.phoneNumber, deliveryDetails.locality, deliveryDetails.country, deliveryDetails.city, deliveryDetails.address, deliveryDetails.pincode, deliveryDetails.email, paymentInfo.deliveryCharge, paymentType, deliveryDetails.vat_number, paymentInfo.note, isGiftEnable, giftMessage, paymentInfo.couponDiscount, paymentInfo.gstAmount, paymentInfo.status, createdAt, '0000-00-00 00:00:00'];
             [rows] = yield db_1.default.query(sql, VALUES);
         }
         else {
@@ -100,13 +100,20 @@ const cardPurchase = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             const randomNum = Math.floor(Math.random() * (9999 - 1000));
             const offlineTrx = 'op-' + randomAlhpa + '-' + randomNum;
             const paymentType = 1;
-            const offlineSql = `INSERT INTO all_payment_info(user_id, txn_id, username, email, currency_code, price, name, phone_number, locality, country, city, address, pincode, contact_info, delivery_charges, payment_type, vat_num, note, is_gift_enable, gift_message, status, created_at, approve_time) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-            const offlineVALUES = [userId, offlineTrx, paymentInfo.username, paymentInfo.email, paymentInfo.price_currency_code, paymentInfo.price, deliveryDetails.name, deliveryDetails.phoneNumber, deliveryDetails.locality, deliveryDetails.country, deliveryDetails.city, deliveryDetails.address, deliveryDetails.pincode, deliveryDetails.email, paymentInfo.deliveryCharge, paymentType, deliveryDetails.vat_number, paymentInfo.note, isGiftEnable, giftMessage, paymentInfo.status, createdAt, '0000-00-00 00:00:00'];
+            const offlineSql = `INSERT INTO all_payment_info(user_id, txn_id, username, email, currency_code, price, name, phone_number, locality, country, city, address, pincode, contact_info, delivery_charges, payment_type, vat_num, note, is_gift_enable, gift_message, status, order_status, created_at, approve_time) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+            const offlineVALUES = [userId, offlineTrx, paymentInfo.username, paymentInfo.email, paymentInfo.price_currency_code, paymentInfo.price, deliveryDetails.name, deliveryDetails.phoneNumber, deliveryDetails.locality, deliveryDetails.country, deliveryDetails.city, deliveryDetails.address, deliveryDetails.pincode, deliveryDetails.email, paymentInfo.deliveryCharge, paymentType, deliveryDetails.vat_number, paymentInfo.note, isGiftEnable, giftMessage, paymentInfo.status, 'placed', createdAt, '0000-00-00 00:00:00'];
             [rows] = yield db_1.default.query(offlineSql, offlineVALUES);
         }
         const paymentId = rows.insertId;
         let orderListSql = `INSERT INTO orderlist(user_id, order_id, product_id, qty, sub_total, created_at) VALUES `;
         let result = "";
+        // let customizeSql = `INSERT INTO customize_card(user_id, product_id, name, designation, qty, created_at) VALUES`;
+        // const VALUES = [userId, productId, name, designation, qty, createdAt];
+        // const customize_id = rows.insertId;
+        // const addLogoQuery = `INSERT INTO customize_card_files(customize_id, type, file_name) VALUES (?, ?, ?)`;
+        // const fileVALUES = [customize_id, "cusfile", logo];
+        // const [data]:any = await pool.query(addLogoQuery, fileVALUES);
+        const orderId = rows.insertId;
         if (rows.affectedRows > 0) {
             try {
                 for (var _d = true, orderlist_1 = __asyncValues(orderlist), orderlist_1_1; orderlist_1_1 = yield orderlist_1.next(), _a = orderlist_1_1.done, !_a;) {
@@ -117,9 +124,23 @@ const cardPurchase = (req, res) => __awaiter(void 0, void 0, void 0, function* (
                         const productId = element.product_id;
                         const qty = element.qty;
                         const subTotal = element.sub_total;
-                        const orderId = rows.insertId;
+                        // const orderId  = rows.insertId;
+                        const isCustomizable = element.isCustomizable;
+                        const name = element.customizeName;
+                        const designation = element.customizeDesignation;
+                        const logo = element.customzeLogo;
+                        const customizeQty = element.customizeQty;
                         orderListSql = orderListSql + `(${userId}, ${orderId}, ${productId}, ${qty}, '${subTotal}', '${createdAt}'),`;
                         result = orderListSql.substring(0, orderListSql.lastIndexOf(','));
+                        if (isCustomizable === 1) {
+                            let customizeSql = `INSERT INTO customize_card(user_id, product_id, name, designation, qty, created_at) VALUES(?, ?, ?, ?, ?, ?)`;
+                            const VALUES = [userId, productId, name, designation, customizeQty, createdAt];
+                            const [customizeRows] = yield db_1.default.query(customizeSql, VALUES);
+                            const customize_id = customizeRows.insertId;
+                            const addLogoQuery = `INSERT INTO customize_card_files(customize_id, type, file_name) VALUES (?, ?, ?)`;
+                            const fileVALUES = [customize_id, "cusfile", logo];
+                            const [data] = yield db_1.default.query(addLogoQuery, fileVALUES);
+                        }
                     }
                     finally {
                         _d = true;
@@ -134,7 +155,12 @@ const cardPurchase = (req, res) => __awaiter(void 0, void 0, void 0, function* (
                 finally { if (e_1) throw e_1.error; }
             }
             const [data] = yield db_1.default.query(result);
+            const orderStatusQuery = `INSERT INTO order_tracking(user_id, order_id, status, expected_date, delivey_date) VALUES(?, ?, ?, ?, ?)`;
+            const orderStatusValues = [userId, orderId, 'placed', createdAt, createdAt];
+            const [orderStatusRows] = yield db_1.default.query(orderStatusQuery, orderStatusValues);
             if (data.affectedRows > 0) {
+                const deleteCartQuery = `DELETE FROM cart_details WHERE user_id = ${userId}`;
+                const [deleteCartRows] = yield db_1.default.query(deleteCartQuery);
                 const getFcm = `SELECT fcm_token FROM users WHERE id = ${userId}`;
                 const [rows] = yield db_1.default.query(getFcm);
                 let fcm;
@@ -146,6 +172,9 @@ const cardPurchase = (req, res) => __awaiter(void 0, void 0, void 0, function* (
                     body: `Your order received successfully`
                 };
                 const result = yield notify.fcmSend(notificationData, fcm, null);
+                const notificationQuery = `INSERT INTO notifications(user_id, identity, type, title, body, created_at) VALUES(?, ?, ?, ?, ?, ?)`;
+                const VALUES = [userId, paymentId, 'purchase_card', notificationData.title, notificationData.body, createdAt];
+                const [notificationRows] = yield db_1.default.query(notificationQuery, VALUES);
                 // return apiResponse.successResponse(res, "Purchase Successfully!", null);
                 return res.status(200).json({
                     status: true,

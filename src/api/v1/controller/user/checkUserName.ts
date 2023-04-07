@@ -38,7 +38,7 @@ export const checkEmail =async (req:Request, res:Response) => {
         if (!email || email === null) {
             return apiResponse.errorMessage(res, 400, "Enter Valid Email.");
         }
-        const checkEmailQuery = `Select email from users where email = '${email}' limit 1`;
+        const checkEmailQuery = `Select email from users where email = '${email}' AND deleted_at IS NULL limit 1`;
         const [rows]:any = await pool.query(checkEmailQuery);
 
         if (rows.length > 0) {

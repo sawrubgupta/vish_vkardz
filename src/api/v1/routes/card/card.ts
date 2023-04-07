@@ -15,6 +15,7 @@ const cardRouter = Router();
 
 cardRouter.get("/getCategory", productController.getCategories);
 cardRouter.get("/productList", tempAuthenticatingToken, productController.getProductByCategoryId);
+cardRouter.get("/productDetail", tempAuthenticatingToken, productController.productDetail);
 cardRouter.get("/productsFaq", productController.productFaq);
 cardRouter.post("/purchaseCard", authenticatingToken, validation.purchaseValidation, purchaseController.cardPurchase);
 // cardRouter.post("/shipping_method", authenticatingToken, validation.purchaseValidation, cartController.shipping);

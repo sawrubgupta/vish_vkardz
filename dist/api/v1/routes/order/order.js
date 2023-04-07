@@ -30,5 +30,6 @@ const authorization_controller_1 = require("../../middleware/authorization.contr
 const orderRouter = (0, express_1.Router)();
 orderRouter.get("/getTransactions", authorization_controller_1.authenticatingToken, transactionController.transactionHistory);
 orderRouter.get("/orderList", authorization_controller_1.authenticatingToken, orderController.orderHistory);
-orderRouter.get("/cancelOrder", authorization_controller_1.authenticatingToken, orderController.cancelOrder);
+orderRouter.post("/cancelOrder", authorization_controller_1.authenticatingToken, orderController.cancelOrder);
+orderRouter.get("/orderSummary", authorization_controller_1.authenticatingToken, orderController.orderSummary);
 exports.default = orderRouter;

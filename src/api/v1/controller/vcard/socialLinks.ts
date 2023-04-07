@@ -20,7 +20,7 @@ export const getSocialLinks =async (req:Request, res:Response) => {
         // const getPageQuery = `SELECT social_sites.id, vcard_social_sites.value FROM social_sites LEFT JOIN vcard_social_sites ON social_sites.id = vcard_social_sites.site_id WHERE vcard_social_sites.user_id = ${userId} AND social_sites.name LIKE '%${keyword}%'`;
         // const [result]:any= await pool.query(getPageQuery);
 
-        const sql = `SELECT social_sites.id, social_sites.name, social_sites.social_link, social_sites.social_img, social_sites.type, social_sites.status, social_sites.primary_profile, social_sites.icon, social_sites.mobile_icon, vcard_social_sites.value, vcard_social_sites.label, vcard_social_sites.orders FROM social_sites LEFT JOIN vcard_social_sites ON social_sites.id = vcard_social_sites.site_id WHERE vcard_social_sites.user_id = ${userId} AND social_sites.name LIKE '%${keyword}%' ORDER BY vcard_social_sites.value DESC, vcard_social_sites.orders IS NULL ASC`
+        const sql = `SELECT social_sites.id, social_sites.name, social_sites.social_link, social_sites.social_img, social_sites.type, social_sites.status, social_sites.primary_profile, social_sites.icon, social_sites.mobile_icon, vcard_social_sites.value, vcard_social_sites.label, vcard_social_sites.orders FROM social_sites LEFT JOIN vcard_social_sites ON social_sites.id = vcard_social_sites.site_id AND vcard_social_sites.user_id = ${userId} AND social_sites.name LIKE '%${keyword}%' ORDER BY vcard_social_sites.value DESC, vcard_social_sites.orders IS NULL ASC`
         //  limit ${page_size} offset ${offset}`;
         const [socialRows]:any = await pool.query(sql); 
         

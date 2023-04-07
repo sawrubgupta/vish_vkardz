@@ -49,6 +49,9 @@ const changePassword = (req, res) => __awaiter(void 0, void 0, void 0, function*
         if (data.length > 0) {
             const oldPassCorrect = (0, md5_1.default)(oldPassword) == data[0].password;
             if (oldPassCorrect) {
+                if (oldPassword === newPassword) {
+                    return apiResponse.errorMessage(res, 400, "old password and new password can't same");
+                }
                 const updatePassSql = `Update users Set password = ? where id = ?`;
                 const VALUES = [hash, userId];
                 const [updatePassword] = yield db_1.default.query(updatePassSql, VALUES);

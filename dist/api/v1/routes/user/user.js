@@ -31,7 +31,7 @@ const changePassword = __importStar(require("../../controller/user/changePasswor
 const checkUserName = __importStar(require("../../controller/user/checkUserName"));
 const countryListController = __importStar(require("../../controller/user/countryList"));
 const settingController = __importStar(require("../../controller/user/setting"));
-// import * as deleteAccountController from '../../controller/user/deleteAccount';
+const deleteAccountController = __importStar(require("../../controller/user/deleteAccount"));
 const authorization_controller_1 = require("../../middleware/authorization.controller");
 const validation = __importStar(require("../../middleware/validation"));
 const authRouter = (0, express_1.Router)();
@@ -45,5 +45,5 @@ authRouter.get('/checkUserName', checkUserName.validUserName);
 authRouter.get('/checkEmail', checkUserName.checkEmail);
 authRouter.get('/getCountryList', countryListController.countryList);
 authRouter.post('/setting', authorization_controller_1.authenticatingToken, validation.settingValidation, settingController.setting);
-// authRouter.delete('/deleteAccount', rateLimiterUsingThirdParty, authenticatingToken, deleteAccountController.deleteAccount);
+authRouter.delete('/deleteAccount', authorization_controller_1.authenticatingToken, deleteAccountController.deleteAccount);
 exports.default = authRouter;

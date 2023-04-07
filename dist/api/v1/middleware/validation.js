@@ -463,7 +463,7 @@ const deliveryAddressValidation = (req, res, next) => __awaiter(void 0, void 0, 
         locality: joi_1.default.string().normalize().max(100).required(),
         city: joi_1.default.string().required(),
         state: joi_1.default.string().required(),
-        pincode: joi_1.default.number().min(999).max(9999999).required(),
+        pincode: joi_1.default.required(),
     });
     const value = schema.validate(req.body);
     if (value.error) {
@@ -485,7 +485,7 @@ const updateDdeliveryAddressValidation = (req, res, next) => __awaiter(void 0, v
         locality: joi_1.default.string().normalize().max(100).required(),
         city: joi_1.default.string().required(),
         state: joi_1.default.string().required(),
-        pincode: joi_1.default.number().min(999).max(9999999).required(),
+        pincode: joi_1.default.required(),
     });
     const value = schema.validate(req.body);
     if (value.error) {
@@ -596,13 +596,20 @@ const purchaseValidation = (req, res, next) => __awaiter(void 0, void 0, void 0,
             paymentType: joi_1.default.string().min(3).max(150).allow(''),
             txnId: joi_1.default.string().allow('').allow(null),
             status: joi_1.default.string().min(1).max(2500),
-            note: joi_1.default.string().allow('').allow(null)
+            note: joi_1.default.string().allow('').allow(null),
+            couponDiscount: joi_1.default.number().allow(null),
+            gstAmount: joi_1.default.number().allow(null),
         },
         orderlist: joi_1.default.array()
             .items({
             product_id: joi_1.default.number(),
             qty: joi_1.default.number(),
             sub_total: joi_1.default.string(),
+            isCustomizable: joi_1.default.number().integer().required(),
+            customizeName: joi_1.default.string().allow(null).allow(''),
+            customizeDesignation: joi_1.default.string().allow(null).allow(''),
+            customzeLogo: joi_1.default.string().allow(null).allow(''),
+            customizeQty: joi_1.default.number().allow(null).allow('')
         })
     });
     const value = schema.validate(req.body);

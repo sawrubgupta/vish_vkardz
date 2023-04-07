@@ -160,6 +160,11 @@ const socialRegister = (req, res) => __awaiter(void 0, void 0, void 0, function*
         const hash = (0, md5_1.default)(password);
         let referralCode;
         referralCode = utility.randomString(6);
+        const referSql = `SELECT referral_code FROM users where referral_code = '${referralCode}' LIMIT 1`;
+        const [referRows] = yield db_1.default.query(referSql);
+        if (referRows.length > 0) {
+            referralCode = utility.randomString(6);
+        }
         let uName;
         let featureStatus;
         let featureResult;
@@ -189,7 +194,7 @@ const socialRegister = (req, res) => __awaiter(void 0, void 0, void 0, function*
         else {
             return apiResponse.errorMessage(res, 400, "Wrong type passed !");
         }
-        const emailSql = `SELECT * FROM users where email = ? or username = ? or phone = ? or facebook_id = ? or google_id = ? or apple_id = ? or referral_code = ? LIMIT 1`;
+        const emailSql = `SELECT * FROM users where status = 0 AND deleted_at IS NULL AND (email = ? or username = ? or phone = ? or facebook_id = ? or google_id = ? or apple_id = ?) LIMIT 1`;
         const emailValues = [email, username, phone, socialId, socialId, socialId, referralCode];
         const [data] = yield db_1.default.query(emailSql, emailValues);
         const dupli = [];

@@ -21,7 +21,7 @@ import serviceRoute from "./service/package";
 // // import aboutusRoute from "./aboutUs/aboutUs";
 // import serviceRoute from "./services/service";
 // import setUserPassword from "./userSetPassword/setPassword";
-// import notification from "./notification/notification";
+import notification from "./notification/notification";
 
 const indexRoute = Router();
 
@@ -45,6 +45,6 @@ indexRoute.use("/service", serviceRoute);
 // // indexRoute.use("/aboutUs", aboutusRoute);
 // indexRoute.use("/services", serviceRoute);
 // indexRoute.use("/setPassword", setUserPassword);
-// indexRoute.use("/sendNotification", notification);
+indexRoute.use("/notification", notification);
 
 export default indexRoute;

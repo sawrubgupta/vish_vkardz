@@ -76,7 +76,7 @@ const updateProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     try {
         const userId = res.locals.jwt.userId;
         const { name, designation, companyName, dialCode, phone, email, website, address } = req.body;
-        const checkUser = `SELECT * FROM users where (phone = ? || email = ?) &&  id != ? LIMIT 1`;
+        const checkUser = `SELECT * FROM users where deleted_at IS NULL AND (phone = ? || email = ?) AND id != ? LIMIT 1`;
         const checkUserVALUES = [phone, email, userId];
         const [rows] = yield db_1.default.query(checkUser, checkUserVALUES);
         if (rows.length > 0) {

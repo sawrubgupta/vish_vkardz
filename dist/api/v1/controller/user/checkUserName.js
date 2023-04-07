@@ -73,7 +73,7 @@ const checkEmail = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         if (!email || email === null) {
             return apiResponse.errorMessage(res, 400, "Enter Valid Email.");
         }
-        const checkEmailQuery = `Select email from users where email = '${email}' limit 1`;
+        const checkEmailQuery = `Select email from users where email = '${email}' AND deleted_at IS NULL limit 1`;
         const [rows] = yield db_1.default.query(checkEmailQuery);
         if (rows.length > 0) {
             emailExist = 1;

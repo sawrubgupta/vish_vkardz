@@ -18,6 +18,44 @@ name api's
 
 
 database changes:
+03-04-2023
+ALTER TABLE all_payment_info ADD COLUMN order_status VARCHAR(55) not null DEFAULT 'placed' AFTER status;
+
+CREATE TABLE `order_tracking` (
+  `id` int(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `order_id` int(11) NOT NULL, 
+  `status` varchar(55) DEFAULT NULL,
+  `expected_date` datetime DEFAULT NULL,
+  `delivey_date` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+31-03-2023
+ALTER TABLE dashboard_banner ADD COLUMN category_id int(11) default null AFTER type;
+ALTER TABLE products ADD COLUMN is_customizable tinyint default 0 AFTER status;
+
+30-03-2023
+ALTER TABLE all_payment_info ADD COLUMN delivery_date datetime default null AFTER created_at;
+ALTER TABLE all_payment_info ADD COLUMN expected_date datetime default null AFTER delivery_date;
+
+CREATE TABLE `notifications` (
+  `id` int(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `identity` VARCHAR(20) NOT NULL, 
+  `type` varchar(255) DEFAULT NULL,
+  `redirect` VARCHAR(55) DEFAULT NULL,
+  `title` VARCHAR(255) DEFAULT NULL,
+  `body` text DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+29-03-2023
+ALTER TABLE all_payment_info ADD COLUMN coupon_discount double not null default 0 AFTER gift_message;
+ALTER TABLE all_payment_info ADD COLUMN gst_amount double not null default 0 AFTER coupon_discount;
+
+28-03-2023
+ALTER TABLE users ADD COLUMN status boolean NOT NULL DEFAULT 1;
+ALTER TABLE users ADD COLUMN deleted_at datetime DEFAULT null;
 
 14-03-2023
 ALTER TABLE user_contacts ADD COLUMN created_at datetime not null DEFAULT CURRENT_TIMESTAMP;

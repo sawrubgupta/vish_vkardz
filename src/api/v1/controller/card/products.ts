@@ -138,6 +138,87 @@ console.log(userId);
 // ====================================================================================================
 // ====================================================================================================
 
+export const productDetail =async (req:Request, res:Response) => {
+    try {
+        const userId:any = res.locals.jwt.userId;
+        const productId = req.query.productId;
+        if (!productId) {
+            return apiResponse.errorMessage(res, 400, "Invalid Product Id");
+        }
+
+        if (userId) {
+            const sql = `SELECT products.product_id, products.name, products.sub_cat, products.slug, products.description, products.price, products.mrp_price, products.discount_percent, products.product_image, products.image_back, products.image_other, products.material, products.bg_color, products.print, products.dimention, products.weight, products.thickness, products.alt_title, product_price.usd_selling_price, product_price.usd_mrp_price, product_price.aed_selling_price, product_price.aed_mrp_price, product_price.inr_selling_price, product_price.inr_mrp_price, product_price.qar_selling_price, product_price.qar_mrp_price, COUNT(product_rating.id) AS totalRating, AVG(COALESCE(product_rating.rating, 0)) AS averageRating FROM products LEFT JOIN product_price ON products.product_id = product_price.product_id LEFT JOIN product_rating ON products.product_id = product_rating.product_id WHERE products.product_id = ${productId} GROUP BY products.product_id`;
+            const [rows]: any = await pool.query(sql);
+
+            const checkWishlist = `SELECT product_id FROM wishlist WHERE user_id = ${userId}`;
+            const [wishlistRows]:any = await pool.query(checkWishlist);
+
+            const cartQuery = `SELECT product_id FROM cart_details WHERE user_id = ${userId}`;
+            const [cartRows]:any = await pool.query(cartQuery);
+
+            rows.forEach((element:any, index:any) => {
+                if (wishlistRows.length === 0) {
+                    rows[index].isAddedToWishlist = false;
+                }
+                for (const i of wishlistRows) {
+                    if (i.product_id === element.product_id) {
+                        rows[index].isAddedToWishlist = true;
+                        break;
+                    } else {
+                        rows[index].isAddedToWishlist = false;
+                    }
+                }
+
+                if (cartRows.length === 0) {
+                    rows[index].isAddedToCart = false;
+                }
+                for (const cartData of cartRows) {
+                    if (cartData.product_id === element.product_id) {
+                        rows[index].isAddedToCart = true;
+                        break;
+                    } else {
+                        rows[index].isAddedToCart = false;
+                    }
+                }
+            });
+
+            if (rows.length > 0) {
+                return apiResponse.successResponse(res, "Products details are here", rows[0]);
+            } else {
+                return apiResponse.successResponse(res, "Data not found", null);
+            }    
+
+        } else {
+            const sql = `SELECT products.product_id, products.name, products.sub_cat, products.slug, products.description, products.price, products.mrp_price, products.discount_percent, products.product_image, products.image_back, products.image_other, products.material, products.bg_color, products.print, products.dimention, products.weight, products.thickness, products.alt_title, product_price.usd_selling_price, product_price.usd_mrp_price, product_price.aed_selling_price, product_price.aed_mrp_price, product_price.inr_selling_price, product_price.inr_mrp_price, product_price.qar_selling_price, product_price.qar_mrp_price, COUNT(product_rating.id) AS totalRating, AVG(COALESCE(product_rating.rating, 0)) AS averageRating FROM products LEFT JOIN product_price ON products.product_id = product_price.product_id LEFT JOIN product_rating ON products.product_id = product_rating.product_id WHERE products.product_id = ${productId} GROUP BY products.product_id`;
+            const [rows]: any = await pool.query(sql);
+
+            rows.forEach((element:any, index:any) => {
+                rows[index].isAddedToWishlist = false;
+                rows[index].isAddedToCart = false;
+            });
+    
+            if (rows.length > 0) {
+                return apiResponse.successResponse(res, "Products details are here", rows[0]);
+                return res.status(200).json({
+                    status: true,
+                    data: rows,
+                    message: "Products details are here"
+                })
+            } else {
+                return apiResponse.successResponse(res, "Data not found", null);
+            }
+    
+    
+        }
+    } catch (error) {
+        console.log(error);
+        return apiResponse.errorMessage(res, 400, "Something Went Wrong");
+    }
+}
+
+// ====================================================================================================
+// ====================================================================================================
+
 export const productFaq = async (req: Request, res: Response) => {
     try {
         const productId = req.query.productId;

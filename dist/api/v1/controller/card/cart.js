@@ -81,15 +81,18 @@ const getCart = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             return apiResponse.errorMessage(res, 401, "Please login !");
         }
         yield client.query("START TRANSACTION");
-        const cartQuery = `SELECT cart_details.product_id, cart_details.qty, products.name, products.slug, products.description, products.price, products.mrp_price, products.discount_percent, products.product_image, products.image_back, products.image_other, products.material, products.bg_color, products.print, products.dimention, products.weight, products.thickness, products.alt_title, product_price.usd_selling_price, product_price.usd_mrp_price, product_price.aed_selling_price, product_price.aed_mrp_price, product_price.inr_selling_price, product_price.inr_mrp_price, product_price.qar_selling_price, product_price.qar_mrp_price, COUNT(product_rating.id) AS totalRating, AVG(COALESCE(product_rating.rating, 0)) AS averageRating, cart_details.created_at FROM products LEFT JOIN cart_details on cart_details.product_id = products.product_id LEFT JOIN product_price ON products.product_id = product_price.product_id LEFT JOIN product_rating ON products.product_id = product_rating.product_id WHERE cart_details.user_id = ${userId} GROUP BY products.product_id ORDER BY created_at DESC`;
+        const cartQuery = `SELECT cart_details.product_id, cart_details.qty, products.name, products.slug, products.description, products.price, products.mrp_price, products.discount_percent, products.product_image, products.image_back, products.image_other, products.material, products.bg_color, products.print, products.dimention, products.weight, products.thickness, products.alt_title, products.is_customizable, product_price.usd_selling_price, product_price.usd_mrp_price, product_price.aed_selling_price, product_price.aed_mrp_price, product_price.inr_selling_price, product_price.inr_mrp_price, product_price.qar_selling_price, product_price.qar_mrp_price, COUNT(product_rating.id) AS totalRating, AVG(COALESCE(product_rating.rating, 0)) AS averageRating, cart_details.created_at FROM products LEFT JOIN cart_details on cart_details.product_id = products.product_id LEFT JOIN product_price ON products.product_id = product_price.product_id LEFT JOIN product_rating ON products.product_id = product_rating.product_id WHERE cart_details.user_id = ${userId} GROUP BY products.product_id ORDER BY created_at DESC`;
         const [rows] = yield client.query(cartQuery);
-        // var items: number = result.length;
-        // var totatAmount: any = 0;
-        // for (let i = 0; i < result.length; i++) {
-        //     var amount: any = result[i].selling_price * result[i].qty;
-        //     totatAmount = totatAmount + amount;
-        //     result[i].totalPrice = amount;
-        // }
+        const gstInPercent = 18;
+        var totatAmount = 0;
+        for (let i = 0; i < rows.length; i++) {
+            var amount = rows[i].inr_selling_price * rows[i].qty;
+            totatAmount = totatAmount + amount;
+            rows[i].totalPriceWithQty = amount;
+        }
+        const gstPrice = (totatAmount * gstInPercent) / 100;
+        const deliveryCharges = 0;
+        const grandTotal = totatAmount + deliveryCharges + gstPrice;
         const userDetailQuery = `SELECT username, name, email, phone, country, thumb FROM users WHERE id = ${userId} LIMIT 1`;
         const [userRows] = yield client.query(userDetailQuery);
         const addressQuery = `SELECT * FROM delivery_addresses WHERE user_id = ${userId} ORDER BY is_default = 1 DESC LIMIT 1`;
@@ -98,8 +101,11 @@ const getCart = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         if (rows.length > 0) {
             userRows[0].cardProducts = rows || [];
             userRows[0].userAddress = addressRows[0] || {};
-            userRows[0].deliveryCharge = 0;
-            userRows[0].gstInPercent = 18;
+            userRows[0].deliveryCharge = deliveryCharges;
+            userRows[0].gstInPercent = gstInPercent;
+            userRows[0].itemsTotal = totatAmount;
+            userRows[0].gstAmount = gstPrice;
+            userRows[0].grandTotal = grandTotal;
             return apiResponse.successResponse(res, "Cart list are here!", userRows);
         }
         else {
@@ -165,16 +171,26 @@ exports.updataCartQty = updataCartQty;
 const addCostmizeCard = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userId = res.locals.jwt.userId;
-        const { productId, name, designation, logo, qty } = req.body;
+        // const { productId, name, designation, logo, qty } = req.body;
+        const customizeCard = req.body.customizeCard;
         const createdAt = utility.dateWithFormat();
-        const sql = `INSERT INTO customize_card(user_id, product_id, name, designation, qty, created_at) VALUES (?, ?, ?, ?, ?, ?)`;
-        const VALUES = [userId, productId, name, designation, qty, createdAt];
-        const [rows] = yield db_1.default.query(sql, VALUES);
+        let sql = `INSERT INTO customize_card(user_id, product_id, name, designation, qty, created_at) VALUES `;
+        let result;
+        for (const element of customizeCard) {
+            const productId = element.productId;
+            const name = element.name;
+            const designation = element.designation;
+            const logo = element.logo;
+            const qty = element.qty;
+            sql = sql + `(${userId}, ${productId}, '${name}', '${designation}', ${qty},  '${createdAt}'),`;
+            result = sql.substring(0, sql.lastIndexOf(','));
+        }
+        const [rows] = yield db_1.default.query(result);
         const customize_id = rows.insertId;
-        const addLogoQuery = `INSERT INTO customize_card_files(customize_id, type, file_name) VALUES (?, ?, ?)`;
-        const fileVALUES = [customize_id, "cusfile", logo];
-        const [data] = yield db_1.default.query(addLogoQuery, fileVALUES);
-        if (data.affectedRows > 0) {
+        // const addLogoQuery = `INSERT INTO customize_card_files(customize_id, type, file_name) VALUES (?, ?, ?)`;
+        // const fileVALUES = [customize_id, "cusfile", logo];
+        // const [data]:any = await pool.query(addLogoQuery, fileVALUES);
+        if (rows.affectedRows > 0) {
             return apiResponse.successResponse(res, "Customization data Added Successfully", null);
         }
         else {

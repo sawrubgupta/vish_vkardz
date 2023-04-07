@@ -35,21 +35,24 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.useReferCode = exports.checkReferCode = void 0;
+exports.deleteAccount = void 0;
 const db_1 = __importDefault(require("../../../../db"));
 const apiResponse = __importStar(require("../../helper/apiResponse"));
 const utility = __importStar(require("../../helper/utility"));
-const checkReferCode = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const deleteAccount = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const referralCode = req.body.referralCode;
-        const sql = `SELECT referral_code FROM users WHERE referral_code = ?`;
-        const VALUES = [referralCode];
+        const userId = res.locals.jwt.userId;
+        const createdAt = utility.dateWithFormat();
+        console.log(userId);
+        console.log(createdAt);
+        const sql = `UPDATE users SET status = ?, deleted_at = ? WHERE id = ?`;
+        const VALUES = [0, createdAt, userId];
         const [rows] = yield db_1.default.query(sql, VALUES);
-        if (rows.length > 0) {
-            return apiResponse.successResponse(res, "Referral Code Verified Successfully", null);
+        if (rows.affectedRows > 0) {
+            return apiResponse.successResponse(res, "Account Deleted Successfully", null);
         }
         else {
-            return apiResponse.errorMessage(res, 400, "Invalid Refferal Code");
+            return apiResponse.errorMessage(res, 400, "Failed, try again");
         }
     }
     catch (error) {
@@ -57,38 +60,6 @@ const checkReferCode = (req, res) => __awaiter(void 0, void 0, void 0, function*
         return apiResponse.errorMessage(res, 400, "Something went wrong");
     }
 });
-exports.checkReferCode = checkReferCode;
-// ====================================================================================================
-// ====================================================================================================
-const useReferCode = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const userId = res.locals.jwt.userId;
-        const referralCode = req.body.referralCode;
-        const createdAt = utility.dateWithFormat();
-        const sql = `SELECT id, referral_code, offer_coin FROM users WHERE referral_code = ?`;
-        const VALUES = [referralCode];
-        const [rows] = yield db_1.default.query(sql, VALUES);
-        if (rows.length === 0) {
-            return apiResponse.errorMessage(res, 400, "Invalid Refferal Code");
-        }
-        const offerCoin = rows[0].offer_coin + 100;
-        const addreferral = `INSERT INTO referrals(user_id, referrer_user_id, refer_code, created_at) VALUES(?, ?, ?, ?)`;
-        const referVALUES = [userId, rows[0].id, referralCode, createdAt];
-        const [referRows] = yield db_1.default.query(addreferral, referVALUES);
-        if (referRows.affectedRows > 0) {
-            const updateReferreData = `UPDATE users SET offer_coin = ${offerCoin} WHERE id = ${rows[0].id}`;
-            const [data] = yield db_1.default.query(updateReferreData);
-            return apiResponse.successResponse(res, "success", null);
-        }
-        else {
-            return apiResponse.errorMessage(res, 400, "Failed to verify refer code, Contact support!!");
-        }
-    }
-    catch (error) {
-        console.log(error);
-        return apiResponse.errorMessage(res, 400, "Something went wrongr");
-    }
-});
-exports.useReferCode = useReferCode;
+exports.deleteAccount = deleteAccount;
 // ====================================================================================================
 // ====================================================================================================

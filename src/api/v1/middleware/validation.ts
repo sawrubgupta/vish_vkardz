@@ -489,7 +489,7 @@ export const deliveryAddressValidation = async (req: Request,res: Response, next
         locality: Joi.string().normalize().max(100).required(),
         city: Joi.string().required(),
         state: Joi.string().required(),
-        pincode: Joi.number().min(999).max(9999999).required(),
+        pincode: Joi.required(),
     });
 
     const value = schema.validate(req.body);
@@ -514,7 +514,7 @@ export const updateDdeliveryAddressValidation = async (req: Request,res: Respons
         locality: Joi.string().normalize().max(100).required(),
         city: Joi.string().required(),
         state: Joi.string().required(),
-        pincode: Joi.number().min(999).max(9999999).required(),
+        pincode: Joi.required(),
     });
 
     const value = schema.validate(req.body);
@@ -638,13 +638,20 @@ export const purchaseValidation = async (req: Request,res: Response,next: NextFu
             paymentType: Joi.string().min(3).max(150).allow(''),
             txnId: Joi.string().allow('').allow(null),
             status: Joi.string().min(1).max(2500),
-            note: Joi.string().allow('').allow(null)
+            note: Joi.string().allow('').allow(null),
+            couponDiscount: Joi.number().allow(null),
+            gstAmount: Joi.number().allow(null),
         },
         orderlist: Joi.array()
         .items({
             product_id: Joi.number(),
             qty: Joi.number(),
             sub_total: Joi.string(),
+            isCustomizable: Joi.number().integer().required(),
+            customizeName: Joi.string().allow(null).allow(''),
+            customizeDesignation: Joi.string().allow(null).allow(''),
+            customzeLogo: Joi.string().allow(null).allow(''),
+            customizeQty: Joi.number().allow(null).allow('')
         })
     });
 

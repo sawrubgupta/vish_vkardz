@@ -94,6 +94,10 @@ const extendedDateWithFormat = (type) => {
         date.setMonth(date.getMonth() + 1);
         endDate = (0, moment_1.default)(date).format("YYYY-MM-DD HH:mm:ss");
     }
+    else if (type === "weekly" || type === "week") {
+        date.setDate(date.getDate() + 7);
+        endDate = (0, moment_1.default)(date).format("YYYY-MM-DD HH:mm:ss");
+    }
     return endDate;
 };
 exports.extendedDateWithFormat = extendedDateWithFormat;

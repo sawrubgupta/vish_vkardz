@@ -50,7 +50,7 @@ export const updateProfile =async (req:Request, res:Response) => {
         const userId: string = res.locals.jwt.userId;
         const { name, designation, companyName, dialCode, phone, email, website, address } = req.body;
 
-        const checkUser = `SELECT * FROM users where (phone = ? || email = ?) &&  id != ? LIMIT 1`;
+        const checkUser = `SELECT * FROM users where deleted_at IS NULL AND (phone = ? || email = ?) AND id != ? LIMIT 1`;
         const checkUserVALUES = [phone, email, userId];
         const [rows]:any = await pool.query(checkUser, checkUserVALUES);
 

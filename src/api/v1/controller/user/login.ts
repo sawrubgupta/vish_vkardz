@@ -75,7 +75,7 @@ export const socialLogin =async (req:Request, res:Response) => {
         let uName;
         const hash = md5(password);
 
-        const emailSql = `SELECT * FROM users where email = ? or username = ? or phone = ? or facebook_id = ? or google_id = ? or apple_id = ? LIMIT 1`;
+        const emailSql = `SELECT * FROM users where status = 1 AND deleted_at IS NULL AND( email = ? or username = ? or phone = ? or facebook_id = ? or google_id = ? or apple_id = ?) LIMIT 1`;
         const emailValues = [email, email, email, socialId, socialId, socialId]
         const [userRows]:any = await pool.query(emailSql, emailValues);
 

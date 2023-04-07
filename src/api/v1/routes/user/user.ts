@@ -7,7 +7,7 @@ import * as changePassword from '../../controller/user/changePassword';
 import  * as checkUserName from'../../controller/user/checkUserName';
 import  * as countryListController from '../../controller/user/countryList';
 import * as settingController from '../../controller/user/setting';
-// import * as deleteAccountController from '../../controller/user/deleteAccount';
+import * as deleteAccountController from '../../controller/user/deleteAccount';
 
 import {authenticatingToken} from '../../middleware/authorization.controller';
 import * as validation from '../../middleware/validation';
@@ -24,6 +24,6 @@ authRouter.get('/checkUserName', checkUserName.validUserName);
 authRouter.get('/checkEmail', checkUserName.checkEmail);
 authRouter.get('/getCountryList', countryListController.countryList);
 authRouter.post('/setting', authenticatingToken ,validation.settingValidation, settingController.setting);
-// authRouter.delete('/deleteAccount', rateLimiterUsingThirdParty, authenticatingToken, deleteAccountController.deleteAccount);
+authRouter.delete('/deleteAccount', authenticatingToken, deleteAccountController.deleteAccount);
 
 export default authRouter;

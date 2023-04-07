@@ -16,6 +16,9 @@ export const changePassword =async (req:Request, res:Response) => {
         if (data.length > 0) {
             const oldPassCorrect = md5(oldPassword) ==  data[0].password;
             if (oldPassCorrect) {
+                if (oldPassword === newPassword) {
+                    return apiResponse.errorMessage(res, 400, "old password and new password can't same");
+                }
                 const updatePassSql = `Update users Set password = ? where id = ?`;
                 const VALUES = [hash, userId]
                 const [updatePassword]:any = await pool.query(updatePassSql, VALUES)

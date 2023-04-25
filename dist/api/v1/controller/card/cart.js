@@ -85,6 +85,8 @@ const getCart = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const [rows] = yield client.query(cartQuery);
         const addressQuery = `SELECT * FROM delivery_addresses WHERE user_id = ${userId} ORDER BY is_default = 1 DESC LIMIT 1`;
         const [addressRows] = yield client.query(addressQuery);
+        const userDetailQuery = `SELECT username, name, email, phone, country, thumb FROM users WHERE id = ${userId} LIMIT 1`;
+        const [userRows] = yield client.query(userDetailQuery);
         const gstInPercent = 18;
         var totatAmount = 0;
         let amount;
@@ -94,11 +96,22 @@ const getCart = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         //     rows[i].totalPriceWithQty = amount;
         // }
         for (let i = 0; i < rows.length; i++) {
-            if (addressRows[0].currency_code === '91' || addressRows[0].currency_code === '+91') {
-                amount = rows[i].inr_selling_price * rows[i].qty;
+            if (addressRows.length > 0) {
+                if (addressRows[0].currency_code === '91' || addressRows[0].currency_code === '+91') {
+                    amount = rows[i].inr_selling_price * rows[i].qty;
+                }
+                else {
+                    amount = rows[i].usd_selling_price * rows[i].qty;
+                }
             }
             else {
-                amount = rows[i].usd_selling_price * rows[i].qty;
+                if (userRows[0].country === '91' || userRows[0].country === '+91') {
+                    amount = rows[i].inr_selling_price * rows[i].qty;
+                }
+                else {
+                    amount = rows[i].usd_selling_price * rows[i].qty;
+                }
+                // amount = rows[i].inr_selling_price * rows[i].qty;
             }
             totatAmount = totatAmount + amount;
             rows[i].totalPriceWithQty = amount;
@@ -106,8 +119,6 @@ const getCart = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const gstPrice = (totatAmount * gstInPercent) / 100;
         const deliveryCharges = 0;
         const grandTotal = totatAmount + deliveryCharges + gstPrice;
-        const userDetailQuery = `SELECT username, name, email, phone, country, thumb FROM users WHERE id = ${userId} LIMIT 1`;
-        const [userRows] = yield client.query(userDetailQuery);
         yield client.query("COMMIT");
         if (rows.length > 0) {
             userRows[0].cardProducts = rows || [];

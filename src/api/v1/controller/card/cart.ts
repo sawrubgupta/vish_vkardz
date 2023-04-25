@@ -47,12 +47,16 @@ export const getCart =async (req:Request, res:Response) => {
             return apiResponse.errorMessage(res, 401, "Please login !");
         }
 
+
         await client.query("START TRANSACTION");
         const cartQuery = `SELECT cart_details.product_id, cart_details.qty, products.name, products.slug, products.description, products.price, products.mrp_price, products.discount_percent, products.product_image, products.image_back, products.image_other, products.material, products.bg_color, products.print, products.dimention, products.weight, products.thickness, products.alt_title, products.is_customizable, product_price.usd_selling_price, product_price.usd_mrp_price, product_price.aed_selling_price, product_price.aed_mrp_price, product_price.inr_selling_price, product_price.inr_mrp_price, product_price.qar_selling_price, product_price.qar_mrp_price, COUNT(product_rating.id) AS totalRating, AVG(COALESCE(product_rating.rating, 0)) AS averageRating, cart_details.created_at FROM products LEFT JOIN cart_details on cart_details.product_id = products.product_id LEFT JOIN product_price ON products.product_id = product_price.product_id LEFT JOIN product_rating ON products.product_id = product_rating.product_id WHERE cart_details.user_id = ${userId} GROUP BY products.product_id ORDER BY created_at DESC`;
         const [rows]:any = await client.query(cartQuery);
-
+        
         const addressQuery = `SELECT * FROM delivery_addresses WHERE user_id = ${userId} ORDER BY is_default = 1 DESC LIMIT 1`;
         const [addressRows]:any = await client.query(addressQuery);
+
+        const userDetailQuery = `SELECT username, name, email, phone, country, thumb FROM users WHERE id = ${userId} LIMIT 1`;
+        const [userRows]:any = await client.query(userDetailQuery);
 
         const gstInPercent = 18;
         var totatAmount: any = 0;
@@ -63,10 +67,19 @@ export const getCart =async (req:Request, res:Response) => {
         //     rows[i].totalPriceWithQty = amount;
         // }
         for (let i = 0; i < rows.length; i++) {
-            if (addressRows[0].currency_code === '91' || addressRows[0].currency_code === '+91') {
-                amount = rows[i].inr_selling_price * rows[i].qty;
+            if (addressRows.length > 0) {
+                if (addressRows[0].currency_code === '91' || addressRows[0].currency_code === '+91') {
+                    amount = rows[i].inr_selling_price * rows[i].qty;
+                } else {
+                    amount = rows[i].usd_selling_price * rows[i].qty;
+                }    
             } else {
-                amount = rows[i].usd_selling_price * rows[i].qty;
+                if (userRows[0].country === '91' || userRows[0].country === '+91') {
+                    amount = rows[i].inr_selling_price * rows[i].qty;
+                } else {
+                    amount = rows[i].usd_selling_price * rows[i].qty;
+                } 
+                // amount = rows[i].inr_selling_price * rows[i].qty;
             }
             totatAmount = totatAmount + amount;
             rows[i].totalPriceWithQty = amount;
@@ -75,8 +88,6 @@ export const getCart =async (req:Request, res:Response) => {
         const deliveryCharges = 0;
         const grandTotal = totatAmount+deliveryCharges+gstPrice;
 
-        const userDetailQuery = `SELECT username, name, email, phone, country, thumb FROM users WHERE id = ${userId} LIMIT 1`;
-        const [userRows]:any = await client.query(userDetailQuery);
 
 
 

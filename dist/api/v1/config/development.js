@@ -15,6 +15,11 @@ exports.default = {
             rejectUnauthorized: false
         }
     },
+    AWS: {
+        region: process.env.AWS_REGION,
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    },
     secretKey: "nss6DpYlq5CHw6Hn0jPqXJwtkHXuMDdYynDiRFNS6_Y",
     resumeLimit: 10,
     vKardzPhone: "+91 6377256382",

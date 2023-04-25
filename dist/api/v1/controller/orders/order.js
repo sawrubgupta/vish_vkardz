@@ -42,15 +42,19 @@ const development_1 = __importDefault(require("../../config/development"));
 const orderHistory = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userId = res.locals.jwt.userId;
-        const sql = `SELECT api.id AS orderId, api.created_at, api.payment_type, api.delivery_date, api.expected_date, p.product_image, p.name, api.price, ol.qty, api.name, api.address, api.locality, api.city, api.country, api.phone_number, api.delivery_charges, api.cod, api.price AS totalPrice, api.price, api.status FROM all_payment_info AS api LEFT JOIN orderlist AS ol ON ol.order_id = api.id LEFT JOIN products AS p ON ol.product_id = p.product_id WHERE api.user_id = ${userId} AND api.status != 'canceled' ORDER BY created_at DESC`;
+        const sql = `SELECT api.id AS orderId, api.created_at, api.payment_type, api.delivery_date, api.expected_date, p.product_image, p.product_id AS productId, p.name AS productName, p.slug, api.price, ol.qty, api.name, api.address, api.locality, api.city, api.country, api.phone_number, api.delivery_charges, api.cod, api.price AS totalPrice, api.price, api.status, api.order_status, product_price.usd_selling_price, product_price.usd_mrp_price, product_price.aed_selling_price, product_price.aed_mrp_price, product_price.inr_selling_price, product_price.inr_mrp_price, product_price.qar_selling_price, product_price.qar_mrp_price, COUNT(product_rating.id) AS totalRating, AVG(COALESCE(product_rating.rating, 0)) AS averageRating FROM all_payment_info AS api LEFT JOIN orderlist AS ol ON ol.order_id = api.id LEFT JOIN products AS p ON ol.product_id = p.product_id LEFT JOIN product_price ON p.product_id = product_price.product_id LEFT JOIN product_rating ON p.product_id = product_rating.product_id WHERE api.user_id = ${userId} GROUP BY api.id ORDER BY created_at DESC`;
         const [rows] = yield db_1.default.query(sql);
         const ongoingOrder = [];
         const deliveredOrder = [];
+        const cancelOrder = [];
         let rowsIndex = -1;
         for (const iterator of rows) {
             rowsIndex++;
-            if (iterator.status === 'delivered') {
+            if (iterator.order_status === 'delivered') {
                 deliveredOrder.push(iterator);
+            }
+            else if (iterator.order_status === 'canceled') {
+                cancelOrder.push(iterator);
             }
             else {
                 ongoingOrder.push(iterator);
@@ -59,7 +63,7 @@ const orderHistory = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         if (rows.length > 0) {
             return res.status(200).json({
                 status: true,
-                ongoingOrder, deliveredOrder,
+                ongoingOrder, deliveredOrder, cancelOrder,
                 message: "Data Rtrieved Successfully"
             });
             // return apiResponse.successResponse(res, "Data Rtrieved Successfully", rows);
@@ -85,7 +89,7 @@ const cancelOrder = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         // if (orderRows.status === 'dele') {
         // } else {
         // }
-        const sql = `UPDATE all_payment_info SET status = 'canceled' WHERE user_id = ${userId} AND id = ${orderId}`;
+        const sql = `UPDATE all_payment_info SET order_status = 'canceled' WHERE user_id = ${userId} AND id = ${orderId}`;
         const [rows] = yield db_1.default.query(sql);
         return apiResponse.successResponse(res, "your order was canceled!!", null);
     }

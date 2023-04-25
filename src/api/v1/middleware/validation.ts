@@ -482,6 +482,7 @@ export const customizeCardValidation = async (req: Request,res: Response,next: N
 
 export const deliveryAddressValidation = async (req: Request,res: Response, next:NextFunction) => {
     const schema = Joi.object({
+        currencyCode : Joi.string().allow(null).allow(''),
         name: Joi.string().trim().max(70).trim().required(),
         addressType: Joi.string().required(),
         phone: Joi.string().trim().min(8).max(20).trim().required(),
@@ -506,6 +507,7 @@ export const deliveryAddressValidation = async (req: Request,res: Response, next
 
 export const updateDdeliveryAddressValidation = async (req: Request,res: Response, next:NextFunction) => {
     const schema = Joi.object({
+        currencyCode : Joi.string().allow(null).allow(''),
         addressId: Joi.number().integer().required(),
         name: Joi.string().trim().max(70).trim().required(),
         addressType: Joi.string().required(),

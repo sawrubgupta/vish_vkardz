@@ -456,6 +456,7 @@ exports.customizeCardValidation = customizeCardValidation;
 // ====================================================================================================
 const deliveryAddressValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const schema = joi_1.default.object({
+        currencyCode: joi_1.default.string().allow(null).allow(''),
         name: joi_1.default.string().trim().max(70).trim().required(),
         addressType: joi_1.default.string().required(),
         phone: joi_1.default.string().trim().min(8).max(20).trim().required(),
@@ -477,6 +478,7 @@ exports.deliveryAddressValidation = deliveryAddressValidation;
 // ====================================================================================================
 const updateDdeliveryAddressValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const schema = joi_1.default.object({
+        currencyCode: joi_1.default.string().allow(null).allow(''),
         addressId: joi_1.default.number().integer().required(),
         name: joi_1.default.string().trim().max(70).trim().required(),
         addressType: joi_1.default.string().required(),

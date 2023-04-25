@@ -18,6 +18,9 @@ name api's
 
 
 database changes:
+25-04-2023
+ALTER TABLE delivery_addresses ADD COLUMN currency_code varchar(20) not null default '91' AFTER user_id
+
 03-04-2023
 ALTER TABLE all_payment_info ADD COLUMN order_status VARCHAR(55) not null DEFAULT 'placed' AFTER status;
 

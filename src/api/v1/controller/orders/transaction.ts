@@ -9,7 +9,7 @@ export const transactionHistory =async (req:Request, res:Response) => {
     try {
         const userId:string = res.locals.jwt.userId;
 
-        const sql = `SELECT id, price, payment_type, status, created_at FROM all_payment_info WHERE user_id = ${userId} ORDER BY created_at DESC`;
+        const sql = `SELECT id, price, country, payment_type, status, created_at FROM all_payment_info WHERE user_id = ${userId} ORDER BY created_at DESC`;
         const [rows]:any = await pool.query(sql);
 
         if (rows.length > 0) {

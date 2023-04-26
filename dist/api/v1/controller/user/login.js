@@ -150,7 +150,8 @@ const socialLogin = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             }
         }
         else if (type === "facebook") {
-            const sql = `SELECT * FROM users WHERE deleted_at IS NULL AND (email = '${email}' || facebook_id = '${socialId}' ) LIMIT 1`;
+            //    const sql = `SELECT * FROM users WHERE deleted_at IS NULL AND (email = '${email}' || facebook_id = '${socialId}' ) LIMIT 1`;
+            const sql = `SELECT * FROM users WHERE deleted_at IS NULL AND (email = '${email}') LIMIT 1`;
             const [fbRows] = yield db_1.default.query(sql);
             if (fbRows.length > 0) {
                 const sql = `UPDATE users set login_time = ?, fcm_token = ?, facebook_id = '${socialId}' where id = ?`;
@@ -176,7 +177,7 @@ const socialLogin = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             }
         }
         else if (type === "google") {
-            const sql = `SELECT * FROM users WHERE deleted_at IS NULL AND  (email = '${email}' || google_id = '${socialId}') LIMIT 1`;
+            const sql = `SELECT * FROM users WHERE deleted_at IS NULL AND  (email = '${email}') LIMIT 1`;
             const [fbRows] = yield db_1.default.query(sql);
             if (fbRows.length > 0) {
                 const sql = `UPDATE users set login_time = ?, fcm_token = ?, google_id = '${socialId}' where id = ?`;
@@ -202,7 +203,7 @@ const socialLogin = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             }
         }
         else if (type === "apple") {
-            const sql = `SELECT * FROM users WHERE deleted_at IS NULL AND  (email = '${email}' || apple_id = '${socialId}') LIMIT 1`;
+            const sql = `SELECT * FROM users WHERE deleted_at IS NULL AND  (email = '${email}') LIMIT 1`;
             const [fbRows] = yield db_1.default.query(sql);
             if (fbRows.length > 0) {
                 const sql = `UPDATE users set login_time = ?, fcm_token = ?, apple_id = '${socialId}' where id = ?`;

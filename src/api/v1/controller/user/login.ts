@@ -124,7 +124,8 @@ export const socialLogin =async (req:Request, res:Response) => {
             }
         } else if (type === "facebook") {
 
-           const sql = `SELECT * FROM users WHERE deleted_at IS NULL AND (email = '${email}' || facebook_id = '${socialId}' ) LIMIT 1`;
+        //    const sql = `SELECT * FROM users WHERE deleted_at IS NULL AND (email = '${email}' || facebook_id = '${socialId}' ) LIMIT 1`;
+           const sql = `SELECT * FROM users WHERE deleted_at IS NULL AND (email = '${email}') LIMIT 1`;
            const [fbRows]:any = await pool.query(sql);
            
            if (fbRows.length > 0) {
@@ -150,7 +151,7 @@ export const socialLogin =async (req:Request, res:Response) => {
                return apiResponse.errorMessage(res, 400, "User not exist !")
            }
         } else if (type === "google") {
-            const sql = `SELECT * FROM users WHERE deleted_at IS NULL AND  (email = '${email}' || google_id = '${socialId}') LIMIT 1`;
+            const sql = `SELECT * FROM users WHERE deleted_at IS NULL AND  (email = '${email}') LIMIT 1`;
            const [fbRows]:any = await pool.query(sql);
            
            if (fbRows.length > 0) {
@@ -176,7 +177,7 @@ export const socialLogin =async (req:Request, res:Response) => {
                return apiResponse.errorMessage(res, 400, "User not exist !")
            }
         } else if (type === "apple") {
-            const sql = `SELECT * FROM users WHERE deleted_at IS NULL AND  (email = '${email}' || apple_id = '${socialId}') LIMIT 1`;
+            const sql = `SELECT * FROM users WHERE deleted_at IS NULL AND  (email = '${email}') LIMIT 1`;
            const [fbRows]:any = await pool.query(sql);
            
            if (fbRows.length > 0) {

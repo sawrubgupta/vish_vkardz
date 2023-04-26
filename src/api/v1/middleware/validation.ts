@@ -88,7 +88,7 @@ export const loginValidation = async (req: Request,res: Response,next: NextFunct
 export const socialLoginValidation = async (req: Request,res: Response,next: NextFunction) => {
     const schema = Joi.object({
       password: Joi.string().min(3).max(30).allow('').allow(null),
-      email: Joi.string().email().required().allow('').allow(null),
+      email: Joi.string().required().allow('').allow(null),
       fcmToken:Joi.string().trim().required(),
       type: Joi.string().trim().required(),
       socialId: Joi.string().trim().allow(null).allow(''),

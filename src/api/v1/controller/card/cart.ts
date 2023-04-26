@@ -61,6 +61,9 @@ export const getCart =async (req:Request, res:Response) => {
         const gstInPercent = 18;
         var totatAmount: any = 0;
         let amount:any;
+        let gstPrice:any;
+        let deliveryCharges:any;
+        let grandTotal:any;
         // for (let i = 0; i < rows.length; i++) {
         //     var amount: any = rows[i].inr_selling_price * rows[i].qty;
         //     totatAmount = totatAmount + amount;
@@ -68,25 +71,42 @@ export const getCart =async (req:Request, res:Response) => {
         // }
         for (let i = 0; i < rows.length; i++) {
             if (addressRows.length > 0) {
-                if (addressRows[0].currency_code === '91' || addressRows[0].currency_code === '+91') {
+                if (addressRows[0].currency_code == '91' || addressRows[0].currency_code == '+91') {
                     amount = rows[i].inr_selling_price * rows[i].qty;
+                    totatAmount = totatAmount + amount;
+                    gstPrice = (totatAmount*gstInPercent)/100;
+                    deliveryCharges = 0;
+                    grandTotal = totatAmount+deliveryCharges+gstPrice;
+            
                 } else {
                     amount = rows[i].usd_selling_price * rows[i].qty;
+                    totatAmount = totatAmount + amount;
+                    gstPrice = (totatAmount*gstInPercent)/100;
+                    deliveryCharges = 0;
+                    grandTotal = totatAmount+deliveryCharges;
+            
                 }    
             } else {
-                if (userRows[0].country === '91' || userRows[0].country === '+91') {
+                if (userRows[0].country == '91' || userRows[0].country == '+91') {
                     amount = rows[i].inr_selling_price * rows[i].qty;
+                    totatAmount = totatAmount + amount;
+                    gstPrice = (totatAmount*gstInPercent)/100;
+                    deliveryCharges = 0;
+                    grandTotal = totatAmount+deliveryCharges+gstPrice;
+            
+
                 } else {
                     amount = rows[i].usd_selling_price * rows[i].qty;
+                    totatAmount = totatAmount + amount;
+                    gstPrice = (totatAmount*gstInPercent)/100;
+                    deliveryCharges = 0;
+                    grandTotal = totatAmount+deliveryCharges;
+            
                 } 
                 // amount = rows[i].inr_selling_price * rows[i].qty;
             }
-            totatAmount = totatAmount + amount;
             rows[i].totalPriceWithQty = amount;
         }
-        const gstPrice = (totatAmount*gstInPercent)/100;
-        const deliveryCharges = 0;
-        const grandTotal = totatAmount+deliveryCharges+gstPrice;
 
 
 
@@ -94,7 +114,7 @@ export const getCart =async (req:Request, res:Response) => {
         await client.query("COMMIT");
         if (rows.length > 0) {
             userRows[0].cardProducts = rows || [];
-            userRows[0].userAddress = addressRows[0] || {};
+            userRows[0].userAddress = addressRows[0] || null;
             userRows[0].deliveryCharge = deliveryCharges;
             userRows[0].gstInPercent = gstInPercent;
             userRows[0].itemsTotal = totatAmount;

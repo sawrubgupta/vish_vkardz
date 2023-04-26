@@ -114,7 +114,7 @@ exports.loginValidation = loginValidation;
 const socialLoginValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const schema = joi_1.default.object({
         password: joi_1.default.string().min(3).max(30).allow('').allow(null),
-        email: joi_1.default.string().email().required().allow('').allow(null),
+        email: joi_1.default.string().required().allow('').allow(null),
         fcmToken: joi_1.default.string().trim().required(),
         type: joi_1.default.string().trim().required(),
         socialId: joi_1.default.string().trim().allow(null).allow(''),

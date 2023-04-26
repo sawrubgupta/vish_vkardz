@@ -77,13 +77,16 @@ export const socialLogin =async (req:Request, res:Response) => {
 
         const emailSql = `SELECT * FROM users where status = 1 AND deleted_at IS NULL AND( email = ? or username = ? or phone = ? or facebook_id = ? or google_id = ? or apple_id = ?) LIMIT 1`;
         const emailValues = [email, email, email, socialId, socialId, socialId]
-        const [userRows]:any = await pool.query(emailSql, emailValues);
+        const [userRow]:any = await pool.query(emailSql, emailValues);
 
-        if (userRows.length === 0) {
+        if (userRow.length === 0) {
             return apiResponse.errorMessage(res, 400, "User not registered with us, Please signup")
         }
 
         if (type === "email") {
+            const userSql = `SELECT * FROM users WHERE deleted_at IS NULL AND (email = '${email}' || username = '${email}') LIMIT 1`;
+            const [userRows]:any = await pool.query(userSql)
+
             const isLoggedIn =  hash === userRows[0].password; // true
 
             if(isLoggedIn){
@@ -120,23 +123,24 @@ export const socialLogin =async (req:Request, res:Response) => {
                 return apiResponse.errorMessage(res, 400, "Unfortunately, Email and Password is incorrect !");
             }
         } else if (type === "facebook") {
-           const sql = `SELECT username FROM users WHERE facebook_id = '${socialId}' LIMIT 1`;
+
+           const sql = `SELECT * FROM users WHERE deleted_at IS NULL AND (email = '${email}' || facebook_id = '${socialId}' ) LIMIT 1`;
            const [fbRows]:any = await pool.query(sql);
            
            if (fbRows.length > 0) {
-            const sql = `UPDATE users set login_time = ?, fcm_token = ? where id = ?`;
-            const VALUES = [createdAt, fcmToken, userRows[0].id];
+            const sql = `UPDATE users set login_time = ?, fcm_token = ?, facebook_id = '${socialId}' where id = ?`;
+            const VALUES = [createdAt, fcmToken, fbRows[0].id];
             const [data]:any = await pool.query(sql, VALUES);
             
             if (data.affectedRows > 0) {
-                let token = await utility.jwtGenerate(userRows[0].id);
-                delete userRows[0].password;
-                delete userRows[0].id;
+                let token = await utility.jwtGenerate(fbRows[0].id);
+                delete fbRows[0].password;
+                delete fbRows[0].id;
                 
                 return res.status(200).json({
                     status:true,
                     token,
-                    data:userRows[0],
+                    data:fbRows[0],
                     message:"Successfully logged in !"
                 })    
             } else {
@@ -146,23 +150,23 @@ export const socialLogin =async (req:Request, res:Response) => {
                return apiResponse.errorMessage(res, 400, "User not exist !")
            }
         } else if (type === "google") {
-            const sql = `SELECT username FROM users WHERE google_id = '${socialId}' LIMIT 1`;
+            const sql = `SELECT * FROM users WHERE deleted_at IS NULL AND  (email = '${email}' || google_id = '${socialId}') LIMIT 1`;
            const [fbRows]:any = await pool.query(sql);
            
            if (fbRows.length > 0) {
-            const sql = `UPDATE users set login_time = ?, fcm_token = ? where id = ?`;
-            const VALUES = [createdAt, fcmToken, userRows[0].id];
+            const sql = `UPDATE users set login_time = ?, fcm_token = ?, google_id = '${socialId}' where id = ?`;
+            const VALUES = [createdAt, fcmToken, fbRows[0].id];
             const [data]:any = await pool.query(sql, VALUES);
             
             if (data.affectedRows > 0) {
-                let token = await utility.jwtGenerate(userRows[0].id);
-                delete userRows[0].password;
-                delete userRows[0].id;
+                let token = await utility.jwtGenerate(fbRows[0].id);
+                delete fbRows[0].password;
+                delete fbRows[0].id;
                 
                 return res.status(200).json({
                     status:true,
                     token,
-                    data:userRows[0],
+                    data:fbRows[0],
                     message:"Successfully logged in !"
                 })    
             } else {
@@ -172,23 +176,23 @@ export const socialLogin =async (req:Request, res:Response) => {
                return apiResponse.errorMessage(res, 400, "User not exist !")
            }
         } else if (type === "apple") {
-            const sql = `SELECT username FROM users WHERE apple_id = '${socialId}' LIMIT 1`;
+            const sql = `SELECT * FROM users WHERE deleted_at IS NULL AND  (email = '${email}' || apple_id = '${socialId}') LIMIT 1`;
            const [fbRows]:any = await pool.query(sql);
            
            if (fbRows.length > 0) {
-            const sql = `UPDATE users set login_time = ?, fcm_token = ? where id = ?`;
-            const VALUES = [createdAt, fcmToken, userRows[0].id];
+            const sql = `UPDATE users set login_time = ?, fcm_token = ?, apple_id = '${socialId}' where id = ?`;
+            const VALUES = [createdAt, fcmToken, fbRows[0].id];
             const [data]:any = await pool.query(sql, VALUES);
             
             if (data.affectedRows > 0) {
-                let token = await utility.jwtGenerate(userRows[0].id);
-                delete userRows[0].password;
-                delete userRows[0].id;
+                let token = await utility.jwtGenerate(fbRows[0].id);
+                delete fbRows[0].password;
+                delete fbRows[0].id;
                 
                 return res.status(200).json({
                     status:true,
                     token,
-                    data:userRows[0],
+                    data:fbRows[0],
                     message:"Successfully logged in !"
                 })    
             } else {

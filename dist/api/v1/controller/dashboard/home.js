@@ -55,7 +55,7 @@ const home = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             const [wishlistRows] = yield db_1.default.query(checkWishlist);
             const cartQuery = `SELECT product_id FROM cart_details WHERE user_id = ${userId}`;
             const [cartRows] = yield db_1.default.query(cartQuery);
-            const userQuery = `SELECT name, thumb FROM users WHERE id = ${userId} LIMIT 1`;
+            const userQuery = `SELECT name, thumb, username FROM users WHERE id = ${userId} LIMIT 1`;
             const [userData] = yield db_1.default.query(userQuery);
             bestSellerProductsRows.forEach((element, index) => {
                 if (wishlistRows.length === 0) {
@@ -99,6 +99,7 @@ const home = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             });
             const userData = {
                 name: "",
+                username: "",
                 thumb: ""
             };
             return res.status(200).json({

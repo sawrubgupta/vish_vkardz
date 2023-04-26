@@ -107,11 +107,13 @@ const socialLogin = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         const hash = (0, md5_1.default)(password);
         const emailSql = `SELECT * FROM users where status = 1 AND deleted_at IS NULL AND( email = ? or username = ? or phone = ? or facebook_id = ? or google_id = ? or apple_id = ?) LIMIT 1`;
         const emailValues = [email, email, email, socialId, socialId, socialId];
-        const [userRows] = yield db_1.default.query(emailSql, emailValues);
-        if (userRows.length === 0) {
+        const [userRow] = yield db_1.default.query(emailSql, emailValues);
+        if (userRow.length === 0) {
             return apiResponse.errorMessage(res, 400, "User not registered with us, Please signup");
         }
         if (type === "email") {
+            const userSql = `SELECT * FROM users WHERE deleted_at IS NULL AND (email = '${email}' || username = '${email}') LIMIT 1`;
+            const [userRows] = yield db_1.default.query(userSql);
             const isLoggedIn = hash === userRows[0].password; // true
             if (isLoggedIn) {
                 if (userRows[0].card_number !== null && userRows[0].card_number !== undefined && userRows[0].card_number !== '') {
@@ -148,20 +150,20 @@ const socialLogin = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             }
         }
         else if (type === "facebook") {
-            const sql = `SELECT username FROM users WHERE facebook_id = '${socialId}' LIMIT 1`;
+            const sql = `SELECT * FROM users WHERE deleted_at IS NULL AND (email = '${email}' || facebook_id = '${socialId}' ) LIMIT 1`;
             const [fbRows] = yield db_1.default.query(sql);
             if (fbRows.length > 0) {
-                const sql = `UPDATE users set login_time = ?, fcm_token = ? where id = ?`;
-                const VALUES = [createdAt, fcmToken, userRows[0].id];
+                const sql = `UPDATE users set login_time = ?, fcm_token = ?, facebook_id = '${socialId}' where id = ?`;
+                const VALUES = [createdAt, fcmToken, fbRows[0].id];
                 const [data] = yield db_1.default.query(sql, VALUES);
                 if (data.affectedRows > 0) {
-                    let token = yield utility.jwtGenerate(userRows[0].id);
-                    delete userRows[0].password;
-                    delete userRows[0].id;
+                    let token = yield utility.jwtGenerate(fbRows[0].id);
+                    delete fbRows[0].password;
+                    delete fbRows[0].id;
                     return res.status(200).json({
                         status: true,
                         token,
-                        data: userRows[0],
+                        data: fbRows[0],
                         message: "Successfully logged in !"
                     });
                 }
@@ -174,20 +176,20 @@ const socialLogin = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             }
         }
         else if (type === "google") {
-            const sql = `SELECT username FROM users WHERE google_id = '${socialId}' LIMIT 1`;
+            const sql = `SELECT * FROM users WHERE deleted_at IS NULL AND  (email = '${email}' || google_id = '${socialId}') LIMIT 1`;
             const [fbRows] = yield db_1.default.query(sql);
             if (fbRows.length > 0) {
-                const sql = `UPDATE users set login_time = ?, fcm_token = ? where id = ?`;
-                const VALUES = [createdAt, fcmToken, userRows[0].id];
+                const sql = `UPDATE users set login_time = ?, fcm_token = ?, google_id = '${socialId}' where id = ?`;
+                const VALUES = [createdAt, fcmToken, fbRows[0].id];
                 const [data] = yield db_1.default.query(sql, VALUES);
                 if (data.affectedRows > 0) {
-                    let token = yield utility.jwtGenerate(userRows[0].id);
-                    delete userRows[0].password;
-                    delete userRows[0].id;
+                    let token = yield utility.jwtGenerate(fbRows[0].id);
+                    delete fbRows[0].password;
+                    delete fbRows[0].id;
                     return res.status(200).json({
                         status: true,
                         token,
-                        data: userRows[0],
+                        data: fbRows[0],
                         message: "Successfully logged in !"
                     });
                 }
@@ -200,20 +202,20 @@ const socialLogin = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             }
         }
         else if (type === "apple") {
-            const sql = `SELECT username FROM users WHERE apple_id = '${socialId}' LIMIT 1`;
+            const sql = `SELECT * FROM users WHERE deleted_at IS NULL AND  (email = '${email}' || apple_id = '${socialId}') LIMIT 1`;
             const [fbRows] = yield db_1.default.query(sql);
             if (fbRows.length > 0) {
-                const sql = `UPDATE users set login_time = ?, fcm_token = ? where id = ?`;
-                const VALUES = [createdAt, fcmToken, userRows[0].id];
+                const sql = `UPDATE users set login_time = ?, fcm_token = ?, apple_id = '${socialId}' where id = ?`;
+                const VALUES = [createdAt, fcmToken, fbRows[0].id];
                 const [data] = yield db_1.default.query(sql, VALUES);
                 if (data.affectedRows > 0) {
-                    let token = yield utility.jwtGenerate(userRows[0].id);
-                    delete userRows[0].password;
-                    delete userRows[0].id;
+                    let token = yield utility.jwtGenerate(fbRows[0].id);
+                    delete fbRows[0].password;
+                    delete fbRows[0].id;
                     return res.status(200).json({
                         status: true,
                         token,
-                        data: userRows[0],
+                        data: fbRows[0],
                         message: "Successfully logged in !"
                     });
                 }

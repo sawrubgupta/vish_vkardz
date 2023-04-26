@@ -26,7 +26,7 @@ export const home =async (req:Request, res:Response) => {
             const cartQuery = `SELECT product_id FROM cart_details WHERE user_id = ${userId}`;
             const [cartRows]:any = await pool.query(cartQuery);
 
-            const userQuery = `SELECT name, thumb FROM users WHERE id = ${userId} LIMIT 1`;
+            const userQuery = `SELECT name, thumb, username FROM users WHERE id = ${userId} LIMIT 1`;
             const [userData]:any = await pool.query(userQuery);
 
             bestSellerProductsRows.forEach((element:any, index:any) => {
@@ -73,6 +73,7 @@ export const home =async (req:Request, res:Response) => {
 
             const userData = {
                 name: "",
+                username: "",
                 thumb: ""
             }
             return res.status(200).json({

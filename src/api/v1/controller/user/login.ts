@@ -75,7 +75,7 @@ export const socialLogin =async (req:Request, res:Response) => {
         let uName;
         const hash = md5(password);
 
-        const emailSql = `SELECT * FROM users where status = 1 AND deleted_at IS NULL AND( email = ? or username = ? or phone = ? or facebook_id = ? or google_id = ? or apple_id = ?) LIMIT 1`;
+        const emailSql = `SELECT * FROM users where status = 1 AND deleted_at IS NULL AND (email = ? or username = ? or phone = ? or facebook_id = ? or google_id = ? or apple_id = ?) LIMIT 1`;
         const emailValues = [email, email, email, socialId, socialId, socialId]
         const [userRow]:any = await pool.query(emailSql, emailValues);
 
@@ -86,7 +86,9 @@ export const socialLogin =async (req:Request, res:Response) => {
         if (type === "email") {
             const userSql = `SELECT * FROM users WHERE deleted_at IS NULL AND (email = '${email}' || username = '${email}') LIMIT 1`;
             const [userRows]:any = await pool.query(userSql)
-
+            if (userRows.length === 0) {
+                return apiResponse.errorMessage(res, 400, "User not registered with us, Please signup")
+            }
             const isLoggedIn =  hash === userRows[0].password; // true
 
             if(isLoggedIn){
@@ -206,7 +208,7 @@ export const socialLogin =async (req:Request, res:Response) => {
             return apiResponse.errorMessage(res, 400, "Wrong type passed !");
         }
     } catch (error) {
-        console.log(error);
+        console.log("Something went wrong",error);
         return apiResponse.errorMessage(res, 400, "Something went wrong");
     }
 }

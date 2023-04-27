@@ -194,9 +194,12 @@ const socialRegister = (req, res) => __awaiter(void 0, void 0, void 0, function*
         else {
             return apiResponse.errorMessage(res, 400, "Wrong type passed !");
         }
-        const emailSql = `SELECT * FROM users where status = 0 AND deleted_at IS NULL AND (email = ? or username = ? or phone = ? or facebook_id = ? or google_id = ? or apple_id = ?) LIMIT 1`;
-        const emailValues = [email, username, phone, socialId, socialId, socialId, referralCode];
+        // const emailSql = `SELECT * FROM users where status = 0 AND deleted_at IS NULL AND (email = ? or username = ? or phone = ? or facebook_id = ? or google_id = ? or apple_id = ?) LIMIT 1`;
+        // const emailValues = [email, username, phone, socialId, socialId, socialId, referralCode]
+        const emailSql = `SELECT * FROM users where deleted_at IS NULL AND (email = ? or username = ? or phone = ?) LIMIT 1`;
+        const emailValues = [email, username, phone];
         const [data] = yield db_1.default.query(emailSql, emailValues);
+        console.log("data", data);
         const dupli = [];
         if (data.length > 0) {
             if (data[0].email === email) {
@@ -208,15 +211,15 @@ const socialRegister = (req, res) => __awaiter(void 0, void 0, void 0, function*
             if (data[0].phone === phone) {
                 dupli.push("phone");
             }
-            if (data[0].facebook_id === socialId) {
-                dupli.push("facebook id ");
-            }
-            if (data[0].google_id === socialId) {
-                dupli.push("google id");
-            }
-            if (data[0].apple_id === socialId) {
-                dupli.push("apple id");
-            }
+            // if (data[0].facebook_id  === socialId) {
+            //     dupli.push("facebook id ");
+            // } 
+            // if (data[0].google_id === socialId) {
+            //     dupli.push("google id");
+            // } 
+            // if (data[0].apple_id === socialId) {
+            //     dupli.push("apple id");
+            // }
             console.log(dupli);
             const msg = `${dupli.join()} is duplicate, Please change it`;
             return res.status(400).json({

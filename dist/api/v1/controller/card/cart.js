@@ -110,7 +110,7 @@ const getCart = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 else {
                     amount = rows[i].usd_selling_price * rows[i].qty;
                     totatAmount = totatAmount + amount;
-                    gstPrice = (totatAmount * gstInPercent) / 100;
+                    gstPrice = 0;
                     deliveryCharges = 0;
                     grandTotal = totatAmount + deliveryCharges;
                 }
@@ -126,7 +126,7 @@ const getCart = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 else {
                     amount = rows[i].usd_selling_price * rows[i].qty;
                     totatAmount = totatAmount + amount;
-                    gstPrice = (totatAmount * gstInPercent) / 100;
+                    gstPrice = 0;
                     deliveryCharges = 0;
                     grandTotal = totatAmount + deliveryCharges;
                 }

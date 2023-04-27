@@ -81,7 +81,7 @@ export const getCart =async (req:Request, res:Response) => {
                 } else {
                     amount = rows[i].usd_selling_price * rows[i].qty;
                     totatAmount = totatAmount + amount;
-                    gstPrice = (totatAmount*gstInPercent)/100;
+                    gstPrice = 0;
                     deliveryCharges = 0;
                     grandTotal = totatAmount+deliveryCharges;
             
@@ -98,7 +98,7 @@ export const getCart =async (req:Request, res:Response) => {
                 } else {
                     amount = rows[i].usd_selling_price * rows[i].qty;
                     totatAmount = totatAmount + amount;
-                    gstPrice = (totatAmount*gstInPercent)/100;
+                    gstPrice = 0;
                     deliveryCharges = 0;
                     grandTotal = totatAmount+deliveryCharges;
             

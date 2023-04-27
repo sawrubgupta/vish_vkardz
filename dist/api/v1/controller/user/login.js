@@ -105,7 +105,7 @@ const socialLogin = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         let vcardLink = `https://vkardz.com/`;
         let uName;
         const hash = (0, md5_1.default)(password);
-        const emailSql = `SELECT * FROM users where status = 1 AND deleted_at IS NULL AND( email = ? or username = ? or phone = ? or facebook_id = ? or google_id = ? or apple_id = ?) LIMIT 1`;
+        const emailSql = `SELECT * FROM users where status = 1 AND deleted_at IS NULL AND (email = ? or username = ? or phone = ? or facebook_id = ? or google_id = ? or apple_id = ?) LIMIT 1`;
         const emailValues = [email, email, email, socialId, socialId, socialId];
         const [userRow] = yield db_1.default.query(emailSql, emailValues);
         if (userRow.length === 0) {
@@ -114,6 +114,9 @@ const socialLogin = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         if (type === "email") {
             const userSql = `SELECT * FROM users WHERE deleted_at IS NULL AND (email = '${email}' || username = '${email}') LIMIT 1`;
             const [userRows] = yield db_1.default.query(userSql);
+            if (userRows.length === 0) {
+                return apiResponse.errorMessage(res, 400, "User not registered with us, Please signup");
+            }
             const isLoggedIn = hash === userRows[0].password; // true
             if (isLoggedIn) {
                 if (userRows[0].card_number !== null && userRows[0].card_number !== undefined && userRows[0].card_number !== '') {
@@ -233,7 +236,7 @@ const socialLogin = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         }
     }
     catch (error) {
-        console.log(error);
+        console.log("Something went wrong", error);
         return apiResponse.errorMessage(res, 400, "Something went wrong");
     }
 });

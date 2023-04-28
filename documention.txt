@@ -18,6 +18,24 @@ name api's
 
 
 database changes:
+28-04-2023
+ALTER TABLE `users` ADD `admin_id` INT(11) NULL DEFAULT NULL AFTER `type`;
+ALTER TABLE `users` ADD `type` VARCHAR(55) NOT NULL DEFAULT 'user' AFTER `id`;
+
+CREATE TABLE `business_admin` (
+ `id` INT(11) NOT NULL AUTO_INCREMENT ,
+ `name` VARCHAR(200) NOT NULL ,
+ `email` VARCHAR(200) NOT NULL ,
+ `phone` VARCHAR(25) NULL DEFAULT NULL ,
+ `password` VARCHAR(255) NOT NULL ,
+ `image` VARCHAR(255) NULL DEFAULT NULL ,
+ `job_title` VARCHAR(200) NULL DEFAULT NULL,
+ `company` VARCHAR(200) NULL DEFAULT NULL,
+ `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ,
+ `deleted_at` DATETIME NULL DEFAULT NULL,
+ PRIMARY KEY (`id`)
+) ENGINE = InnoDB;
+
 25-04-2023
 ALTER TABLE delivery_addresses ADD COLUMN currency_code varchar(20) not null default '91' AFTER user_id
 

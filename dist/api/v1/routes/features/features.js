@@ -34,24 +34,24 @@ const businessHourController = __importStar(require("../../controller/features/b
 const authorization_controller_1 = require("../../middleware/authorization.controller");
 const validation = __importStar(require("../../middleware/validation"));
 const featureRouter = (0, express_1.Router)();
-featureRouter.get("/getUserFeature", authorization_controller_1.authenticatingToken, featureController.getFeatureByUserId);
-featureRouter.patch("/updateFeatures", authorization_controller_1.authenticatingToken, featureController.updateUserFeaturesStatus);
-featureRouter.put("/aboutUs", authorization_controller_1.authenticatingToken, validation.aboutUsValidation, aboutUsCotroller.addUpdateAboutUs);
-featureRouter.get("/aboutUs", authorization_controller_1.authenticatingToken, aboutUsCotroller.getAboutUs);
-featureRouter.delete("/deleteAboutUs", authorization_controller_1.authenticatingToken, aboutUsCotroller.deleteAboutUs);
-featureRouter.post("/addProducts", authorization_controller_1.authenticatingToken, validation.userProductsValidation, productController.addProduct);
-featureRouter.get("/getProducts", authorization_controller_1.authenticatingToken, productController.getProducts);
-featureRouter.patch("/updateProduct", authorization_controller_1.authenticatingToken, validation.userProductsValidation, productController.updateProduct);
-featureRouter.delete("/deleteProduct", authorization_controller_1.authenticatingToken, productController.deleteProduct);
-featureRouter.post("/addBusinessHour", authorization_controller_1.authenticatingToken, validation.businessHourValidation, businessHourController.addBusinessHour);
-featureRouter.get("/businessHour", authorization_controller_1.authenticatingToken, businessHourController.businessHourList);
-featureRouter.post("/portfolio", authorization_controller_1.authenticatingToken, gallaryController.gallary);
-featureRouter.get("/getPortfolio", authorization_controller_1.authenticatingToken, gallaryController.getPortfolio);
-featureRouter.delete("/deletePortfolio", authorization_controller_1.authenticatingToken, gallaryController.deleteImage);
-featureRouter.get("/getAppointments", authorization_controller_1.authenticatingToken, appointmentController.appointmentList);
-featureRouter.delete("/deleteAppointment", authorization_controller_1.authenticatingToken, appointmentController.deleteAppointment);
-featureRouter.post("/manageAppointment", authorization_controller_1.authenticatingToken, appointmentController.manageAppointment);
-featureRouter.get("/enquiryList", authorization_controller_1.authenticatingToken, enquiryController.enquiryList);
-featureRouter.delete("/deleteEnquiry", authorization_controller_1.authenticatingToken, enquiryController.deleteEnquiry);
-featureRouter.post("/replyEnquiry", authorization_controller_1.authenticatingToken, enquiryController.replyEnquiry);
+featureRouter.get("/getUserFeature", authorization_controller_1.authenticatingToken, featureController.getFeatureByUserId); //use in business type
+featureRouter.patch("/updateFeatures", authorization_controller_1.authenticatingToken, featureController.updateUserFeaturesStatus); //use in business type
+featureRouter.put("/aboutUs", authorization_controller_1.authenticatingToken, validation.aboutUsValidation, aboutUsCotroller.addUpdateAboutUs); //use in business type
+featureRouter.get("/aboutUs", authorization_controller_1.authenticatingToken, aboutUsCotroller.getAboutUs); //use in business type
+featureRouter.delete("/deleteAboutUs", authorization_controller_1.authenticatingToken, aboutUsCotroller.deleteAboutUs); //use in business type
+featureRouter.post("/addProducts", authorization_controller_1.authenticatingToken, validation.userProductsValidation, productController.addProduct); //use in business type
+featureRouter.get("/getProducts", authorization_controller_1.authenticatingToken, productController.getProducts); //use in business type
+featureRouter.patch("/updateProduct", authorization_controller_1.authenticatingToken, validation.userProductsValidation, productController.updateProduct); //use in business tpe
+featureRouter.delete("/deleteProduct", authorization_controller_1.authenticatingToken, productController.deleteProduct); //use in business type
+featureRouter.post("/addBusinessHour", authorization_controller_1.authenticatingToken, validation.businessHourValidation, businessHourController.addBusinessHour); //use in business type
+featureRouter.get("/businessHour", authorization_controller_1.authenticatingToken, businessHourController.businessHourList); //use in business type
+featureRouter.post("/portfolio", authorization_controller_1.authenticatingToken, gallaryController.gallary); //use in business type
+featureRouter.get("/getPortfolio", authorization_controller_1.authenticatingToken, gallaryController.getPortfolio); //use in business type
+featureRouter.delete("/deletePortfolio", authorization_controller_1.authenticatingToken, gallaryController.deleteImage); //use in business type
+featureRouter.get("/getAppointments", authorization_controller_1.authenticatingToken, appointmentController.appointmentList); //use in business type
+featureRouter.delete("/deleteAppointment", authorization_controller_1.authenticatingToken, appointmentController.deleteAppointment); //use in business type
+featureRouter.post("/manageAppointment", authorization_controller_1.authenticatingToken, appointmentController.manageAppointment); //use in business type
+featureRouter.get("/enquiryList", authorization_controller_1.authenticatingToken, enquiryController.enquiryList); //use in business type
+featureRouter.delete("/deleteEnquiry", authorization_controller_1.authenticatingToken, enquiryController.deleteEnquiry); //use in business type
+featureRouter.post("/replyEnquiry", authorization_controller_1.authenticatingToken, enquiryController.replyEnquiry); //use in business type
 exports.default = featureRouter;

@@ -35,72 +35,56 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateVcardLayout = exports.getLayout = void 0;
+exports.userDetail = exports.userList = void 0;
 const db_1 = __importDefault(require("../../../../db"));
 const apiResponse = __importStar(require("../../helper/apiResponse"));
 const development_1 = __importDefault(require("../../config/development"));
-const getLayout = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const userList = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const sql = `SELECT * FROM layout_types`;
-        let [layoutTypeData] = yield db_1.default.query(sql);
-        const sql1 = `SELECT * FROM vkard_layouts`;
-        const [data] = yield db_1.default.query(sql1);
-        let rowIndex = -1;
-        for (const element of layoutTypeData) {
-            rowIndex++;
-            layoutTypeData[rowIndex].layout = [];
-            let dataIndex = -1;
-            for (const e of data) {
-                dataIndex++;
-                if (element.id === e.type_id) {
-                    (layoutTypeData[rowIndex].layout).push(e);
-                }
-            }
+        const userId = res.locals.jwt.userId;
+        console.log(userId);
+        var getPage = req.query.page;
+        var page = parseInt(getPage);
+        if (page === null || page <= 1 || !page) {
+            page = 1;
         }
-        return apiResponse.successResponse(res, "Layouts get Succesfully", layoutTypeData);
+        var page_size = development_1.default.pageSize;
+        const offset = (page - 1) * page_size;
+        const getPageQuery = `SELECT id FROM users WHERE admin_id = ${userId}`;
+        const [result] = yield db_1.default.query(getPageQuery);
+        const sql = `SELECT id, username, name, email, phone, designation, website, thumb, cover_photo, primary_profile_link FROM users WHERE admin_id = ${userId} ORDER BY username asc limit ${page_size} offset ${offset}`;
+        const [rows] = yield db_1.default.query(sql);
+        let totalPages = result.length / page_size;
+        let totalPage = Math.ceil(totalPages);
+        return res.status(200).json({
+            status: true,
+            data: rows,
+            totalPage: totalPage,
+            currentPage: page,
+            totalLength: result.length,
+            message: "Users list are here"
+        });
     }
     catch (error) {
         console.log(error);
         return apiResponse.errorMessage(res, 400, "Something went wrong");
     }
 });
-exports.getLayout = getLayout;
+exports.userList = userList;
 // ====================================================================================================
 // ====================================================================================================
-const updateVcardLayout = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const userDetail = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        // const userId:string = res.locals.jwt.userId;
-        let userId;
-        const type = req.query.type; //type = business, user, null
-        if (type && type === development_1.default.businessType) {
-            userId = req.query.userId;
-        }
-        else {
-            userId = res.locals.jwt.userId;
-        }
-        if (!userId || userId === "" || userId === undefined) {
-            return apiResponse.errorMessage(res, 401, "Please login !");
-        }
-        const profileColor = req.body.profileColor;
-        let styleId = req.body.styleId;
-        // if (!styleId || styleId === "") {
-        //     styleId = 1;
-        // }
-        const sql = `UPDATE users SET vcard_layouts = ?, vcard_bg_color = ? WHERE id = ?`;
-        const VALUES = [styleId, profileColor, userId];
-        const [rows] = yield db_1.default.query(sql, VALUES);
-        if (rows.affectedRows > 0) {
-            return apiResponse.successResponse(res, "Vcard layout updated successfully !", null);
-        }
-        else {
-            return apiResponse.errorMessage(res, 400, "Failed to update layout, try again");
-        }
+        const userId = res.locals.jwt.userId;
+        const sql = `SELECT id, username, name, email, phone, designation, website, thumb, cover_photo, company_name, address, primary_profile_link, website,  FROM users WHERE admin_id = ${userId} `;
+        const [rows] = yield db_1.default.query(sql);
+        return apiResponse.successResponse(res, "Data retrieved Successfully", null);
     }
     catch (error) {
         console.log(error);
         return apiResponse.errorMessage(res, 400, "Something went wrong");
     }
 });
-exports.updateVcardLayout = updateVcardLayout;
+exports.userDetail = userDetail;
 // ====================================================================================================
 // ====================================================================================================

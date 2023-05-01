@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import pool from '../../../../db';
 import * as apiResponse from '../../helper/apiResponse';
-
+import config from '../../config/development';
 
 export const getLayout =async (req:Request, res:Response) => {
     try {
@@ -35,7 +35,18 @@ export const getLayout =async (req:Request, res:Response) => {
 
 export const updateVcardLayout =async (req:Request, res:Response) => {
     try {
-        const userId:string = res.locals.jwt.userId;
+        // const userId:string = res.locals.jwt.userId;
+        let userId:any; 
+        const type = req.query.type; //type = business, user, null
+        if (type && type === config.businessType) {
+            userId = req.query.userId;
+        } else {
+            userId = res.locals.jwt.userId;
+        }
+        if (!userId || userId === "" || userId === undefined) {
+            return apiResponse.errorMessage(res, 401, "Please login !")
+        }
+
         const profileColor = req.body.profileColor;
         let styleId = req.body.styleId;
         // if (!styleId || styleId === "") {

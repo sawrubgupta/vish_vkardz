@@ -208,6 +208,33 @@ export const switchAccountValidation =async (req:Request, res:Response, next:Nex
 // ====================================================================================================
 // ====================================================================================================
 
+export const addVcfValidation =async (req:Request, res:Response, next:NextFunction) => {
+    
+    const schema = Joi.object({
+        type: Joi.string().allow('').allow(null),
+        userId: Joi.number().allow('').allow(null),
+        vcfData: Joi.array().items(
+            Joi.object({
+                vcfId: Joi.number().allow('').allow(null),
+                vcfType: Joi.string().required(),
+                vcfValue: Joi.string().required(),
+                status: Joi.boolean().allow(0, 1),
+            })
+            )
+        })
+
+    const value = schema.validate(req.body);
+
+    if (value.error) {
+        const errMsg = await validationCheck(value);
+        return await apiResponse.errorMessage(res,400, errMsg);
+    }
+    next();
+}
+
+// ====================================================================================================
+// ====================================================================================================
+
 
 
 /*

@@ -46,10 +46,22 @@ exports.businessHourList = exports.addBusinessHour = void 0;
 const db_1 = __importDefault(require("../../../../db"));
 const apiResponse = __importStar(require("../../helper/apiResponse"));
 const utility = __importStar(require("../../helper/utility"));
+const development_1 = __importDefault(require("../../config/development"));
 const addBusinessHour = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, e_1, _b, _c;
     try {
-        const userId = res.locals.jwt.userId;
+        // const userId: string = res.locals.jwt.userId;
+        let userId;
+        const type = req.query.type; //type = business, user, null
+        if (type && type === development_1.default.businessType) {
+            userId = req.query.userId;
+        }
+        else {
+            userId = res.locals.jwt.userId;
+        }
+        if (!userId || userId === "" || userId === undefined) {
+            return apiResponse.errorMessage(res, 401, "User Id is required!");
+        }
         const createdAt = utility.dateWithFormat();
         const deleteQuery = `DELETE FROM business_hours WHERE user_id = ${userId}`;
         const [data] = yield db_1.default.query(deleteQuery);
@@ -98,7 +110,18 @@ exports.addBusinessHour = addBusinessHour;
 // ====================================================================================================
 const businessHourList = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const userId = res.locals.jwt.userId;
+        // const userId = res.locals.jwt.userId;
+        let userId;
+        const type = req.query.type; //type = business, user, null
+        if (type && type === development_1.default.businessType) {
+            userId = req.query.userId;
+        }
+        else {
+            userId = res.locals.jwt.userId;
+        }
+        if (!userId || userId === "" || userId === undefined) {
+            return apiResponse.errorMessage(res, 401, "User Id is required!");
+        }
         const sql = `SELECT * FROM business_hours WHERE user_id = ${userId}`;
         const [rows] = yield db_1.default.query(sql);
         if (rows.length > 0) {

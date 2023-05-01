@@ -1,10 +1,22 @@
 import { Request, Response } from "express";
 import pool from '../../../../db';
 import * as apiResponse from '../../helper/apiResponse';
+import config from '../../config/development';
 
 export const getFeatureByUserId =async (req:Request, res:Response) => {
     try {
-        const userId:string = res.locals.jwt.userId;
+        // const userId:string = res.locals.jwt.userId;
+        let userId:any; 
+        const type = req.query.type; //type = business, user, null
+        if (type && type === config.businessType) {
+            userId = req.query.userId;
+        } else {
+            userId = res.locals.jwt.userId;
+        }
+        if (!userId || userId === "" || userId === undefined) {
+            return apiResponse.errorMessage(res, 401, "User Id is required!");
+        }
+
 
         const sql = `SELECT users_features.feature_id, features.features, features.slug, users_features.status FROM features LEFT JOIN users_features ON features.id = users_features.feature_id WHERE users_features.user_id = ${userId} AND features.id IN (3, 5, 6, 8, 10, 11)`;
         const [rows]:any = await pool.query(sql);
@@ -32,7 +44,18 @@ export const getFeatureByUserId =async (req:Request, res:Response) => {
 
 export const updateUserFeaturesStatus =async (req:Request, res:Response) => {
     try {
-        const userId:string = res.locals.jwt.userId;
+        // const userId:string = res.locals.jwt.userId;
+        let userId:any; 
+        const type = req.query.type; //type = business, user, null
+        if (type && type === config.businessType) {
+            userId = req.query.userId;
+        } else {
+            userId = res.locals.jwt.userId;
+        }
+        if (!userId || userId === "" || userId === undefined) {
+            return apiResponse.errorMessage(res, 401, "User Id is required!");
+        }
+
         let data:any;
         const sql = `UPDATE users_features SET status = ? WHERE user_id = ? AND feature_id = ?`;
 

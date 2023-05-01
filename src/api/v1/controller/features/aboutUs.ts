@@ -2,10 +2,22 @@ import { Request, Response } from "express";
 import pool from '../../../../db';
 import * as apiResponse from '../../helper/apiResponse';
 import * as utility from "../../helper/utility";
+import config from '../../config/development';
 
 export const addUpdateAboutUs =async (req:Request, res:Response) => {
     try {
-        const userId:string = res.locals.jwt.userId;
+        // const userId:string = res.locals.jwt.userId;
+        let userId:any; 
+        const type = req.query.type; //type = business, user, null
+        if (type && type === config.businessType) {
+            userId = req.query.userId;
+        } else {
+            userId = res.locals.jwt.userId;
+        }
+        if (!userId || userId === "" || userId === undefined) {
+            return apiResponse.errorMessage(res, 401, "User Id is required!");
+        }
+
         const createdAt = utility.dateWithFormat();
         const { companyName, year, business, aboutUsDetail, image } = req.body;
 
@@ -44,7 +56,17 @@ export const addUpdateAboutUs =async (req:Request, res:Response) => {
 
 export const getAboutUs =async (req:Request, res:Response) => {
     try {
-        const userId:string = res.locals.jwt.userId;
+        // const userId:string = res.locals.jwt.userId;
+        let userId:any; 
+        const type = req.query.type; //type = business, user, null
+        if (type && type === config.businessType) {
+            userId = req.query.userId;
+        } else {
+            userId = res.locals.jwt.userId;
+        }
+        if (!userId || userId === "" || userId === undefined) {
+            return apiResponse.errorMessage(res, 401, "User Id is required!");
+        }
 
         const sql = `SELECT id, company_name, business, year, about_detail, images, created_at FROM about WHERE user_id = ${userId}`;
         const [rows]:any = await pool.query(sql);
@@ -75,7 +97,18 @@ export const getAboutUs =async (req:Request, res:Response) => {
 
 export const deleteAboutUs =async (req:Request, res:Response) => {
     try {
-        const userId:string = res.locals.jwt.userId;
+        // const userId:string = res.locals.jwt.userId;
+        let userId:any; 
+        const type = req.query.type; //type = business, user, null
+        if (type && type === config.businessType) {
+            userId = req.query.userId;
+        } else {
+            userId = res.locals.jwt.userId;
+        }
+        if (!userId || userId === "" || userId === undefined) {
+            return apiResponse.errorMessage(res, 401, "User Id is required!");
+        }
+
 
         const sql = `DELETE FROM about WHERE user_id = ${userId}`;
         const [rows]:any = await pool.query(sql);

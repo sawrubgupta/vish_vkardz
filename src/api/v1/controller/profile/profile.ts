@@ -7,7 +7,13 @@ import config  from '../../config/development';
 
 export const getProfile =async (req:Request, res:Response) => {
     try {
-        const userId:string = res.locals.jwt.userId;
+        let userId:any; 
+        const type = req.query.type; //type = business, user, null
+        if (type && type === config.businessType) {
+            userId = req.query.userId;
+        } else {
+            userId = res.locals.jwt.userId;
+        }
         if (!userId || userId === "" || userId === undefined) {
             return apiResponse.errorMessage(res, 401, "Please login !")
         }
@@ -47,7 +53,18 @@ export const getProfile =async (req:Request, res:Response) => {
 
 export const updateProfile =async (req:Request, res:Response) => {
     try {
-        const userId: string = res.locals.jwt.userId;
+        // const userId: string = res.locals.jwt.userId;
+        let userId:any; 
+        const type = req.query.type; //type = business, user, null
+        if (type && type === config.businessType) {
+            userId = req.query.userId;
+        } else {
+            userId = res.locals.jwt.userId;
+        }
+        if (!userId || userId === "" || userId === undefined) {
+            return apiResponse.errorMessage(res, 401, "Please login !")
+        }
+
         const { name, designation, companyName, dialCode, phone, email, website, address } = req.body;
 
         const checkUser = `SELECT * FROM users where deleted_at IS NULL AND (phone = ? || email = ?) AND id != ? LIMIT 1`;
@@ -86,7 +103,18 @@ export const updateProfile =async (req:Request, res:Response) => {
 // ====================================================================================================
 
 export const updateImage =async (req:Request, res:Response) => {
-    const userId: string = res.locals.jwt.userId;
+    // const userId: string = res.locals.jwt.userId;
+    let userId:any; 
+    const type = req.query.type; //type = business, user, null
+    if (type && type === config.businessType) {
+        userId = req.query.userId;
+    } else {
+        userId = res.locals.jwt.userId;
+    }
+    if (!userId || userId === "" || userId === undefined) {
+        return apiResponse.errorMessage(res, 401, "Please login !")
+    }
+
     const { profileImage, coverImage } = req.body;
 
     const sql = `UPDATE users SET thumb = ?, cover_photo = ? WHERE id = ?`;

@@ -42,7 +42,18 @@ const utility = __importStar(require("../../helper/utility"));
 const development_1 = __importDefault(require("../../config/development"));
 const enquiryList = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const userId = res.locals.jwt.userId;
+        // const userId:string = res.locals.jwt.userId;
+        let userId;
+        const type = req.query.type; //type = business, user, null
+        if (type && type === development_1.default.businessType) {
+            userId = req.query.userId;
+        }
+        else {
+            userId = res.locals.jwt.userId;
+        }
+        if (!userId || userId === "" || userId === undefined) {
+            return apiResponse.errorMessage(res, 401, "User Id is required!");
+        }
         var getPage = req.query.page;
         var page = parseInt(getPage);
         if (page === null || page <= 1 || !page) {
@@ -91,7 +102,18 @@ exports.enquiryList = enquiryList;
 // ====================================================================================================
 const deleteEnquiry = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const userId = res.locals.jwt.userId;
+        // const userId:string = res.locals.jwt.userId;
+        let userId;
+        const type = req.query.type; //type = business, user, null
+        if (type && type === development_1.default.businessType) {
+            userId = req.query.userId;
+        }
+        else {
+            userId = res.locals.jwt.userId;
+        }
+        if (!userId || userId === "" || userId === undefined) {
+            return apiResponse.errorMessage(res, 401, "User Id is required!");
+        }
         const enquiryId = req.body.enquiryId;
         const sql = `DELETE FROM user_contacts WHERE user_id = ? AND id = ?`;
         const VALUES = [userId, enquiryId];
@@ -108,7 +130,18 @@ exports.deleteEnquiry = deleteEnquiry;
 // ====================================================================================================
 const replyEnquiry = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const userId = res.locals.jwt.userId;
+        // const userId:string = res.locals.jwt.userId;
+        let userId;
+        const type = req.query.type; //type = business, user, null
+        if (type && type === development_1.default.businessType) {
+            userId = req.query.userId;
+        }
+        else {
+            userId = res.locals.jwt.userId;
+        }
+        if (!userId || userId === "" || userId === undefined) {
+            return apiResponse.errorMessage(res, 401, "User Id is required!");
+        }
         const enquiryId = req.body.enquiryId;
         const message = req.body.message;
         const sql = `SELECT email FROM user_contacts WHERE user_id = ? AND id = ? LIMIT 1`;

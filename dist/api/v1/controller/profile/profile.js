@@ -38,9 +38,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateImage = exports.updateProfile = exports.getProfile = void 0;
 const db_1 = __importDefault(require("../../../../db"));
 const apiResponse = __importStar(require("../../helper/apiResponse"));
+const development_1 = __importDefault(require("../../config/development"));
 const getProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const userId = res.locals.jwt.userId;
+        let userId;
+        const type = req.query.type; //type = business, user, null
+        if (type && type === development_1.default.businessType) {
+            userId = req.query.userId;
+        }
+        else {
+            userId = res.locals.jwt.userId;
+        }
         if (!userId || userId === "" || userId === undefined) {
             return apiResponse.errorMessage(res, 401, "Please login !");
         }
@@ -74,7 +82,18 @@ exports.getProfile = getProfile;
 // ====================================================================================================
 const updateProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const userId = res.locals.jwt.userId;
+        // const userId: string = res.locals.jwt.userId;
+        let userId;
+        const type = req.query.type; //type = business, user, null
+        if (type && type === development_1.default.businessType) {
+            userId = req.query.userId;
+        }
+        else {
+            userId = res.locals.jwt.userId;
+        }
+        if (!userId || userId === "" || userId === undefined) {
+            return apiResponse.errorMessage(res, 401, "Please login !");
+        }
         const { name, designation, companyName, dialCode, phone, email, website, address } = req.body;
         const checkUser = `SELECT * FROM users where deleted_at IS NULL AND (phone = ? || email = ?) AND id != ? LIMIT 1`;
         const checkUserVALUES = [phone, email, userId];
@@ -110,7 +129,18 @@ exports.updateProfile = updateProfile;
 // ====================================================================================================
 // ====================================================================================================
 const updateImage = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const userId = res.locals.jwt.userId;
+    // const userId: string = res.locals.jwt.userId;
+    let userId;
+    const type = req.query.type; //type = business, user, null
+    if (type && type === development_1.default.businessType) {
+        userId = req.query.userId;
+    }
+    else {
+        userId = res.locals.jwt.userId;
+    }
+    if (!userId || userId === "" || userId === undefined) {
+        return apiResponse.errorMessage(res, 401, "Please login !");
+    }
     const { profileImage, coverImage } = req.body;
     const sql = `UPDATE users SET thumb = ?, cover_photo = ? WHERE id = ?`;
     const VALUES = [profileImage, coverImage, userId];

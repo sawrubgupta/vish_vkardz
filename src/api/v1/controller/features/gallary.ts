@@ -7,7 +7,18 @@ import config  from '../../config/development';
 
 export const gallary =async (req:Request, res:Response) => {
     try {
-        const userId:string = res.locals.jwt.userId;
+        // const userId:string = res.locals.jwt.userId;
+        let userId:any; 
+        const type = req.query.type; //type = business, user, null
+        if (type && type === config.businessType) {
+            userId = req.query.userId;
+        } else {
+            userId = res.locals.jwt.userId;
+        }
+        if (!userId || userId === "" || userId === undefined) {
+            return apiResponse.errorMessage(res, 401, "User Id is required!");
+        }
+
         const createdAt = utility.dateWithFormat();
         const image = req.body.image;
         if (!image || image === "" || image === undefined) {
@@ -34,7 +45,18 @@ export const gallary =async (req:Request, res:Response) => {
 
 export const getPortfolio =async (req:Request, res:Response) => {
     try {
-        const userId:string = res.locals.jwt.userId;
+        // const userId:string = res.locals.jwt.userId;
+        let userId:any; 
+        const type = req.query.type; //type = business, user, null
+        if (type && type === config.businessType) {
+            userId = req.query.userId;
+        } else {
+            userId = res.locals.jwt.userId;
+        }
+        if (!userId || userId === "" || userId === undefined) {
+            return apiResponse.errorMessage(res, 401, "User Id is required!");
+        }
+
         var getPage:any = req.query.page;
         var page = parseInt(getPage);
         if (page === null || page <= 1 || !page ) {
@@ -87,7 +109,18 @@ export const getPortfolio =async (req:Request, res:Response) => {
 
 export const deleteImage =async (req:Request, res:Response) => {
     try {
-        const userId:string = res.locals.jwt.userId;
+        // const userId:string = res.locals.jwt.userId;
+        let userId:any; 
+        const type = req.query.type; //type = business, user, null
+        if (type && type === config.businessType) {
+            userId = req.query.userId;
+        } else {
+            userId = res.locals.jwt.userId;
+        }
+        if (!userId || userId === "" || userId === undefined) {
+            return apiResponse.errorMessage(res, 401, "User Id is required!");
+        }
+
         const portfolioId = req.body.portfolioId;
 
         const sql = `DELETE FROM portfolio WHERE user_id = ${userId} AND id IN (${portfolioId})`;

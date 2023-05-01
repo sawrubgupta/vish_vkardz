@@ -42,7 +42,18 @@ const utility = __importStar(require("../../helper/utility"));
 const development_1 = __importDefault(require("../../config/development"));
 const addProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const userId = res.locals.jwt.userId;
+        // const userId:string = res.locals.jwt.userId;
+        let userId;
+        const type = req.query.type; //type = business, user, null
+        if (type && type === development_1.default.businessType) {
+            userId = req.query.userId;
+        }
+        else {
+            userId = res.locals.jwt.userId;
+        }
+        if (!userId || userId === "" || userId === undefined) {
+            return apiResponse.errorMessage(res, 401, "User Id is required!");
+        }
         const createdAt = utility.dateWithFormat();
         const { title, description, price, image } = req.body;
         const sql = `INSERT INTO services(user_id, title, images, overview, price, status, created_at) VALUES(?, ?, ?, ?, ?, ?, ?)`;
@@ -65,7 +76,18 @@ exports.addProduct = addProduct;
 // ====================================================================================================
 const getProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const userId = res.locals.jwt.userId;
+        // const userId:string = res.locals.jwt.userId;
+        let userId;
+        const type = req.query.type; //type = business, user, null
+        if (type && type === development_1.default.businessType) {
+            userId = req.query.userId;
+        }
+        else {
+            userId = res.locals.jwt.userId;
+        }
+        if (!userId || userId === "" || userId === undefined) {
+            return apiResponse.errorMessage(res, 401, "User Id is required!");
+        }
         var getPage = req.query.page;
         var page = parseInt(getPage);
         if (page === null || page <= 1 || !page) {
@@ -116,7 +138,18 @@ exports.getProducts = getProducts;
 // ====================================================================================================
 const updateProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const userId = res.locals.jwt.userId;
+        // const userId:string = res.locals.jwt.userId;
+        let userId;
+        const type = req.query.type; //type = business, user, null
+        if (type && type === development_1.default.businessType) {
+            userId = req.query.userId;
+        }
+        else {
+            userId = res.locals.jwt.userId;
+        }
+        if (!userId || userId === "" || userId === undefined) {
+            return apiResponse.errorMessage(res, 401, "User Id is required!");
+        }
         const productId = req.query.productId;
         const { title, description, price, image } = req.body;
         const sql = `UPDATE services SET title = ?, overview = ?, price = ?, images = ? WHERE user_id = ? AND id = ?`;
@@ -139,7 +172,18 @@ exports.updateProduct = updateProduct;
 // ====================================================================================================
 const deleteProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const userId = res.locals.jwt.userId;
+        // const userId:string = res.locals.jwt.userId;
+        let userId;
+        const type = req.query.type; //type = business, user, null
+        if (type && type === development_1.default.businessType) {
+            userId = req.query.userId;
+        }
+        else {
+            userId = res.locals.jwt.userId;
+        }
+        if (!userId || userId === "" || userId === undefined) {
+            return apiResponse.errorMessage(res, 401, "User Id is required!");
+        }
         const productId = req.query.productId;
         const sql = `DELETE FROM services WHERE user_id = ? AND id = ?`;
         const VALUES = [userId, productId];

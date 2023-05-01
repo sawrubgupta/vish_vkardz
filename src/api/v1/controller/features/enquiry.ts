@@ -7,7 +7,18 @@ import config  from '../../config/development';
 
 export const enquiryList =async (req:Request, res:Response) => {
     try {
-        const userId:string = res.locals.jwt.userId;
+        // const userId:string = res.locals.jwt.userId;
+        let userId:any; 
+        const type = req.query.type; //type = business, user, null
+        if (type && type === config.businessType) {
+            userId = req.query.userId;
+        } else {
+            userId = res.locals.jwt.userId;
+        }
+        if (!userId || userId === "" || userId === undefined) {
+            return apiResponse.errorMessage(res, 401, "User Id is required!");
+        }
+
         var getPage:any = req.query.page;
         var page = parseInt(getPage);
         if (page === null || page <= 1 || !page ) {
@@ -60,7 +71,18 @@ export const enquiryList =async (req:Request, res:Response) => {
 
 export const deleteEnquiry =async (req:Request, res:Response) => {
     try {
-        const userId:string = res.locals.jwt.userId;
+        // const userId:string = res.locals.jwt.userId;
+        let userId:any; 
+        const type = req.query.type; //type = business, user, null
+        if (type && type === config.businessType) {
+            userId = req.query.userId;
+        } else {
+            userId = res.locals.jwt.userId;
+        }
+        if (!userId || userId === "" || userId === undefined) {
+            return apiResponse.errorMessage(res, 401, "User Id is required!");
+        }
+
         const enquiryId = req.body.enquiryId;
 
         const sql = `DELETE FROM user_contacts WHERE user_id = ? AND id = ?`;
@@ -79,7 +101,18 @@ export const deleteEnquiry =async (req:Request, res:Response) => {
 
 export const replyEnquiry =async (req:Request, res:Response) => {
     try {
-        const userId:string = res.locals.jwt.userId;
+        // const userId:string = res.locals.jwt.userId;
+        let userId:any; 
+        const type = req.query.type; //type = business, user, null
+        if (type && type === config.businessType) {
+            userId = req.query.userId;
+        } else {
+            userId = res.locals.jwt.userId;
+        }
+        if (!userId || userId === "" || userId === undefined) {
+            return apiResponse.errorMessage(res, 401, "User Id is required!");
+        }
+
         const enquiryId = req.body.enquiryId;
         const message = req.body.message;
 

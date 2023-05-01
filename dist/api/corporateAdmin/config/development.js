@@ -25,7 +25,6 @@ exports.default = {
     vKardzPhone: "+91 6377256382",
     templateLimit: 6,
     pageSize: 20,
-    businessType: 'business',
     orderStatus: ["placed", "processed", "dispatched", "delivered"],
     token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEyOTQ1LCJpYXQiOjE2NzI3NTAyNTksImV4cCI6MTY3NTM0MjI1OX0.FijHwKIYVIBWnZbtWVry88FWnrejpu2HIWRDc_dKynw",
 };

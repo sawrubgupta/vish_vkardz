@@ -39,9 +39,21 @@ exports.deleteAboutUs = exports.getAboutUs = exports.addUpdateAboutUs = void 0;
 const db_1 = __importDefault(require("../../../../db"));
 const apiResponse = __importStar(require("../../helper/apiResponse"));
 const utility = __importStar(require("../../helper/utility"));
+const development_1 = __importDefault(require("../../config/development"));
 const addUpdateAboutUs = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const userId = res.locals.jwt.userId;
+        // const userId:string = res.locals.jwt.userId;
+        let userId;
+        const type = req.query.type; //type = business, user, null
+        if (type && type === development_1.default.businessType) {
+            userId = req.query.userId;
+        }
+        else {
+            userId = res.locals.jwt.userId;
+        }
+        if (!userId || userId === "" || userId === undefined) {
+            return apiResponse.errorMessage(res, 401, "User Id is required!");
+        }
         const createdAt = utility.dateWithFormat();
         const { companyName, year, business, aboutUsDetail, image } = req.body;
         const getAboutUs = `SELECT id FROM about WHERE user_id = ${userId}`;
@@ -79,7 +91,18 @@ exports.addUpdateAboutUs = addUpdateAboutUs;
 // ====================================================================================================
 const getAboutUs = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const userId = res.locals.jwt.userId;
+        // const userId:string = res.locals.jwt.userId;
+        let userId;
+        const type = req.query.type; //type = business, user, null
+        if (type && type === development_1.default.businessType) {
+            userId = req.query.userId;
+        }
+        else {
+            userId = res.locals.jwt.userId;
+        }
+        if (!userId || userId === "" || userId === undefined) {
+            return apiResponse.errorMessage(res, 401, "User Id is required!");
+        }
         const sql = `SELECT id, company_name, business, year, about_detail, images, created_at FROM about WHERE user_id = ${userId}`;
         const [rows] = yield db_1.default.query(sql);
         const getFeatureStatus = `SELECT status FROM users_features WHERE user_id = ${userId} AND feature_id = 3`;
@@ -108,7 +131,18 @@ exports.getAboutUs = getAboutUs;
 // ====================================================================================================
 const deleteAboutUs = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const userId = res.locals.jwt.userId;
+        // const userId:string = res.locals.jwt.userId;
+        let userId;
+        const type = req.query.type; //type = business, user, null
+        if (type && type === development_1.default.businessType) {
+            userId = req.query.userId;
+        }
+        else {
+            userId = res.locals.jwt.userId;
+        }
+        if (!userId || userId === "" || userId === undefined) {
+            return apiResponse.errorMessage(res, 401, "User Id is required!");
+        }
         const sql = `DELETE FROM about WHERE user_id = ${userId}`;
         const [rows] = yield db_1.default.query(sql);
         return apiResponse.successResponse(res, "Deleted Successfully", null);

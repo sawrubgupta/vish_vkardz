@@ -35,7 +35,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.adminChangePasswordValidation = exports.adminLoginValidation = exports.adminRegistrationValidation = void 0;
+exports.updateUserDetailValidation = exports.ChangeUserPasswordValidation = exports.ChangeAdminPasswordValidation = exports.adminLoginValidation = exports.adminRegistrationValidation = void 0;
 const apiResponse = __importStar(require("../helper/apiResponse"));
 const joi_1 = __importDefault(require("joi"));
 function validationCheck(value) {
@@ -84,9 +84,9 @@ const adminLoginValidation = (req, res, next) => __awaiter(void 0, void 0, void 
 exports.adminLoginValidation = adminLoginValidation;
 // ====================================================================================================
 // ====================================================================================================
-const adminChangePasswordValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+const ChangeAdminPasswordValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const schema = joi_1.default.object({
-        // oldPassword: Joi.string().max(80).required(),
+        oldPassword: joi_1.default.string().max(80).required(),
         newPassword: joi_1.default.string().min(3).max(80).required(),
     });
     const value = schema.validate(req.body);
@@ -96,6 +96,41 @@ const adminChangePasswordValidation = (req, res, next) => __awaiter(void 0, void
     }
     next();
 });
-exports.adminChangePasswordValidation = adminChangePasswordValidation;
+exports.ChangeAdminPasswordValidation = ChangeAdminPasswordValidation;
+// ====================================================================================================
+// ====================================================================================================
+const ChangeUserPasswordValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const schema = joi_1.default.object({
+        // oldPassword: Joi.string().max(80).required(),
+        type: joi_1.default.string().allow('').allow(null),
+        userId: joi_1.default.number().allow('').allow(null),
+        newPassword: joi_1.default.string().min(3).max(80).required(),
+    });
+    const value = schema.validate(req.body);
+    if (value.error) {
+        const errMsg = yield validationCheck(value);
+        return yield apiResponse.errorMessage(res, 400, errMsg);
+    }
+    next();
+});
+exports.ChangeUserPasswordValidation = ChangeUserPasswordValidation;
+// ====================================================================================================
+// ====================================================================================================
+const updateUserDetailValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const schema = joi_1.default.object({
+        type: joi_1.default.string().allow('').allow(null),
+        userId: joi_1.default.number().allow('').allow(null),
+        username: joi_1.default.string().trim().required(),
+        email: joi_1.default.string().trim().email().required(),
+        phone: joi_1.default.string().required(),
+    });
+    const value = schema.validate(req.body);
+    if (value.error) {
+        const errMsg = yield validationCheck(value);
+        return yield apiResponse.errorMessage(res, 400, errMsg);
+    }
+    next();
+});
+exports.updateUserDetailValidation = updateUserDetailValidation;
 // ====================================================================================================
 // ====================================================================================================

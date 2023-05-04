@@ -13,8 +13,8 @@ import * as validation from '../../middleware/validation';
 
 const vcardRouter = Router();
 
-vcardRouter.post("/activateCard", authenticatingToken, activateCardController.activateCard);
-vcardRouter.get("/deactivateCard", authenticatingToken, deactivateCardController.deactivateCard);
+vcardRouter.post("/activateCard", tempAuthenticatingToken, activateCardController.activateCard);//use in business type
+vcardRouter.get("/deactivateCard", tempAuthenticatingToken, deactivateCardController.deactivateCard);//use in business type
 vcardRouter.get("/getVcardProfile", tempAuthenticatingToken, getVcardProfileController.getVcardProfile); //use in business type
 
 vcardRouter.get("/getSocialLinks", tempAuthenticatingToken, socialLinksController.getSocialLinks); //use in business type

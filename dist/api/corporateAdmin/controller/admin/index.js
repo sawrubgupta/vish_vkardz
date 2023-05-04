@@ -31,5 +31,6 @@ const authRouter = (0, express_1.Router)();
 authRouter.post('/register', validation.adminRegistrationValidation, userController.register);
 authRouter.post('/login', validation.adminLoginValidation, userController.login);
 authRouter.post('/forgotPassword', userController.forgotPassword);
-authRouter.patch('/changePassword', authorization_controller_1.tempAuthenticatingToken, validation.adminChangePasswordValidation, userController.changePassword);
+authRouter.patch('/changeAdminPassword', authorization_controller_1.tempAuthenticatingToken, validation.ChangeAdminPasswordValidation, userController.changeAdminPassword);
+authRouter.patch('/changeUserPassword', authorization_controller_1.tempAuthenticatingToken, validation.ChangeUserPasswordValidation, userController.changeUserPassword);
 exports.default = authRouter;

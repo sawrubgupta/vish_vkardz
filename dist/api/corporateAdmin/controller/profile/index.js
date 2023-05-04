@@ -25,7 +25,9 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const profileController = __importStar(require("./profile"));
+const validation = __importStar(require("../../middleware/validation"));
 const authorization_controller_1 = require("../../middleware/authorization.controller");
 const profileRouter = (0, express_1.Router)();
 profileRouter.get('/userList', authorization_controller_1.authenticatingToken, profileController.userList);
+profileRouter.patch('/updateUserDetail', authorization_controller_1.tempAuthenticatingToken, validation.updateUserDetailValidation, profileController.updateUser);
 exports.default = profileRouter;

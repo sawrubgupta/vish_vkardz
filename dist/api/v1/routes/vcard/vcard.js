@@ -33,8 +33,8 @@ const getVcardProfileController = __importStar(require("../../controller/vcard/g
 const authorization_controller_1 = require("../../middleware/authorization.controller");
 const validation = __importStar(require("../../middleware/validation"));
 const vcardRouter = (0, express_1.Router)();
-vcardRouter.post("/activateCard", authorization_controller_1.authenticatingToken, activateCardController.activateCard);
-vcardRouter.get("/deactivateCard", authorization_controller_1.authenticatingToken, deactivateCardController.deactivateCard);
+vcardRouter.post("/activateCard", authorization_controller_1.tempAuthenticatingToken, activateCardController.activateCard); //use in business type
+vcardRouter.get("/deactivateCard", authorization_controller_1.tempAuthenticatingToken, deactivateCardController.deactivateCard); //use in business type
 vcardRouter.get("/getVcardProfile", authorization_controller_1.tempAuthenticatingToken, getVcardProfileController.getVcardProfile); //use in business type
 vcardRouter.get("/getSocialLinks", authorization_controller_1.tempAuthenticatingToken, socialLinksController.getSocialLinks); //use in business type
 vcardRouter.patch("/updateSocialLinks", authorization_controller_1.tempAuthenticatingToken, validation.editSocialLinksValidation, socialLinksController.updateSocialLinks); //use in business type

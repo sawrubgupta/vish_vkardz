@@ -39,9 +39,21 @@ exports.activateCard = void 0;
 const db_1 = __importDefault(require("../../../../db"));
 const utility = __importStar(require("../../helper/utility"));
 const apiResponse = __importStar(require("../../helper/apiResponse"));
+const development_1 = __importDefault(require("../../config/development"));
 const activateCard = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const userId = res.locals.jwt.userId;
+        // const userId:string = res.locals.jwt.userId;
+        let userId;
+        const type = req.query.type; //type = business, user, null
+        if (type && type === development_1.default.businessType) {
+            userId = req.query.userId;
+        }
+        else {
+            userId = res.locals.jwt.userId;
+        }
+        // if (!userId || userId === "" || userId === undefined) {
+        //     return apiResponse.errorMessage(res, 401, "User Id is required!");
+        // }
         if (userId === undefined || !userId) {
             return apiResponse.errorMessage(res, 400, "Please re-login!!");
         }

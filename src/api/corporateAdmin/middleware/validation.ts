@@ -55,10 +55,53 @@ export const adminLoginValidation = async (req: Request, res: Response, next: Ne
 // ====================================================================================================
 // ====================================================================================================
 
-export const adminChangePasswordValidation = async (req: Request, res: Response, next: NextFunction) => {
+export const ChangeAdminPasswordValidation = async (req: Request, res: Response, next: NextFunction) => {
+    const schema = Joi.object({
+        oldPassword: Joi.string().max(80).required(),
+        newPassword: Joi.string().min(3).max(80).required(),
+    });
+
+    const value = schema.validate(req.body);
+
+    if (value.error) {
+        const errMsg = await validationCheck(value);
+        return await apiResponse.errorMessage(res,400, errMsg);
+    }
+    next();
+};
+
+// ====================================================================================================
+// ====================================================================================================
+
+
+export const ChangeUserPasswordValidation = async (req: Request, res: Response, next: NextFunction) => {
     const schema = Joi.object({
         // oldPassword: Joi.string().max(80).required(),
+        type: Joi.string().allow('').allow(null),
+        userId: Joi.number().allow('').allow(null),
         newPassword: Joi.string().min(3).max(80).required(),
+    });
+
+    const value = schema.validate(req.body);
+
+    if (value.error) {
+        const errMsg = await validationCheck(value);
+        return await apiResponse.errorMessage(res,400, errMsg);
+    }
+    next();
+};
+
+// ====================================================================================================
+// ====================================================================================================
+
+
+export const updateUserDetailValidation = async (req: Request, res: Response, next: NextFunction) => {
+    const schema = Joi.object({
+        type: Joi.string().allow('').allow(null),
+        userId: Joi.number().allow('').allow(null),
+        username: Joi.string().trim().required(),
+        email: Joi.string().trim().email().required(),
+        phone: Joi.string().required(),
     });
 
     const value = schema.validate(req.body);

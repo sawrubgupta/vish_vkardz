@@ -18,6 +18,16 @@ name api's
 
 
 database changes:
+01-05-2023
+CREATE TABLE `user_images` ( 
+ `id` INT(11) NOT NULL AUTO_INCREMENT ,
+ `user_id` INT(11) NOT NULL ,
+ `type` VARCHAR(55) NOT NULL ,
+ `image` VARCHAR(255) NOT NULL ,
+ `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ,
+ PRIMARY KEY (`id`)
+) ENGINE = InnoDB;
+
 28-04-2023
 ALTER TABLE `users` ADD `admin_id` INT(11) NULL DEFAULT NULL AFTER `type`;
 ALTER TABLE `users` ADD `type` VARCHAR(55) NOT NULL DEFAULT 'user' AFTER `id`;

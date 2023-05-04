@@ -31,5 +31,5 @@ const authRouter = (0, express_1.Router)();
 authRouter.post('/register', validation.adminRegistrationValidation, userController.register);
 authRouter.post('/login', validation.adminLoginValidation, userController.login);
 authRouter.post('/forgotPassword', userController.forgotPassword);
-authRouter.patch('/changePassword', authorization_controller_1.authenticatingToken, validation.adminChangePasswordValidation, userController.changePassword);
+authRouter.patch('/changePassword', authorization_controller_1.tempAuthenticatingToken, validation.adminChangePasswordValidation, userController.changePassword);
 exports.default = authRouter;

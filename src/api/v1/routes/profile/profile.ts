@@ -13,15 +13,15 @@ import * as validation from '../../middleware/validation';
 
 const profileRouter = Router();
 
-profileRouter.get("/getProfile", authenticatingToken, profileController.getProfile); //use in business type
-profileRouter.patch("/updateProfile", authenticatingToken, validation.updateProfileValidation, profileController.updateProfile); //use in business type
-profileRouter.patch("/updateImage", authenticatingToken, profileController.updateImage); //use in business type
+profileRouter.get("/getProfile", tempAuthenticatingToken, profileController.getProfile); //use in business type
+profileRouter.patch("/updateProfile", tempAuthenticatingToken, validation.updateProfileValidation, profileController.updateProfile); //use in business type
+profileRouter.patch("/updateImage", tempAuthenticatingToken, profileController.updateImage); //use in business type
 
 profileRouter.post("/setProfilePin", authenticatingToken, validation.setProfilePinValidation, setPinController.setPin);
 profileRouter.delete("/removeProfilePin", authenticatingToken, setPinController.removePin);
 
 profileRouter.get("/getLayots", themeController.getLayout);
-profileRouter.patch("/updateVcardLayout", authenticatingToken, themeController.updateVcardLayout); //use in business type
+profileRouter.patch("/updateVcardLayout", tempAuthenticatingToken, themeController.updateVcardLayout); //use in business type
 
 profileRouter.post('/addPrimaryProfile', authenticatingToken, validation.primaryProfileValidation, primaryProfileController.setPrimaryProfile);
 profileRouter.get('/getPrimrySites', authenticatingToken, primaryProfileController.getPrimarySite);

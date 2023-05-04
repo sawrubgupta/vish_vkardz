@@ -35,44 +35,34 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getVcardProfile = void 0;
-const apiResponse = __importStar(require("../../helper/apiResponse"));
+exports.uploadImage = void 0;
 const db_1 = __importDefault(require("../../../../db"));
-const development_1 = __importDefault(require("../../config/development"));
-const getVcardProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const apiResponse = __importStar(require("../../helper/apiResponse"));
+const utility = __importStar(require("../../helper/utility"));
+const uploadImage = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        // const userId:string = res.locals.jwt.userId;
-        let userId;
-        const type = req.query.type; //type = business, user, null
-        if (type && type === development_1.default.businessType) {
-            userId = req.query.userId;
-        }
-        else {
-            userId = res.locals.jwt.userId;
-        }
+        // let userId:any; 
+        // const type = req.query.type; //type = business, user, null
+        // if (type && type === config.businessType) {
+        //     userId = req.query.userId;
+        // } else {
+        //     userId = res.locals.jwt.userId;
+        // }
+        const userId = req.body.userId;
+        const { type, image } = req.body.type;
         if (!userId || userId === "" || userId === undefined) {
-            return apiResponse.errorMessage(res, 404, "User profile not found !");
+            return apiResponse.errorMessage(res, 401, "User Id is required!");
         }
-        const sql = `SELECT username, card_number, full_name, thumb, cover_photo, vcard_layouts,  vcard_bg_color, designation, company_name, display_email, display_dial_code, display_number, website, display_email, address, colors FROM users WHERE id = ${userId} LIMIT 1`;
-        const [userData] = yield db_1.default.query(sql);
-        if (userData.length > 0) {
-            const getSocialSiteQyery = `SELECT social_sites.id, social_sites.name, social_sites.social_link, social_sites.social_img, social_sites.type, social_sites.status, social_sites.primary_profile, vcard_social_sites.value, vcard_social_sites.orders FROM social_sites INNER JOIN vcard_social_sites on social_sites.id = vcard_social_sites.site_id AND vcard_social_sites.user_id = ${userId} ORDER BY vcard_social_sites.orders IS NULL ASC`;
-            const [socialRows] = yield db_1.default.query(getSocialSiteQyery);
-            if (socialRows.length > 0) {
-                userData[0].socialSites = socialRows;
-                return apiResponse.successResponse(res, "Get user vcard profile data !", userData[0]);
-            }
-            else {
-                userData[0].socialSites = null;
-                return apiResponse.successResponse(res, "Get user vcard profile data !", userData[0]);
-            }
-        }
+        const createdAt = utility.dateWithFormat();
+        const sql = `INSERT INTO user_images(user_id, type, image, created_at) VALUES(?, ?, ?, ?)`;
+        const VALUES = [userId, type, image, createdAt];
+        const [rows] = yield db_1.default.query(sql, VALUES);
     }
     catch (error) {
         console.log(error);
         return apiResponse.errorMessage(res, 400, "Something went wrong");
     }
 });
-exports.getVcardProfile = getVcardProfile;
+exports.uploadImage = uploadImage;
 // ====================================================================================================
 // ====================================================================================================

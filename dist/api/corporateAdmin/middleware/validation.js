@@ -86,7 +86,7 @@ exports.adminLoginValidation = adminLoginValidation;
 // ====================================================================================================
 const adminChangePasswordValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const schema = joi_1.default.object({
-        oldPassword: joi_1.default.string().max(80).required(),
+        // oldPassword: Joi.string().max(80).required(),
         newPassword: joi_1.default.string().min(3).max(80).required(),
     });
     const value = schema.validate(req.body);

@@ -39,9 +39,21 @@ exports.deleteSocialLink = exports.updateSocialLinks = exports.getSocialLinks = 
 const apiResponse = __importStar(require("../../helper/apiResponse"));
 const db_1 = __importDefault(require("../../../../db"));
 const utility = __importStar(require("../../helper/utility"));
+const development_1 = __importDefault(require("../../config/development"));
 const getSocialLinks = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const userId = res.locals.jwt.userId;
+        // const userId: string = res.locals.jwt.userId;
+        let userId;
+        const type = req.query.type; //type = business, user, null
+        if (type && type === development_1.default.businessType) {
+            userId = req.query.userId;
+        }
+        else {
+            userId = res.locals.jwt.userId;
+        }
+        if (!userId || userId === "" || userId === undefined) {
+            return apiResponse.errorMessage(res, 401, "Please login !");
+        }
         let keyword = req.query.keyword;
         // var getPage:any = req.query.page;
         // var page = parseInt(getPage);
@@ -77,7 +89,18 @@ exports.getSocialLinks = getSocialLinks;
 // ====================================================================================================
 const updateSocialLinks = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const userId = res.locals.jwt.userId;
+        // const userId:string = res.locals.jwt.userId;
+        let userId;
+        const type = req.query.type; //type = business, user, null
+        if (type && type === development_1.default.businessType) {
+            userId = req.query.userId;
+        }
+        else {
+            userId = res.locals.jwt.userId;
+        }
+        if (!userId || userId === "" || userId === undefined) {
+            return apiResponse.errorMessage(res, 401, "Please login !");
+        }
         const createdAt = utility.dateWithFormat();
         const { siteId, siteValue, orders, siteLabel } = req.body;
         let data;
@@ -110,7 +133,18 @@ exports.updateSocialLinks = updateSocialLinks;
 // ====================================================================================================
 const deleteSocialLink = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const userId = res.locals.jwt.userId;
+        // const userId:string = res.locals.jwt.userId;
+        let userId;
+        const type = req.query.type; //type = business, user, null
+        if (type && type === development_1.default.businessType) {
+            userId = req.query.userId;
+        }
+        else {
+            userId = res.locals.jwt.userId;
+        }
+        if (!userId || userId === "" || userId === undefined) {
+            return apiResponse.errorMessage(res, 401, "Please login !");
+        }
         const siteId = req.query.siteId;
         const sql = `DELETE FROM vcard_social_sites WHERE user_id = ? AND site_id = ?`;
         const VALUES = [userId, siteId];

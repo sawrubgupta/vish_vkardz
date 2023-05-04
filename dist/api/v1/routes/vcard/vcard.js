@@ -35,10 +35,10 @@ const validation = __importStar(require("../../middleware/validation"));
 const vcardRouter = (0, express_1.Router)();
 vcardRouter.post("/activateCard", authorization_controller_1.authenticatingToken, activateCardController.activateCard);
 vcardRouter.get("/deactivateCard", authorization_controller_1.authenticatingToken, deactivateCardController.deactivateCard);
-vcardRouter.get("/getVcardProfile", authorization_controller_1.authenticatingToken, getVcardProfileController.getVcardProfile);
-vcardRouter.get("/getSocialLinks", authorization_controller_1.authenticatingToken, socialLinksController.getSocialLinks);
-vcardRouter.patch("/updateSocialLinks", authorization_controller_1.authenticatingToken, validation.editSocialLinksValidation, socialLinksController.updateSocialLinks);
-vcardRouter.delete("/deleteSocialLink", authorization_controller_1.authenticatingToken, socialLinksController.deleteSocialLink);
+vcardRouter.get("/getVcardProfile", authorization_controller_1.tempAuthenticatingToken, getVcardProfileController.getVcardProfile); //use in business type
+vcardRouter.get("/getSocialLinks", authorization_controller_1.tempAuthenticatingToken, socialLinksController.getSocialLinks); //use in business type
+vcardRouter.patch("/updateSocialLinks", authorization_controller_1.tempAuthenticatingToken, validation.editSocialLinksValidation, socialLinksController.updateSocialLinks); //use in business type
+vcardRouter.delete("/deleteSocialLink", authorization_controller_1.tempAuthenticatingToken, socialLinksController.deleteSocialLink); //use in business type
 // vcardRouter.patch("/updateVcardProfile", authenticatingToken,  updateVcardProfileController.updateVcardProfile);
 // vcardRouter.get("/viewVcardProfile", authenticatingToken, viewVcardProfileController.viewVcardProfile);
 // vcardRouter.get("/getSocialQuickSetupLinks", authenticatingToken, getSocialLinksController.getQuickSetupSocialLinks);

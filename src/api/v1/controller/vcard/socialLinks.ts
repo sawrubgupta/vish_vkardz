@@ -6,7 +6,18 @@ import config  from '../../config/development';
 
 export const getSocialLinks =async (req:Request, res:Response) => {
     try {
-        const userId: string = res.locals.jwt.userId;
+        // const userId: string = res.locals.jwt.userId;
+        let userId:any; 
+        const type = req.query.type; //type = business, user, null
+        if (type && type === config.businessType) {
+            userId = req.query.userId;
+        } else {
+            userId = res.locals.jwt.userId;
+        }
+        if (!userId || userId === "" || userId === undefined) {
+            return apiResponse.errorMessage(res, 401, "Please login !")
+        }
+    
         let keyword = req.query.keyword;
 
         // var getPage:any = req.query.page;
@@ -47,7 +58,18 @@ export const getSocialLinks =async (req:Request, res:Response) => {
 
 export const updateSocialLinks = async (req:Request, res:Response) => {
     try {
-        const userId:string = res.locals.jwt.userId;
+        // const userId:string = res.locals.jwt.userId;
+        let userId:any; 
+        const type = req.query.type; //type = business, user, null
+        if (type && type === config.businessType) {
+            userId = req.query.userId;
+        } else {
+            userId = res.locals.jwt.userId;
+        }
+        if (!userId || userId === "" || userId === undefined) {
+            return apiResponse.errorMessage(res, 401, "Please login !")
+        }
+    
         const createdAt = utility.dateWithFormat();
         const { siteId, siteValue, orders, siteLabel } = req.body;
         let data:any
@@ -82,7 +104,18 @@ export const updateSocialLinks = async (req:Request, res:Response) => {
 
 export const deleteSocialLink =async (req:Request, res:Response) => {
     try {
-        const userId:string = res.locals.jwt.userId;
+        // const userId:string = res.locals.jwt.userId;
+        let userId:any; 
+        const type = req.query.type; //type = business, user, null
+        if (type && type === config.businessType) {
+            userId = req.query.userId;
+        } else {
+            userId = res.locals.jwt.userId;
+        }
+        if (!userId || userId === "" || userId === undefined) {
+            return apiResponse.errorMessage(res, 401, "Please login !")
+        }
+    
         const siteId = req.query.siteId;
 
         const sql = `DELETE FROM vcard_social_sites WHERE user_id = ? AND site_id = ?`;

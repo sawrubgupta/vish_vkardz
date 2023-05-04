@@ -41,6 +41,7 @@ const apiResponse = __importStar(require("../../helper/apiResponse"));
 const utility = __importStar(require("../../helper/utility"));
 // import config from "../../config/development";
 const md5_1 = __importDefault(require("md5"));
+const development_1 = __importDefault(require("../../config/development"));
 const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { name, email, phone, password, jobTitle, company, image } = req.body;
@@ -164,29 +165,36 @@ exports.forgotPassword = forgotPassword;
 // ====================================================================================================
 const changePassword = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const userId = res.locals.jwt.userId;
-        const { oldPassword, newPassword } = req.body;
+        // const userId:string = res.locals.jwt.userId;    
+        let userId;
+        const type = req.query.type; //type = business, user, null
+        if (type && type === development_1.default.businessType) {
+            userId = req.query.userId;
+        }
+        else {
+            userId = res.locals.jwt.userId;
+        }
+        if (!userId || userId === "" || userId === undefined) {
+            return apiResponse.errorMessage(res, 401, "User Id is required!");
+        }
+        const { newPassword } = req.body;
         const hash = (0, md5_1.default)(newPassword);
         const sql = `SELECT password from business_admin WHERE id = ${userId}`;
         const [data] = yield db_1.default.query(sql);
         if (data.length > 0) {
-            const oldPassCorrect = (0, md5_1.default)(oldPassword) == data[0].password;
-            if (oldPassCorrect) {
-                if (oldPassword === newPassword) {
-                    return apiResponse.errorMessage(res, 400, "old password and new password can't same");
-                }
-                const updatePassSql = `Update business_admin Set password = ? where id = ?`;
-                const VALUES = [hash, userId];
-                const [updatePassword] = yield db_1.default.query(updatePassSql, VALUES);
-                if (updatePassword.affectedRows > 0) {
-                    return yield apiResponse.successResponse(res, "Password updated successfully !", null);
-                }
-                else {
-                    return yield apiResponse.errorMessage(res, 400, "Something Went Wrong, Please Try again later");
-                }
+            //     const oldPassCorrect = md5(oldPassword) ==  data[0].password;
+            //     if (oldPassCorrect) {
+            //         if (oldPassword === newPassword) {
+            //             return apiResponse.errorMessage(res, 400, "old password and new password can't same");
+            //         }
+            const updatePassSql = `Update business_admin Set password = ? where id = ?`;
+            const VALUES = [hash, userId];
+            const [updatePassword] = yield db_1.default.query(updatePassSql, VALUES);
+            if (updatePassword.affectedRows > 0) {
+                return yield apiResponse.successResponse(res, "Password updated successfully !", null);
             }
             else {
-                return apiResponse.errorMessage(res, 400, "Wrong old password !!");
+                return yield apiResponse.errorMessage(res, 400, "Something Went Wrong, Please Try again later");
             }
         }
         else {

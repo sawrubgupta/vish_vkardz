@@ -4,6 +4,7 @@ import * as apiResponse from '../../helper/apiResponse';
 import * as utility from "../../helper/utility";
 // import config from "../../config/development";
 import md5 from "md5";
+import config from '../../config/development';
 
 export const register =async (req:Request, res:Response) => {
     try {
@@ -136,19 +137,30 @@ export const forgotPassword =async (req:Request, res:Response) => {
 
 export const changePassword =async (req:Request, res:Response) => {
     try {
-        const userId:string = res.locals.jwt.userId;        
-        const {oldPassword, newPassword} = req.body;
+        // const userId:string = res.locals.jwt.userId;    
+        let userId:any; 
+        const type = req.query.type; //type = business, user, null
+        if (type && type === config.businessType) {
+            userId = req.query.userId;
+        } else {
+            userId = res.locals.jwt.userId;
+        }
+        if (!userId || userId === "" || userId === undefined) {
+            return apiResponse.errorMessage(res, 401, "User Id is required!");
+        }
+    
+        const {newPassword} = req.body;
         const hash = md5(newPassword);
 
         const sql = `SELECT password from business_admin WHERE id = ${userId}`;
         const [data]:any = await pool.query(sql);
 
         if (data.length > 0) {
-            const oldPassCorrect = md5(oldPassword) ==  data[0].password;
-            if (oldPassCorrect) {
-                if (oldPassword === newPassword) {
-                    return apiResponse.errorMessage(res, 400, "old password and new password can't same");
-                }
+        //     const oldPassCorrect = md5(oldPassword) ==  data[0].password;
+        //     if (oldPassCorrect) {
+        //         if (oldPassword === newPassword) {
+        //             return apiResponse.errorMessage(res, 400, "old password and new password can't same");
+        //         }
                 const updatePassSql = `Update business_admin Set password = ? where id = ?`;
                 const VALUES = [hash, userId]
                 const [updatePassword]:any = await pool.query(updatePassSql, VALUES)
@@ -158,9 +170,6 @@ export const changePassword =async (req:Request, res:Response) => {
                 } else {
                     return await apiResponse.errorMessage(res,400,"Something Went Wrong, Please Try again later");
                 }   
-            } else {
-                return apiResponse.errorMessage(res, 400, "Wrong old password !!");
-            }
         } else{
             return apiResponse.errorMessage(res, 400, "User not found !")
         }

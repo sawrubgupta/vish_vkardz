@@ -57,7 +57,7 @@ export const adminLoginValidation = async (req: Request, res: Response, next: Ne
 
 export const adminChangePasswordValidation = async (req: Request, res: Response, next: NextFunction) => {
     const schema = Joi.object({
-        oldPassword: Joi.string().max(80).required(),
+        // oldPassword: Joi.string().max(80).required(),
         newPassword: Joi.string().min(3).max(80).required(),
     });
 

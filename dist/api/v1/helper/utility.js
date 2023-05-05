@@ -12,13 +12,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.jwtGenerate = exports.sendMail = exports.extendedDateWithFormat = exports.dateWithFormat = exports.validateEmail = exports.englishCheck = exports.randomNumber = exports.randomString = exports.maxChecker = void 0;
+exports.uploadFile = exports.jwtGenerate = exports.sendMail = exports.extendedDateWithFormat = exports.dateWithFormat = exports.validateEmail = exports.englishCheck = exports.randomNumber = exports.randomString = exports.maxChecker = void 0;
 const moment_1 = __importDefault(require("moment"));
 const nodemailer_1 = __importDefault(require("nodemailer"));
 const development_1 = __importDefault(require("../config/development"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 require("dotenv/config");
 const secretKey = development_1.default.secretKey; //process.env.SECRET;
+const axios_1 = __importDefault(require("axios"));
 const maxChecker = (vari, count) => {
     if (vari.length > count) {
         return true;
@@ -138,5 +139,34 @@ const jwtGenerate = (id) => __awaiter(void 0, void 0, void 0, function* () {
     return token;
 });
 exports.jwtGenerate = jwtGenerate;
+// ====================================================================================================
+// ====================================================================================================
+const uploadFile = (filePath) => __awaiter(void 0, void 0, void 0, function* () {
+    let result = false;
+    try {
+        // const response = await axios({
+        //     url: `https://vkardz.com/api/qrCode.php?username=${username}`,
+        //     method: "get",
+        // });
+        yield axios_1.default.post('https://vkardz.com/api/uploadFile.php', {
+            type: 'file',
+            lastName: filePath
+        })
+            .then(function (response) {
+            console.log(response);
+            result = response;
+        })
+            .catch(function (error) {
+            console.log(error);
+            result = false;
+        });
+        return result;
+    }
+    catch (error) {
+        result = false;
+        return result;
+    }
+});
+exports.uploadFile = uploadFile;
 // ====================================================================================================
 // ====================================================================================================

@@ -56,7 +56,7 @@ const adminRegistrationValidation = (req, res, next) => __awaiter(void 0, void 0
         password: joi_1.default.string().min(3).max(80).required(),
         phone: joi_1.default.string().trim().min(8).max(20).trim().required(),
         image: joi_1.default.string().trim().allow(''),
-        jobTitle: joi_1.default.string().required(),
+        jobTitle: joi_1.default.string().allow('').allow(null),
         company: joi_1.default.string().trim().required(),
     });
     const value = schema.validate(req.body);

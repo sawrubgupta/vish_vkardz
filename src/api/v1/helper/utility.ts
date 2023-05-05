@@ -4,6 +4,7 @@ import config from "../config/development";
 import jwt from "jsonwebtoken";
 import 'dotenv/config';
 const secretKey:any = config.secretKey; //process.env.SECRET;
+import axios from 'axios';
 
 export const maxChecker = (vari: string, count: number) => {
 	if (vari.length > count) {
@@ -128,6 +129,35 @@ export const jwtGenerate = async (id: string) => {
 	});
 	return token;
 };
+
+// ====================================================================================================
+// ====================================================================================================
+
+export const uploadFile =async (filePath:string) => {
+    let result:any = false;
+    try {
+        // const response = await axios({
+        //     url: `https://vkardz.com/api/qrCode.php?username=${username}`,
+        //     method: "get",
+        // });
+		await axios.post('https://vkardz.com/api/uploadFile.php', {
+			type: 'file',
+			lastName: filePath
+		  })
+		  .then(function (response) {
+			console.log(response);
+			result = response;
+		  })
+		  .catch(function (error) {
+			console.log(error);
+			result = false;
+		  });
+        return result;
+    } catch (error) {
+      result = false;
+      return result;
+    }
+}
 
 // ====================================================================================================
 // ====================================================================================================

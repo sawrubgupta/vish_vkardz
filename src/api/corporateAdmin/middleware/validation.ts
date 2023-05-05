@@ -21,7 +21,7 @@ export const adminRegistrationValidation = async (req: Request, res: Response, n
         password: Joi.string().min(3).max(80).required(),
         phone: Joi.string().trim().min(8).max(20).trim().required(),
         image : Joi.string().trim().allow(''),
-        jobTitle: Joi.string().required(),
+        jobTitle: Joi.string().allow('').allow(null),
         company:Joi.string().trim().required(),
     });
 

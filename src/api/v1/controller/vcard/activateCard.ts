@@ -79,6 +79,8 @@ export const activateCard =async (req:Request, res:Response) => {
                         })
                         const [userFeatureData]:any = await pool.query(featureResult)
                         if (userFeatureData.affectedRows > 0) {
+                            const updateCodeStatus = `UPDATE card_activation SET card_assign = '${config.ASSIGNEDStatus}' WHERE card_key = '${code}'`;
+                            const [cardRows]:any = await pool.query(updateCodeStatus);
                             return apiResponse.successResponse(res, "Congratulations, Your card is Actived Now!", null);
                         } else {
                             return apiResponse.errorMessage(res, 400, "Failed to add features, Contact Support");

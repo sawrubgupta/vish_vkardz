@@ -52,13 +52,16 @@ const userList = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const offset = (page - 1) * page_size;
         const getPageQuery = `SELECT id FROM users WHERE admin_id = ${userId}`;
         const [result] = yield db_1.default.query(getPageQuery);
-        const sql = `SELECT id, username, name, email, phone, designation, website, account_type, thumb, cover_photo, primary_profile_link FROM users WHERE admin_id = ${userId} AND (username LIKE '%${keyword}%' OR name LIKE '%${keyword}%' OR full_name LIKE '%${keyword}%') ORDER BY username asc limit ${page_size} offset ${offset}`;
+        const sql = `SELECT id, username, name, email, phone, designation, website, account_type, thumb, cover_photo, primary_profile_link FROM users WHERE admin_id = ${userId} AND (username LIKE '%${keyword}%' OR name LIKE '%${keyword}%') ORDER BY username asc limit ${page_size} offset ${offset}`;
         const [rows] = yield db_1.default.query(sql);
+        const adminSql = `SELECT * FROM business_admin WHERE id = ${userId} LIMIT 1`;
+        const [adminRows] = yield db_1.default.query(adminSql);
         let totalPages = result.length / page_size;
         let totalPage = Math.ceil(totalPages);
         return res.status(200).json({
             status: true,
             data: rows,
+            adminData: adminRows,
             totalPage: totalPage,
             currentPage: page,
             totalLength: result.length,
@@ -102,8 +105,8 @@ const updateUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             return apiResponse.errorMessage(res, 401, "User Id is required!");
         }
         const { username, email, phone } = req.body;
-        const emailSql = `SELECT username, email, phone FROM users where deleted_at IS NULL AND (email = ? or username = ? or phone = ?) LIMIT 1`;
-        const emailValues = [email, username, phone];
+        const emailSql = `SELECT username, email, phone FROM users where deleted_at IS NULL AND id != ? AND (email = ? or username = ? or phone = ?) LIMIT 1`;
+        const emailValues = [email, username, phone, userId];
         const [data] = yield db_1.default.query(emailSql, emailValues);
         const dupli = [];
         if (data.length > 0) {

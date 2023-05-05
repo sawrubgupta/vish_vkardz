@@ -113,6 +113,8 @@ const activateCard = (req, res) => __awaiter(void 0, void 0, void 0, function* (
                         }));
                         const [userFeatureData] = yield db_1.default.query(featureResult);
                         if (userFeatureData.affectedRows > 0) {
+                            const updateCodeStatus = `UPDATE card_activation SET card_assign = '${development_1.default.ASSIGNEDStatus}' WHERE card_key = '${code}'`;
+                            const [cardRows] = yield db_1.default.query(updateCodeStatus);
                             return apiResponse.successResponse(res, "Congratulations, Your card is Actived Now!", null);
                         }
                         else {

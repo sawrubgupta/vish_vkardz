@@ -3,6 +3,10 @@ import nodemailer from "nodemailer";
 import config from "../config/development";
 import jwt from "jsonwebtoken";
 import 'dotenv/config';
+import axios from 'axios';
+import fs from 'fs';
+import formData from 'form-data';
+
 const secretKey:any = config.secretKey; //process.env.SECRET;
 
 export const maxChecker = (vari: string, count: number) => {
@@ -128,6 +132,37 @@ export const jwtGenerate = async (id: string) => {
 	});
 	return token;
 };
+
+// ====================================================================================================
+// ====================================================================================================
+
+export const uploadFile =async (filePath:string) => {
+    let result:any = false;
+    try {
+        // const response = await axios({
+        //     url: `https://vkardz.com/api/qrCode.php?username=${username}`,
+        //     method: "get",
+        // });
+		const fileStream = fs.createReadStream('path/to/file.jpg');
+
+		await axios.post('https://vkardz.com/api/uploadFile.php', {
+			type: 'file',
+			lastName: fs.createReadStream(filePath)
+		  })
+		  .then(function (response) {
+			console.log(response.data);
+			result = response.data;
+		  })
+		  .catch(function (error) {
+			console.log(error);
+			result = false;
+		  });
+        return result;
+    } catch (error) {
+      result = false;
+      return result;
+    }
+}
 
 // ====================================================================================================
 // ====================================================================================================

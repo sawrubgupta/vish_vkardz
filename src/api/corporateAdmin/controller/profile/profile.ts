@@ -81,7 +81,7 @@ export const updateUser = async (req:Request, res:Response) => {
         const { username, email, phone } = req.body;
 
         const emailSql = `SELECT username, email, phone FROM users where deleted_at IS NULL AND id != ? AND (email = ? or username = ? or phone = ?) LIMIT 1`;
-        const emailValues = [email, username, phone, userId]
+        const emailValues = [userId, email, username, phone]
 
         const [data]:any = await pool.query(emailSql, emailValues);
 
@@ -111,6 +111,62 @@ export const updateUser = async (req:Request, res:Response) => {
         if (userData.length > 0) {
             const updateSql = `UPDATE users SET username = ?, email = ?, phone = ? WHERE id = ?`;
             const VALUES = [username, email, phone, userId];
+            const [rows]:any = await pool.query(updateSql, VALUES);
+            if (rows.affectedRows > 0) {
+                return apiResponse.successResponse(res, "Updated Successfully", null);
+            } else {
+                return apiResponse.errorMessage(res, 400, "Failed to update, try again");
+            }
+
+        } else {
+            return apiResponse.errorMessage(res, 400, "User not found!");
+        }
+    } catch (error) {
+        console.log(error);
+        return apiResponse.errorMessage(res, 400, "Something went wrong");
+    }
+}
+
+// ====================================================================================================
+// ====================================================================================================
+
+export const updateAdmin = async (req:Request, res:Response) => {
+    try {
+        let userId = res.locals.jwt.userId;
+
+        if (!userId || userId === "" || userId === undefined) {
+            return apiResponse.errorMessage(res, 401, "User Id is required!");
+        }
+        const { name, email, phone, image, company, designation, cin_number, gst_number} = req.body;
+
+        const emailSql = `SELECT email, phone FROM business_admin WHERE deleted_at IS NULL AND id != ? AND (email = ? or phone = ?) LIMIT 1`;
+        const emailValues = [userId, email, phone]
+
+        const [data]:any = await pool.query(emailSql, emailValues);
+
+        const dupli = [];
+        if (data.length > 0) {
+            if (data[0].email === email) {
+                dupli.push("email");
+            }
+            if (data[0].phone === phone) {
+                dupli.push("phone");
+            }
+            console.log(dupli);
+            
+            const msg = `${dupli.join()} is duplicate, Please change it`;
+            return res.status(400).json({
+                status: false,
+                data: null,
+                message: msg,
+            });
+        }
+
+        const checkUserSql = `SELECT name FROM business_admin WHERE id = ${userId} LIMIT 1`;
+        const [userData]:any = await pool.query(checkUserSql);
+        if (userData.length > 0) {
+            const updateSql = `UPDATE business_admin SET name = ?, email = ?, phone = ?, image = ?, company = ?, designation = ?, cin_number = ?, gst_number = ? WHERE id = ?`;
+            const VALUES = [name, email, phone, image, company, designation, cin_number, gst_number, userId];
             const [rows]:any = await pool.query(updateSql, VALUES);
             if (rows.affectedRows > 0) {
                 return apiResponse.successResponse(res, "Updated Successfully", null);

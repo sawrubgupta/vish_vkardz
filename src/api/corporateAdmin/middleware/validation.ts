@@ -116,3 +116,28 @@ export const updateUserDetailValidation = async (req: Request, res: Response, ne
 // ====================================================================================================
 // ====================================================================================================
 
+
+export const updateAdminDetailValidation = async (req: Request, res: Response, next: NextFunction) => {
+    const schema = Joi.object({
+        name: Joi.string().required(), 
+        email: Joi.string().email().required(), 
+        phone: Joi.string().required(), 
+        image: Joi.string().allow('').allow(null), 
+        company: Joi.string().allow('').allow(null), 
+        designation: Joi.string().allow('').allow(null), 
+        cin_number: Joi.string().allow('').allow(null), 
+        gst_number: Joi.string().allow('').allow(null)  
+      });
+
+    const value = schema.validate(req.body);
+
+    if (value.error) {
+        const errMsg = await validationCheck(value);
+        return await apiResponse.errorMessage(res,400, errMsg);
+    }
+    next();
+};
+
+// ====================================================================================================
+// ====================================================================================================
+

@@ -35,7 +35,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateUserDetailValidation = exports.ChangeUserPasswordValidation = exports.ChangeAdminPasswordValidation = exports.adminLoginValidation = exports.adminRegistrationValidation = void 0;
+exports.updateAdminDetailValidation = exports.updateUserDetailValidation = exports.ChangeUserPasswordValidation = exports.ChangeAdminPasswordValidation = exports.adminLoginValidation = exports.adminRegistrationValidation = void 0;
 const apiResponse = __importStar(require("../helper/apiResponse"));
 const joi_1 = __importDefault(require("joi"));
 function validationCheck(value) {
@@ -132,5 +132,26 @@ const updateUserDetailValidation = (req, res, next) => __awaiter(void 0, void 0,
     next();
 });
 exports.updateUserDetailValidation = updateUserDetailValidation;
+// ====================================================================================================
+// ====================================================================================================
+const updateAdminDetailValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const schema = joi_1.default.object({
+        name: joi_1.default.string().required(),
+        email: joi_1.default.string().email().required(),
+        phone: joi_1.default.string().required(),
+        image: joi_1.default.string().allow('').allow(null),
+        company: joi_1.default.string().allow('').allow(null),
+        designation: joi_1.default.string().allow('').allow(null),
+        cin_number: joi_1.default.string().allow('').allow(null),
+        gst_number: joi_1.default.string().allow('').allow(null)
+    });
+    const value = schema.validate(req.body);
+    if (value.error) {
+        const errMsg = yield validationCheck(value);
+        return yield apiResponse.errorMessage(res, 400, errMsg);
+    }
+    next();
+});
+exports.updateAdminDetailValidation = updateAdminDetailValidation;
 // ====================================================================================================
 // ====================================================================================================

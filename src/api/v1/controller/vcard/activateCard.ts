@@ -47,8 +47,8 @@ export const activateCard =async (req:Request, res:Response) => {
             const checkPackageQuery = `Select * from features_type where status = 1 && id = ${packageId}`;
             const [packageFound]:any = await pool.query(checkPackageQuery);
             if (packageFound.length > 0) {
-                const addCardDataQuery = `UPDATE users SET is_deactived = ?, is_active = ?, is_verify = ?, is_payment = ?, card_number = ?, account_type = ?, verify_time = ?, start_date = ?, end_date = ? WHERE id = ?`;
-                const VALUES = [0, 1, 1, 1, card_number, packageId, justDate, justDate, endDate, userId];
+                const addCardDataQuery = `UPDATE users SET is_deactived = ?, is_card_linked = ?, is_active = ?, is_verify = ?, is_payment = ?, card_number = ?, account_type = ?, verify_time = ?, start_date = ?, end_date = ? WHERE id = ?`;
+                const VALUES = [0, 1, 1, 1, 1, card_number, packageId, justDate, justDate, endDate, userId];
                 const [addCardRows]:any = await pool.query(addCardDataQuery, VALUES);
 
                 if (addCardRows.affectedRows > 0) {

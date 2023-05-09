@@ -10,6 +10,7 @@ const profileRouter = Router();
 
 profileRouter.get('/userList', authenticatingToken, profileController.userList);
 profileRouter.patch('/updateUserDetail', tempAuthenticatingToken, validation.updateUserDetailValidation, profileController.updateUser);
+profileRouter.patch('/updateAdminDetail', authenticatingToken, validation.updateAdminDetailValidation, profileController.updateUser);
 
 profileRouter.get('/exportUsers', authenticatingToken, exportController.exportUser);
 

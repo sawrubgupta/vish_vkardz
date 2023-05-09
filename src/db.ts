@@ -3,10 +3,10 @@ import 'dotenv/config';
 
 
 const pool = mysql.createPool({
-  host: process.env.HOST || "localhost",//"151.106.125.161", //database-1.c8nty4yxdhpq.ap-south-1.rds.amazonaws.com",// //"194.31.52.223",
-  user: process.env.USER || "root", //"vkar_staging1",//"admin", //"root", //"vkar_vkardz",
-  password: process.env.PASSWORD || "",//"GfCudy6C9CGDOd#!",//"lnbc100n1p" , //"sOMAIqlIqrhzp!@4",
-  database: process.env.DATABASE || "vkardz_new", //"vkar_staging1",//"furball",//"vkardz_new", //"vkar_vkardz"wo
+  host: process.env.HOST || "151.106.125.161", //"localhost",// //database-1.c8nty4yxdhpq.ap-south-1.rds.amazonaws.com",// //"194.31.52.223",
+  user: process.env.USER || "vkar_staging1", //"root", //,//"admin", //"root", //"vkar_vkardz",
+  password: process.env.PASSWORD || "GfCudy6C9CGDOd#!", //"",////"lnbc100n1p" , //"sOMAIqlIqrhzp!@4",
+  database: process.env.DATABASE || "vkar_staging1", //"vkardz_new", //"vkar_staging1",//"furball",//"vkardz_new", //"vkar_vkardz"wo
   connectTimeout: 10000,
 
         /**

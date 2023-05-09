@@ -53,7 +53,7 @@ const deactivateCard = (req, res) => __awaiter(void 0, void 0, void 0, function*
         if (!userId || userId === "" || userId === undefined) {
             return apiResponse.errorMessage(res, 401, "User Id is required!");
         }
-        const sql = `UPDATE users SET is_deactived = ?, is_payment = ?, card_number = ?, card_number_fix = ? WHERE id = ?`;
+        const sql = `UPDATE users SET is_card_linked = ?, is_payment = ?, card_number = ?, card_number_fix = ? WHERE id = ?`;
         const VALUES = [1, 0, "", "", userId];
         const [rows] = yield db_1.default.query(sql, VALUES);
         if (rows.affectedRows > 0) {

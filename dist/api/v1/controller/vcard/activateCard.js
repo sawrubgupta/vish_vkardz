@@ -81,8 +81,8 @@ const activateCard = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             const checkPackageQuery = `Select * from features_type where status = 1 && id = ${packageId}`;
             const [packageFound] = yield db_1.default.query(checkPackageQuery);
             if (packageFound.length > 0) {
-                const addCardDataQuery = `UPDATE users SET is_deactived = ?, is_active = ?, is_verify = ?, is_payment = ?, card_number = ?, account_type = ?, verify_time = ?, start_date = ?, end_date = ? WHERE id = ?`;
-                const VALUES = [0, 1, 1, 1, card_number, packageId, justDate, justDate, endDate, userId];
+                const addCardDataQuery = `UPDATE users SET is_deactived = ?, is_card_linked = ?, is_active = ?, is_verify = ?, is_payment = ?, card_number = ?, account_type = ?, verify_time = ?, start_date = ?, end_date = ? WHERE id = ?`;
+                const VALUES = [0, 1, 1, 1, 1, card_number, packageId, justDate, justDate, endDate, userId];
                 const [addCardRows] = yield db_1.default.query(addCardDataQuery, VALUES);
                 if (addCardRows.affectedRows > 0) {
                     const getFeatures = `SELECT * FROM features WHERE status = 1`;

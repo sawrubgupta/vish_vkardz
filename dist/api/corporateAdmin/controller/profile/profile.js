@@ -35,7 +35,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateAdmin = exports.updateUser = exports.userDetail = exports.userList = void 0;
+exports.adminProfile = exports.updateAdmin = exports.updateUser = exports.userDetail = exports.userList = void 0;
 const db_1 = __importDefault(require("../../../../db"));
 const apiResponse = __importStar(require("../../helper/apiResponse"));
 const development_1 = __importDefault(require("../../config/development"));
@@ -201,5 +201,20 @@ const updateAdmin = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     }
 });
 exports.updateAdmin = updateAdmin;
+// ====================================================================================================
+// ====================================================================================================
+const adminProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const userId = res.locals.jwt.userId;
+        const adminSql = `SELECT * FROM business_admin WHERE id = ${userId} LIMIT 1`;
+        const [adminRows] = yield db_1.default.query(adminSql);
+        return apiResponse.successResponse(res, "Data retrieved Successfully", adminRows[0]);
+    }
+    catch (error) {
+        console.log(error);
+        return apiResponse.errorMessage(res, 400, "Something went wrong");
+    }
+});
+exports.adminProfile = adminProfile;
 // ====================================================================================================
 // ====================================================================================================

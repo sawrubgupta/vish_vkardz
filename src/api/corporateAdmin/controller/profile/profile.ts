@@ -145,7 +145,7 @@ export const updateAdmin = async (req:Request, res:Response) => {
         const [data]:any = await pool.query(emailSql, emailValues);
 
         const dupli = [];
-        if (data.length > 0) {
+        if (data.length > 0) { 
             if (data[0].email === email) {
                 dupli.push("email");
             }
@@ -177,6 +177,23 @@ export const updateAdmin = async (req:Request, res:Response) => {
         } else {
             return apiResponse.errorMessage(res, 400, "User not found!");
         }
+    } catch (error) {
+        console.log(error);
+        return apiResponse.errorMessage(res, 400, "Something went wrong");
+    }
+}
+
+// ====================================================================================================
+// ====================================================================================================
+
+export const adminProfile =async (req:Request, res:Response) => {
+    try {
+        const userId = res.locals.jwt.userId;
+
+        const adminSql = `SELECT * FROM business_admin WHERE id = ${userId} LIMIT 1`;
+        const [adminRows]:any = await pool.query(adminSql);
+
+        return apiResponse.successResponse(res, "Data retrieved Successfully", adminRows[0])
     } catch (error) {
         console.log(error);
         return apiResponse.errorMessage(res, 400, "Something went wrong");

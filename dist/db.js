@@ -6,10 +6,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mysql2_1 = __importDefault(require("mysql2"));
 require("dotenv/config");
 const pool = mysql2_1.default.createPool({
-    host: process.env.HOST || "151.106.125.161",
-    user: process.env.USER || "vkar_staging1",
-    password: process.env.PASSWORD || "GfCudy6C9CGDOd#!",
-    database: process.env.DATABASE || "vkar_staging1",
+    host: process.env.HOST || "localhost",
+    user: process.env.USER || "root",
+    password: process.env.PASSWORD || "",
+    database: process.env.DATABASE || "vkardz_new",
     connectTimeout: 10000,
     /**
      * The maximum number of connection requests the pool will queue before returning an error from getConnection. If set to 0, there

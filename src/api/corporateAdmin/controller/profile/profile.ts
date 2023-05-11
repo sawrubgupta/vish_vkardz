@@ -21,7 +21,7 @@ export const userList =async (req:Request, res:Response) => {
         const getPageQuery = `SELECT id FROM users WHERE admin_id = ${userId}`;
         const [result]: any = await pool.query(getPageQuery);
 
-        const sql = `SELECT id, username, name, email, phone, designation, website, account_type, thumb, cover_photo, primary_profile_link FROM users WHERE admin_id = ${userId} AND (username LIKE '%${keyword}%' OR name LIKE '%${keyword}%') ORDER BY username asc limit ${page_size} offset ${offset}`;
+        const sql = `SELECT id, username, name, email, phone, designation, website, account_type, thumb, cover_photo, primary_profile_link, display_dial_code, display_email, display_number FROM users WHERE admin_id = ${userId} AND (username LIKE '%${keyword}%' OR name LIKE '%${keyword}%') ORDER BY username asc limit ${page_size} offset ${offset}`;
         const [rows]:any = await pool.query(sql);
 
         const adminSql = `SELECT * FROM business_admin WHERE id = ${userId} LIMIT 1`;
@@ -145,7 +145,7 @@ export const updateAdmin = async (req:Request, res:Response) => {
         const [data]:any = await pool.query(emailSql, emailValues);
 
         const dupli = [];
-        if (data.length > 0) { 
+        if (data.length > 0) {
             if (data[0].email === email) {
                 dupli.push("email");
             }

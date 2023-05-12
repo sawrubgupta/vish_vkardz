@@ -8,6 +8,7 @@ import path from 'path';
 import fs from 'fs';
 import axios from 'axios';
 import FormData from 'form-data';
+import xlsx from 'xlsx';
 
 export const exportUser = async (req: Request, res: Response) => {
     try {
@@ -146,6 +147,66 @@ export const exportUser = async (req: Request, res: Response) => {
 
         return apiResponse.successResponse(res, "Exported Successfully", result);
 
+    } catch (error) {
+        console.log(error);
+        return apiResponse.errorMessage(res, 400, "Something went wrong");
+    }
+}
+
+// ====================================================================================================
+// ====================================================================================================
+
+export const importUser =async (req:Request, res:Response) => {
+    try {
+        const userId = res.locals.jwt.userId;
+        const justDate = utility.dateWithFormat();
+        const endDate = utility.extendedDateWithFormat("yearly");
+        const file:any = req.file
+
+        const fileData = xlsx.readFile(file.path); // Read the file using pathname        
+        const sheetNames: any = fileData.SheetNames; // Grab the sheet info from the file
+        const totalSheets: any = (sheetNames.length);
+
+        let parsedData:any = []; // Variable to store our data 
+        for (let i = 0; i < totalSheets; i++) { // Loop through sheets
+            const tempData = xlsx.utils.sheet_to_json(fileData.Sheets[sheetNames[i]]);  // Convert to json using xlsx
+            // tempData.shift(); // Skip header row which is the colum names or if want header use this..
+            parsedData.push(...tempData); // Add the sheet's json to our data array
+        }
+        if (parsedData.length === 0) {
+            return apiResponse.errorMessage(res, 400, "Empty rows!!")
+        }
+        const maxRecord:number = 50;
+        if (parsedData.length >= maxRecord) {
+            return apiResponse.errorMessage(res, 400, `You can't insert more than ${maxRecord} records!`);
+        }
+
+        let insertQuery =  `INSERT INTO users(username, name, card_number, card_number_fix, email, dial_code, phone, country, password, login_time, account_type, start_date, end_date, post_time, created_at) VALUES `;
+        let result;
+
+        let dataIndex = -1;
+        let element:any;
+        let duplicateData:any;
+        for (element of parsedData) {
+            dataIndex++;
+
+            const emailSql = `SELECT * FROM users WHERE deleted_at IS NULL AND (email = ? or username = ? or phone = ?) LIMIT 1`;
+            const emailVALUES = [element.email, element.username, element.phone];
+            const [dupliRows]:any = await pool.query(emailSql, emailVALUES);
+            if (dupliRows.length > 0) {
+                if (dupliRows[0].email === element.email) {
+                    // dupli.push("email");
+                }
+                if (dupliRows[0].username === element.username) {
+                    // dupli.push("username");
+                }
+                if (dupliRows[0].phone === element.phone) {
+                    // dupli.push("phone");
+                }
+                parsedData[dataIndex].failedMessage = 
+                duplicateData.push(parsedData[dataIndex])
+            }
+        }
     } catch (error) {
         console.log(error);
         return apiResponse.errorMessage(res, 400, "Something went wrong");

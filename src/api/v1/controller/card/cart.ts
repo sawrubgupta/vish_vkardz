@@ -52,6 +52,8 @@ export const getCart =async (req:Request, res:Response) => {
         const cartQuery = `SELECT cart_details.product_id, cart_details.qty, products.name, products.slug, products.description, products.price, products.mrp_price, products.discount_percent, products.product_image, products.image_back, products.image_other, products.material, products.bg_color, products.print, products.dimention, products.weight, products.thickness, products.alt_title, products.is_customizable, product_price.usd_selling_price, product_price.usd_mrp_price, product_price.aed_selling_price, product_price.aed_mrp_price, product_price.inr_selling_price, product_price.inr_mrp_price, product_price.qar_selling_price, product_price.qar_mrp_price, COUNT(product_rating.id) AS totalRating, AVG(COALESCE(product_rating.rating, 0)) AS averageRating, cart_details.created_at FROM products LEFT JOIN cart_details on cart_details.product_id = products.product_id LEFT JOIN product_price ON products.product_id = product_price.product_id LEFT JOIN product_rating ON products.product_id = product_rating.product_id WHERE cart_details.user_id = ${userId} GROUP BY products.product_id ORDER BY created_at DESC`;
         const [rows]:any = await client.query(cartQuery);
         
+        if (rows.length > 0) {
+
         const addressQuery = `SELECT * FROM delivery_addresses WHERE user_id = ${userId} ORDER BY is_default = 1 DESC LIMIT 1`;
         const [addressRows]:any = await client.query(addressQuery);
 
@@ -112,7 +114,6 @@ export const getCart =async (req:Request, res:Response) => {
 
 
         await client.query("COMMIT");
-        if (rows.length > 0) {
             userRows[0].cardProducts = rows || [];
             userRows[0].userAddress = addressRows[0] || null;
             userRows[0].deliveryCharge = deliveryCharges;

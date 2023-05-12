@@ -35,14 +35,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.exportUser = void 0;
+exports.importUser = exports.exportUser = void 0;
 const db_1 = __importDefault(require("../../../../db"));
 const apiResponse = __importStar(require("../../helper/apiResponse"));
+const utility = __importStar(require("../../helper/utility"));
 const exceljs_1 = __importDefault(require("exceljs"));
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
 const axios_1 = __importDefault(require("axios"));
 const form_data_1 = __importDefault(require("form-data"));
+const xlsx_1 = __importDefault(require("xlsx"));
 const exportUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userId = res.locals.jwt.userId;
@@ -166,5 +168,60 @@ const exportUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
 });
 exports.exportUser = exportUser;
+// ====================================================================================================
+// ====================================================================================================
+const importUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const userId = res.locals.jwt.userId;
+        const justDate = utility.dateWithFormat();
+        const endDate = utility.extendedDateWithFormat("yearly");
+        const file = req.file;
+        const fileData = xlsx_1.default.readFile(file.path); // Read the file using pathname        
+        const sheetNames = fileData.SheetNames; // Grab the sheet info from the file
+        const totalSheets = (sheetNames.length);
+        let parsedData = []; // Variable to store our data 
+        for (let i = 0; i < totalSheets; i++) { // Loop through sheets
+            const tempData = xlsx_1.default.utils.sheet_to_json(fileData.Sheets[sheetNames[i]]); // Convert to json using xlsx
+            // tempData.shift(); // Skip header row which is the colum names or if want header use this..
+            parsedData.push(...tempData); // Add the sheet's json to our data array
+        }
+        if (parsedData.length === 0) {
+            return apiResponse.errorMessage(res, 400, "Empty rows!!");
+        }
+        const maxRecord = 50;
+        if (parsedData.length >= maxRecord) {
+            return apiResponse.errorMessage(res, 400, `You can't insert more than ${maxRecord} records!`);
+        }
+        let insertQuery = `INSERT INTO users(username, name, card_number, card_number_fix, email, dial_code, phone, country, password, login_time, account_type, start_date, end_date, post_time, created_at) VALUES `;
+        let result;
+        let dataIndex = -1;
+        let element;
+        let duplicateData;
+        for (element of parsedData) {
+            dataIndex++;
+            const emailSql = `SELECT * FROM users WHERE deleted_at IS NULL AND (email = ? or username = ? or phone = ?) LIMIT 1`;
+            const emailVALUES = [element.email, element.username, element.phone];
+            const [dupliRows] = yield db_1.default.query(emailSql, emailVALUES);
+            if (dupliRows.length > 0) {
+                if (dupliRows[0].email === element.email) {
+                    // dupli.push("email");
+                }
+                if (dupliRows[0].username === element.username) {
+                    // dupli.push("username");
+                }
+                if (dupliRows[0].phone === element.phone) {
+                    // dupli.push("phone");
+                }
+                parsedData[dataIndex].failedMessage =
+                    duplicateData.push(parsedData[dataIndex]);
+            }
+        }
+    }
+    catch (error) {
+        console.log(error);
+        return apiResponse.errorMessage(res, 400, "Something went wrong");
+    }
+});
+exports.importUser = importUser;
 // ====================================================================================================
 // ====================================================================================================

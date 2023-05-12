@@ -31,6 +31,7 @@ const authorization_controller_1 = require("../../middleware/authorization.contr
 const profileRouter = (0, express_1.Router)();
 profileRouter.get('/userList', authorization_controller_1.authenticatingToken, profileController.userList);
 profileRouter.patch('/updateUserDetail', authorization_controller_1.tempAuthenticatingToken, validation.updateUserDetailValidation, profileController.updateUser);
+profileRouter.patch('/updateUserDisplayField', authorization_controller_1.tempAuthenticatingToken, validation.updateUserDisplayFieldValidation, profileController.updateUserDisplayField);
 profileRouter.patch('/updateAdminDetail', authorization_controller_1.authenticatingToken, validation.updateAdminDetailValidation, profileController.updateAdmin);
 profileRouter.get('/adminProfile', authorization_controller_1.authenticatingToken, profileController.adminProfile);
 profileRouter.get('/exportUsers', authorization_controller_1.authenticatingToken, exportController.exportUser);

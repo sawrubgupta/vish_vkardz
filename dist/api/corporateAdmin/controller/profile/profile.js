@@ -35,7 +35,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.adminProfile = exports.updateAdmin = exports.updateUser = exports.userDetail = exports.userList = void 0;
+exports.adminProfile = exports.updateAdmin = exports.updateUserDisplayField = exports.updateUser = exports.userDetail = exports.userList = void 0;
 const db_1 = __importDefault(require("../../../../db"));
 const apiResponse = __importStar(require("../../helper/apiResponse"));
 const development_1 = __importDefault(require("../../config/development"));
@@ -52,7 +52,7 @@ const userList = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const offset = (page - 1) * page_size;
         const getPageQuery = `SELECT id FROM users WHERE admin_id = ${userId}`;
         const [result] = yield db_1.default.query(getPageQuery);
-        const sql = `SELECT id, username, name, email, phone, designation, website, account_type, thumb, cover_photo, primary_profile_link, display_dial_code, display_email, display_number FROM users WHERE admin_id = ${userId} AND (username LIKE '%${keyword}%' OR name LIKE '%${keyword}%') ORDER BY username asc limit ${page_size} offset ${offset}`;
+        const sql = `SELECT id, username, name, email, phone, card_number, card_number_fix, is_card_linked, is_deactived, designation, website, account_type, thumb, cover_photo, primary_profile_link, display_dial_code, display_email, display_number FROM users WHERE admin_id = ${userId} AND (username LIKE '%${keyword}%' OR name LIKE '%${keyword}%') ORDER BY username asc limit ${page_size} offset ${offset}`;
         const [rows] = yield db_1.default.query(sql);
         const adminSql = `SELECT * FROM business_admin WHERE id = ${userId} LIMIT 1`;
         const [adminRows] = yield db_1.default.query(adminSql);
@@ -150,6 +150,39 @@ const updateUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
 });
 exports.updateUser = updateUser;
+// ====================================================================================================
+// ====================================================================================================
+const updateUserDisplayField = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        // const userId: string = res.locals.jwt.userId;
+        let userId;
+        const type = req.query.type; //type = business, user, null
+        if (type && type === development_1.default.businessType) {
+            userId = req.query.userId;
+        }
+        else {
+            userId = res.locals.jwt.userId;
+        }
+        if (!userId || userId === "" || userId === undefined) {
+            return apiResponse.errorMessage(res, 401, "Please login !");
+        }
+        const { name, designation, companyName, dialCode, phone, email, website, address } = req.body;
+        const updateQuery = `UPDATE users SET name = ?, designation = ?, company_name = ?, display_dial_code = ?, display_number = ?, display_email = ?, website = ?, address = ? WHERE id = ?`;
+        const VALUES = [name, designation, companyName, dialCode, phone, email, website, address, userId];
+        const [data] = yield db_1.default.query(updateQuery, VALUES);
+        if (data.affectedRows > 0) {
+            return apiResponse.successResponse(res, "Profile updated successfully !", null);
+        }
+        else {
+            return apiResponse.errorMessage(res, 400, "Failed to update the user, please try again later !");
+        }
+    }
+    catch (error) {
+        console.log(error);
+        return apiResponse.errorMessage(res, 400, "Something went wrong");
+    }
+});
+exports.updateUserDisplayField = updateUserDisplayField;
 // ====================================================================================================
 // ====================================================================================================
 const updateAdmin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {

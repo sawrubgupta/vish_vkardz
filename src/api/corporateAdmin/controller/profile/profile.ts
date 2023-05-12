@@ -21,7 +21,7 @@ export const userList =async (req:Request, res:Response) => {
         const getPageQuery = `SELECT id FROM users WHERE admin_id = ${userId}`;
         const [result]: any = await pool.query(getPageQuery);
 
-        const sql = `SELECT id, username, name, email, phone, designation, website, account_type, thumb, cover_photo, primary_profile_link, display_dial_code, display_email, display_number FROM users WHERE admin_id = ${userId} AND (username LIKE '%${keyword}%' OR name LIKE '%${keyword}%') ORDER BY username asc limit ${page_size} offset ${offset}`;
+        const sql = `SELECT id, username, name, email, phone, card_number, card_number_fix, is_card_linked, is_deactived, designation, website, account_type, thumb, cover_photo, primary_profile_link, display_dial_code, display_email, display_number FROM users WHERE admin_id = ${userId} AND (username LIKE '%${keyword}%' OR name LIKE '%${keyword}%') ORDER BY username asc limit ${page_size} offset ${offset}`;
         const [rows]:any = await pool.query(sql);
 
         const adminSql = `SELECT * FROM business_admin WHERE id = ${userId} LIMIT 1`;
@@ -120,6 +120,40 @@ export const updateUser = async (req:Request, res:Response) => {
 
         } else {
             return apiResponse.errorMessage(res, 400, "User not found!");
+        }
+    } catch (error) {
+        console.log(error);
+        return apiResponse.errorMessage(res, 400, "Something went wrong");
+    }
+}
+
+// ====================================================================================================
+// ====================================================================================================
+
+export const updateUserDisplayField =async (req:Request, res:Response) => {
+    try {
+        // const userId: string = res.locals.jwt.userId;
+        let userId:any; 
+        const type = req.query.type; //type = business, user, null
+        if (type && type === config.businessType) {
+            userId = req.query.userId;
+        } else {
+            userId = res.locals.jwt.userId;
+        }
+        if (!userId || userId === "" || userId === undefined) {
+            return apiResponse.errorMessage(res, 401, "Please login !")
+        }
+
+        const { name, designation, companyName, dialCode, phone, email, website, address } = req.body;
+
+        const updateQuery = `UPDATE users SET name = ?, designation = ?, company_name = ?, display_dial_code = ?, display_number = ?, display_email = ?, website = ?, address = ? WHERE id = ?`;
+        const VALUES = [name, designation, companyName, dialCode, phone, email, website, address, userId];
+        const [data]:any = await pool.query(updateQuery, VALUES);
+
+        if (data.affectedRows > 0) {
+            return apiResponse.successResponse(res,"Profile updated successfully !", null);
+        } else {
+            return apiResponse.errorMessage(res, 400, "Failed to update the user, please try again later !");
         }
     } catch (error) {
         console.log(error);

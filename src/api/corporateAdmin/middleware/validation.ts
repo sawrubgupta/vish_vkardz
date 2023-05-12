@@ -141,3 +141,24 @@ export const updateAdminDetailValidation = async (req: Request, res: Response, n
 // ====================================================================================================
 // ====================================================================================================
 
+export const updateUserDisplayFieldValidation =async (req:Request, res:Response, next:NextFunction) => {
+    
+    const schema = Joi.object({
+        name: Joi.string().trim().min(3).max(80).trim().required(),
+        designation: Joi.string().min(3).max(80).allow(''),
+        companyName : Joi.string().trim().min(3).max(80).allow(''),
+        dialCode: Joi.string().required(),
+        phone: Joi.string().trim().min(8).max(20).trim().required(),
+        email: Joi.string().email( ).max(60).required(),
+        website: Joi.string().trim().max(80).min(5).allow(''),
+        address: Joi.string().normalize().max(200).required(),
+    });
+
+    const value = schema.validate(req.body);
+
+    if (value.error) {
+        const errMsg = await validationCheck(value);
+        return await apiResponse.errorMessage(res,400, errMsg);
+    }
+    next();
+};

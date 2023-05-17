@@ -52,21 +52,34 @@ const userList = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const offset = (page - 1) * page_size;
         const getPageQuery = `SELECT id FROM users WHERE admin_id = ${userId}`;
         const [result] = yield db_1.default.query(getPageQuery);
-        const sql = `SELECT id, username, name, email, phone, card_number, card_number_fix, is_card_linked, is_deactived, designation, website, account_type, thumb, cover_photo, primary_profile_link, display_dial_code, display_email, display_number FROM users WHERE admin_id = ${userId} AND (username LIKE '%${keyword}%' OR name LIKE '%${keyword}%') ORDER BY username asc limit ${page_size} offset ${offset}`;
+        const sql = `SELECT id, username, name, email, phone, dial_code, card_number, card_number_fix, is_card_linked, is_deactived, designation, website, account_type, thumb, cover_photo, primary_profile_link, display_dial_code, display_email, display_number FROM users WHERE admin_id = ${userId} AND (username LIKE '%${keyword}%' OR name LIKE '%${keyword}%') ORDER BY username asc limit ${page_size} offset ${offset}`;
         const [rows] = yield db_1.default.query(sql);
         const adminSql = `SELECT * FROM business_admin WHERE id = ${userId} LIMIT 1`;
         const [adminRows] = yield db_1.default.query(adminSql);
         let totalPages = result.length / page_size;
         let totalPage = Math.ceil(totalPages);
-        return res.status(200).json({
-            status: true,
-            data: rows,
-            adminData: adminRows,
-            totalPage: totalPage,
-            currentPage: page,
-            totalLength: result.length,
-            message: "Users list are here"
-        });
+        if (rows.length > 0) {
+            return res.status(200).json({
+                status: true,
+                data: rows,
+                adminData: adminRows,
+                totalPage: totalPage,
+                currentPage: page,
+                totalLength: result.length,
+                message: "Users list are here"
+            });
+        }
+        else {
+            return res.status(200).json({
+                status: true,
+                data: rows,
+                adminData: adminRows,
+                totalPage: totalPage,
+                currentPage: page,
+                totalLength: result.length,
+                message: "Data Not Found"
+            });
+        }
     }
     catch (error) {
         console.log(error);
@@ -104,7 +117,7 @@ const updateUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         if (!userId || userId === "" || userId === undefined) {
             return apiResponse.errorMessage(res, 401, "User Id is required!");
         }
-        const { username, email, phone } = req.body;
+        const { username, email, phone, dialCode } = req.body;
         const emailSql = `SELECT username, email, phone FROM users where deleted_at IS NULL AND id != ? AND (email = ? or username = ? or phone = ?) LIMIT 1`;
         const emailValues = [userId, email, username, phone];
         const [data] = yield db_1.default.query(emailSql, emailValues);
@@ -130,8 +143,8 @@ const updateUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         const checkUserSql = `SELECT name FROM users WHERE id = ${userId} LIMIT 1`;
         const [userData] = yield db_1.default.query(checkUserSql);
         if (userData.length > 0) {
-            const updateSql = `UPDATE users SET username = ?, email = ?, phone = ? WHERE id = ?`;
-            const VALUES = [username, email, phone, userId];
+            const updateSql = `UPDATE users SET username = ?, email = ?, phone = ?, dial_code = ? WHERE id = ?`;
+            const VALUES = [username, email, phone, dialCode, userId];
             const [rows] = yield db_1.default.query(updateSql, VALUES);
             if (rows.affectedRows > 0) {
                 return apiResponse.successResponse(res, "Updated Successfully", null);
@@ -191,7 +204,7 @@ const updateAdmin = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         if (!userId || userId === "" || userId === undefined) {
             return apiResponse.errorMessage(res, 401, "User Id is required!");
         }
-        const { name, email, phone, image, company, designation, cin_number, gst_number } = req.body;
+        const { name, email, phone, dialCode, image, company, designation, cin_number, gst_number } = req.body;
         const emailSql = `SELECT email, phone FROM business_admin WHERE deleted_at IS NULL AND id != ? AND (email = ? or phone = ?) LIMIT 1`;
         const emailValues = [userId, email, phone];
         const [data] = yield db_1.default.query(emailSql, emailValues);
@@ -214,8 +227,8 @@ const updateAdmin = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         const checkUserSql = `SELECT name FROM business_admin WHERE id = ${userId} LIMIT 1`;
         const [userData] = yield db_1.default.query(checkUserSql);
         if (userData.length > 0) {
-            const updateSql = `UPDATE business_admin SET name = ?, email = ?, phone = ?, image = ?, company = ?, designation = ?, cin_number = ?, gst_number = ? WHERE id = ?`;
-            const VALUES = [name, email, phone, image, company, designation, cin_number, gst_number, userId];
+            const updateSql = `UPDATE business_admin SET name = ?, email = ?, phone = ?, dial_code = ?, image = ?, company = ?, designation = ?, cin_number = ?, gst_number = ? WHERE id = ?`;
+            const VALUES = [name, email, phone, dialCode, image, company, designation, cin_number, gst_number, userId];
             const [rows] = yield db_1.default.query(updateSql, VALUES);
             if (rows.affectedRows > 0) {
                 return apiResponse.successResponse(res, "Updated Successfully", null);

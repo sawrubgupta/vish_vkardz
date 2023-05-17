@@ -20,7 +20,10 @@ export default {
         accessKeyId: process.env.AWS_ACCESS_KEY_ID,
         secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
     },
+    BUCKET_NAME: "imagefurb",
 
+    ASSIGNEDStatus: "ASSIGNED",
+    vcardLink: `https://vkardz.com/`,
     secretKey:"nss6DpYlq5CHw6Hn0jPqXJwtkHXuMDdYynDiRFNS6_Y", //process.env.SECRET,
     resumeLimit:10,
     vKardzPhone: "+91 6377256382",

@@ -20,6 +20,9 @@ name api's
 database changes:
 
 ------------------------------new changes--------------------------------
+25-05-2023
+ALTER TABLE `business_admin` ADD `dial_code` VARCHAR(25) NULL DEFAULT NULL AFTER `email`;
+
 CREATE TABLE `user_images` ( 
  `id` INT(11) NOT NULL AUTO_INCREMENT ,
  `user_id` INT(11) NOT NULL ,

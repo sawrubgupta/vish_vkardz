@@ -20,6 +20,7 @@ export const adminRegistrationValidation = async (req: Request, res: Response, n
         email: Joi.string().email().max(80).required(),
         password: Joi.string().min(3).max(80).required(),
         phone: Joi.string().trim().min(8).max(20).trim().required(),
+        dialCode: Joi.string().required(),
         image : Joi.string().trim().allow(''),
         jobTitle: Joi.string().allow('').allow(null),
         company:Joi.string().trim().required(),
@@ -99,6 +100,7 @@ export const updateUserDetailValidation = async (req: Request, res: Response, ne
     const schema = Joi.object({
         type: Joi.string().allow('').allow(null),
         userId: Joi.number().allow('').allow(null),
+        dialCode: Joi.string().required(),
         username: Joi.string().trim().required(),
         email: Joi.string().trim().email().required(),
         phone: Joi.string().required(),
@@ -122,6 +124,7 @@ export const updateAdminDetailValidation = async (req: Request, res: Response, n
         name: Joi.string().required(), 
         email: Joi.string().email().required(), 
         phone: Joi.string().required(), 
+        dialCode: Joi.string().required(),
         image: Joi.string().allow('').allow(null), 
         company: Joi.string().allow('').allow(null), 
         designation: Joi.string().allow('').allow(null), 

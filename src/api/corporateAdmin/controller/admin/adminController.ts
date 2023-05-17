@@ -8,7 +8,7 @@ import config from '../../config/development';
 
 export const register =async (req:Request, res:Response) => {
     try {
-        const { name, email, phone, password, jobTitle, company, image } = req.body;
+        const { name, email, phone, dialCode, password, jobTitle, company, image } = req.body;
         const createdAt = utility.dateWithFormat();
         const hash = md5(password);
 
@@ -33,8 +33,8 @@ export const register =async (req:Request, res:Response) => {
             });
         }
 
-        const sql = `INSERT INTO business_admin(name, email, phone, password, image, job_title, company, created_at) VALUES(?, ?, ?, ?, ?, ?, ?, ?)`;
-        const VALUES = [name, email, phone, hash, image, jobTitle, company, createdAt];
+        const sql = `INSERT INTO business_admin(name, email, phone, dial_code, password, image, job_title, company, created_at) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+        const VALUES = [name, email, phone, dialCode, hash, image, jobTitle, company, createdAt];
         const [rows]:any = await pool.query(sql, VALUES);
 
         if (rows.affectedRows > 0) {

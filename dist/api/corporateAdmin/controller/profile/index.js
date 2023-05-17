@@ -22,12 +22,39 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.storage = void 0;
 const express_1 = require("express");
 const profileController = __importStar(require("./profile"));
 const exportController = __importStar(require("./exportUser"));
 const validation = __importStar(require("../../middleware/validation"));
 const authorization_controller_1 = require("../../middleware/authorization.controller");
+const multer_1 = __importDefault(require("multer"));
+var destinationPath = "";
+var dbImagePath = "";
+exports.storage = multer_1.default.diskStorage({
+    destination: function (req, file, cb) {
+        let type = req.body.type;
+        if (type === "add_client") {
+            destinationPath = "./public_html/uploads/";
+            dbImagePath = "public_html/uploads/";
+        }
+        else {
+            destinationPath = "./public_html/uploads/";
+            dbImagePath = "public_html/uploads/";
+        }
+        cb(null, destinationPath);
+    },
+    filename: function (req, file, cb) {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        dbImagePath = dbImagePath + '' + uniqueSuffix + '_' + file.originalname;
+        cb(null, uniqueSuffix + '_' + file.originalname);
+    }
+});
+var upload = (0, multer_1.default)({ storage: exports.storage });
 const profileRouter = (0, express_1.Router)();
 profileRouter.get('/userList', authorization_controller_1.authenticatingToken, profileController.userList);
 profileRouter.patch('/updateUserDetail', authorization_controller_1.tempAuthenticatingToken, validation.updateUserDetailValidation, profileController.updateUser);
@@ -35,4 +62,5 @@ profileRouter.patch('/updateUserDisplayField', authorization_controller_1.tempAu
 profileRouter.patch('/updateAdminDetail', authorization_controller_1.authenticatingToken, validation.updateAdminDetailValidation, profileController.updateAdmin);
 profileRouter.get('/adminProfile', authorization_controller_1.authenticatingToken, profileController.adminProfile);
 profileRouter.get('/exportUsers', authorization_controller_1.authenticatingToken, exportController.exportUser);
+profileRouter.post('/importUsers', authorization_controller_1.authenticatingToken, upload.single('file'), exportController.importUser);
 exports.default = profileRouter;

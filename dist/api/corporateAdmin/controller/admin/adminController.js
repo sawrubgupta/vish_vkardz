@@ -44,7 +44,7 @@ const md5_1 = __importDefault(require("md5"));
 const development_1 = __importDefault(require("../../config/development"));
 const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { name, email, phone, password, jobTitle, company, image } = req.body;
+        const { name, email, phone, dialCode, password, jobTitle, company, image } = req.body;
         const createdAt = utility.dateWithFormat();
         const hash = (0, md5_1.default)(password);
         const checkDupliSql = `SELECT * FROM business_admin WHERE deleted_at IS NULL AND email = ? LIMIT 1`;
@@ -66,8 +66,8 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 message: msg,
             });
         }
-        const sql = `INSERT INTO business_admin(name, email, phone, password, image, job_title, company, created_at) VALUES(?, ?, ?, ?, ?, ?, ?, ?)`;
-        const VALUES = [name, email, phone, hash, image, jobTitle, company, createdAt];
+        const sql = `INSERT INTO business_admin(name, email, phone, dial_code, password, image, job_title, company, created_at) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+        const VALUES = [name, email, phone, dialCode, hash, image, jobTitle, company, createdAt];
         const [rows] = yield db_1.default.query(sql, VALUES);
         if (rows.affectedRows > 0) {
             const getUserName = `SELECT * FROM business_admin WHERE id = ${rows.insertId} LIMIT 1`;

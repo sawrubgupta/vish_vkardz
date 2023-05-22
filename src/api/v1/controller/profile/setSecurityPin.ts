@@ -7,7 +7,18 @@ import config  from '../../config/development';
 
 export const setPin =async (req:Request, res:Response) => {
     try {
-        const userId:string = res.locals.jwt.userId;
+        // const userId:string = res.locals.jwt.userId;
+        let userId:any; 
+        const type = req.query.type; //type = business, user, null
+        if (type && type === config.businessType) {
+            userId = req.query.userId;
+        } else {
+            userId = res.locals.jwt.userId;
+        }
+        if (!userId || userId === "" || userId === undefined) {
+            return apiResponse.errorMessage(res, 401, "User Id is required!");
+        }
+
         const isPasswordEnable = req.body.isPasswordEnable;
         const securityPin = req.body.securityPin;
         
@@ -30,7 +41,17 @@ export const setPin =async (req:Request, res:Response) => {
 
 export const removePin =async (req:Request, res:Response) => {
     try {
-        const userId:string = res.locals.jwt.userId;
+        // const userId:string = res.locals.jwt.userId;
+        let userId:any; 
+        const type = req.query.type; //type = business, user, null
+        if (type && type === config.businessType) {
+            userId = req.query.userId;
+        } else {
+            userId = res.locals.jwt.userId;
+        }
+        if (!userId || userId === "" || userId === undefined) {
+            return apiResponse.errorMessage(res, 401, "User Id is required!");
+        }
 
         const sql = `UPDATE users SET is_password_enable = 0 WHERE id = ${userId}`;
         const [rows]:any = await pool.query(sql);

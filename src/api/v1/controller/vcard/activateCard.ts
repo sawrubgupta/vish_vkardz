@@ -27,10 +27,17 @@ export const activateCard =async (req:Request, res:Response) => {
         let featureResult:any;
 
         const { username, code } = req.body;
+
+        const splitCode = code.split('https://www.vkardz.com/');
+        let newCardNum:any = splitCode[1] || '';
+
+        let splitNewCardNumber = newCardNum.split('/');
+        let newCardNumber = splitNewCardNumber[0] || newCardNum;
+        
         if (!code) {
             return apiResponse.errorMessage(res, 400, "Card number is invalid !");
         }
-        const getCardDetail = `SELECT * FROM card_activation where card_key = '${code}' limit 1`;
+        const getCardDetail = `SELECT * FROM card_activation where card_key = '${code}' OR card_number = '${newCardNumber}' limit 1`;
         const [cardData]:any = await pool.query(getCardDetail);
         if (cardData.length === 0) {
             return apiResponse.errorMessage(res, 400, "Code is invalid, Contact support!");

@@ -5,12 +5,12 @@ import initDb from './db';
 const port= process.env.PORT || 5000;
 const app = express();
 app.use(express.urlencoded({ extended: false, limit: '1gb' }));
-
+ 
 initRoutes(app) 
-initDb;
+initDb; 
 
 app.listen(port, () => {
   console.log(`Express server listening on ${port} `);
 });
-  
-export default app;
+   
+export default app; 

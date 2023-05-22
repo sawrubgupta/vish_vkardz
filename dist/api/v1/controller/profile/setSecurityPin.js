@@ -38,9 +38,21 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.removePin = exports.setPin = void 0;
 const db_1 = __importDefault(require("../../../../db"));
 const apiResponse = __importStar(require("../../helper/apiResponse"));
+const development_1 = __importDefault(require("../../config/development"));
 const setPin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const userId = res.locals.jwt.userId;
+        // const userId:string = res.locals.jwt.userId;
+        let userId;
+        const type = req.query.type; //type = business, user, null
+        if (type && type === development_1.default.businessType) {
+            userId = req.query.userId;
+        }
+        else {
+            userId = res.locals.jwt.userId;
+        }
+        if (!userId || userId === "" || userId === undefined) {
+            return apiResponse.errorMessage(res, 401, "User Id is required!");
+        }
         const isPasswordEnable = req.body.isPasswordEnable;
         const securityPin = req.body.securityPin;
         const sql = `UPDATE users SET is_password_enable = ?, set_password = ? WHERE id = ?`;
@@ -63,7 +75,18 @@ exports.setPin = setPin;
 // ====================================================================================================
 const removePin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const userId = res.locals.jwt.userId;
+        // const userId:string = res.locals.jwt.userId;
+        let userId;
+        const type = req.query.type; //type = business, user, null
+        if (type && type === development_1.default.businessType) {
+            userId = req.query.userId;
+        }
+        else {
+            userId = res.locals.jwt.userId;
+        }
+        if (!userId || userId === "" || userId === undefined) {
+            return apiResponse.errorMessage(res, 401, "User Id is required!");
+        }
         const sql = `UPDATE users SET is_password_enable = 0 WHERE id = ${userId}`;
         const [rows] = yield db_1.default.query(sql);
         if (rows.affectedRows > 0) {

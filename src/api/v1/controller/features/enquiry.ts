@@ -18,7 +18,7 @@ export const enquiryList =async (req:Request, res:Response) => {
         if (!userId || userId === "" || userId === undefined) {
             return apiResponse.errorMessage(res, 401, "User Id is required!");
         }
-
+ 
         var getPage:any = req.query.page;
         var page = parseInt(getPage);
         if (page === null || page <= 1 || !page ) {
@@ -34,7 +34,12 @@ export const enquiryList =async (req:Request, res:Response) => {
         const [rows]:any = await pool.query(sql);
 
         const getFeatureStatus = `SELECT status FROM users_features WHERE user_id = ${userId} AND feature_id = 11`;
-        const [featureStatus]:any = await pool.query(getFeatureStatus);
+        let [featureStatus]:any = await pool.query(getFeatureStatus);
+
+        if(featureStatus.length === 0) {
+            featureStatus[0] = {};
+            featureStatus[0].status = 0;
+        }
 
         let totalPages:any = result.length/page_size;
         let totalPage = Math.ceil(totalPages);
@@ -43,7 +48,7 @@ export const enquiryList =async (req:Request, res:Response) => {
             return res.status(200).json({
                 status: true,
                 data: rows,
-                featureStatus: featureStatus[0].status,
+                featureStatus: featureStatus[0].status || "",
                 totalPage: totalPage,
                 currentPage: page,
                 totalLength: result.length,
@@ -74,7 +79,7 @@ export const deleteEnquiry =async (req:Request, res:Response) => {
         // const userId:string = res.locals.jwt.userId;
         let userId:any; 
         const type = req.query.type; //type = business, user, null
-        if (type && type === config.businessType) {
+        if (type && type == config.businessType) {
             userId = req.query.userId;
         } else {
             userId = res.locals.jwt.userId;
@@ -89,7 +94,11 @@ export const deleteEnquiry =async (req:Request, res:Response) => {
         const VALUES = [userId, enquiryId]
         const [rows]:any = await pool.query(sql, VALUES)
 
-        return apiResponse.successResponse(res, "Enquiry Deleted Successfuly", null);
+        if (rows.affectedRows > 0) {
+            return apiResponse.successResponse(res, "Enquiry Deleted Successfuly", null);
+        } else {
+            return apiResponse.errorMessage(res, 400, "Failed to delete, try again");
+        }
     } catch (error) {
         console.log(error);
         return apiResponse.errorMessage(res, 400, "Something ent wrong");

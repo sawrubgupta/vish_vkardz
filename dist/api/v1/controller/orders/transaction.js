@@ -41,7 +41,7 @@ const apiResponse = __importStar(require("../../helper/apiResponse"));
 const transactionHistory = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userId = res.locals.jwt.userId;
-        const sql = `SELECT id, price, country, payment_type, status, created_at FROM all_payment_info WHERE user_id = ${userId} ORDER BY created_at DESC`;
+        const sql = `SELECT id, txn_id, price, country, payment_type, status, created_at FROM all_payment_info WHERE user_id = ${userId} ORDER BY created_at DESC`;
         const [rows] = yield db_1.default.query(sql);
         if (rows.length > 0) {
             rows.forEach((element, index) => {

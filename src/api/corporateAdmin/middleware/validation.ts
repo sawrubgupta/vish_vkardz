@@ -154,7 +154,7 @@ export const updateUserDisplayFieldValidation =async (req:Request, res:Response,
         phone: Joi.string().trim().min(8).max(20).trim().required(),
         email: Joi.string().email( ).max(60).required(),
         website: Joi.string().trim().max(80).min(5).allow(''),
-        address: Joi.string().normalize().max(200).required(),
+        address: Joi.string().normalize().max(200).allow(''),
     });
 
     const value = schema.validate(req.body);

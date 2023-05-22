@@ -158,7 +158,7 @@ export const updateUserDisplayField =async (req:Request, res:Response) => {
 
         const { name, designation, companyName, dialCode, phone, email, website, address } = req.body;
 
-        const updateQuery = `UPDATE users SET name = ?, designation = ?, company_name = ?, display_dial_code = ?, display_number = ?, display_email = ?, website = ?, address = ? WHERE id = ?`;
+        const updateQuery = `UPDATE users SET full_name = ?, designation = ?, company_name = ?, display_dial_code = ?, display_number = ?, display_email = ?, website = ?, address = ? WHERE id = ?`;
         const VALUES = [name, designation, companyName, dialCode, phone, email, website, address, userId];
         const [data]:any = await pool.query(updateQuery, VALUES);
 

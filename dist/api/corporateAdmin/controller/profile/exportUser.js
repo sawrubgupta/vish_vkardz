@@ -59,6 +59,7 @@ const aws_sdk_1 = __importDefault(require("aws-sdk"));
 const credentials = development_1.default.AWS;
 const bucketName = development_1.default.BUCKET_NAME;
 const exportUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, e_1, _b, _c;
     try {
         const userId = res.locals.jwt.userId;
         const createdAt = utility.dateWithFormat();
@@ -76,7 +77,7 @@ const exportUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         const [rows] = yield db_1.default.query(sql);
         const workbook = new exceljs_1.default.Workbook();
         const worksheet = workbook.addWorksheet('User Detail');
-        let columns = [
+        let columnsHeader = [
             { key: 'username', header: 'username' },
             { key: 'card_number', header: 'Card Number' },
             { key: 'name', header: 'Full Name' },
@@ -87,86 +88,109 @@ const exportUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             { key: 'designation', header: 'Designation' },
             { key: 'website', header: 'Website' },
             { key: 'address', header: 'Address' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
+            { key: 'value', header: 'Facebook' },
+            { key: 'value', header: 'Twitter' },
+            { key: 'value', header: 'Instagram' },
+            { key: 'value', header: 'Linkedin' },
+            { key: 'value', header: 'Youtube' },
+            { key: 'value', header: 'WhatsApp' },
+            { key: 'value', header: 'Amazon' },
+            { key: 'value', header: 'Apple Pay' },
+            { key: 'value', header: 'Behance' },
+            { key: 'value', header: 'Blogger' },
+            { key: 'value', header: 'Clubhouse' },
+            { key: 'value', header: 'Custom Link' },
+            { key: 'value', header: 'Discord' },
+            { key: 'value', header: 'Discord' },
+            { key: 'value', header: 'Drive' },
+            { key: 'value', header: 'Dropbox' },
+            { key: 'value', header: 'Email' },
+            { key: 'value', header: 'Evanto' },
+            { key: 'value', header: 'Evernote' },
+            { key: 'value', header: 'Fiver' },
+            { key: 'value', header: 'Freelance' },
+            { key: 'value', header: 'Github' },
+            { key: 'value', header: 'Gmail' },
+            { key: 'value', header: 'Google Plus' },
+            { key: 'value', header: 'Google Pay' },
+            { key: 'value', header: 'Keybase' },
+            { key: 'value', header: 'Messenger' },
+            { key: 'value', header: 'Line' },
+            { key: 'value', header: 'Medium' },
+            { key: 'value', header: 'Menu' },
+            { key: 'value', header: 'Patreon' },
+            { key: 'value', header: 'Paypal' },
+            { key: 'value', header: 'Phone' },
+            { key: 'value', header: 'Pinterest' },
+            { key: 'value', header: 'Quora' },
+            { key: 'value', header: 'Qzone' },
+            { key: 'value', header: 'Razorpay' },
+            { key: 'value', header: 'Reddit' },
+            { key: 'value', header: 'Rss' },
+            { key: 'value', header: 'Skype' },
+            { key: 'value', header: 'Slack' },
+            { key: 'value', header: 'Sms' },
+            { key: 'value', header: 'Snapchat' },
+            { key: 'value', header: 'Soundcloud' },
+            { key: 'value', header: 'Stripe' },
+            { key: 'value', header: 'Telegram' },
+            { key: 'value', header: 'Threema' },
+            { key: 'value', header: 'Tiktok' },
+            { key: 'value', header: 'Tumbler' },
+            { key: 'value', header: 'Twitch' },
+            { key: 'value', header: 'Upwork' },
+            { key: 'value', header: 'Viber' },
+            { key: 'value', header: 'Vimeo' },
+            { key: 'value', header: 'Vine' },
+            { key: 'value', header: 'Vk' },
+            { key: 'value', header: 'Wechat' },
+            { key: 'value', header: 'Zoom' },
         ];
-        worksheet.columns = columns;
         // rows.forEach(async(element: any) => {
         for (const element of rows) {
-            const sociaSiteSql = `SELECT label, value FROM vcard_social_sites WHERE user_id = ${element.user_id} AND status = 1`;
+            const sociaSiteSql = `SELECT social_sites.name, vcard_social_sites.label, vcard_social_sites.value FROM social_sites LEFT JOIN vcard_social_sites ON vcard_social_sites.site_id = social_sites.id AND vcard_social_sites.user_id = ${element.user_id} WHERE social_sites.status = 1 ORDER BY social_sites.id ASC`;
             const [socialRows] = yield db_1.default.query(sociaSiteSql);
+            // console.log("socialRows", socialRows);
+            // for (let i = 0; i < socialRows.length; i++) {
+            //     const element = socialRows[i];
+            //     columnsHeader.push({ key: 'value', header: socialRows[i].name })
+            //     // data.push(`${socialRows[i].label}: ${socialRows[i].value}`)
+            // } 
+            // columns.push({ key: 'value', header: socialRows[i]. })
             const data = [element.username, element.card_number, element.name, element.display_email, element.display_dial_code, element.display_number, element.company_name, element.designation, element.website, element.address];
             for (let i = 0; i < socialRows.length; i++) {
-                const element = socialRows[i];
-                data.push(`${socialRows[i].label}: ${socialRows[i].value}`);
+                data.push(`${socialRows[i].value}`);
+            }
+            const vcfSql = `SELECT value, type FROM vcf_custom_field WHERE user_id = ${element.user_id} AND status = 1`;
+            const [vcfData] = yield db_1.default.query(vcfSql);
+            let vcfIndex = -1;
+            try {
+                for (var _d = true, vcfData_1 = (e_1 = void 0, __asyncValues(vcfData)), vcfData_1_1; vcfData_1_1 = yield vcfData_1.next(), _a = vcfData_1_1.done, !_a;) {
+                    _c = vcfData_1_1.value;
+                    _d = false;
+                    try {
+                        const ele = _c;
+                        vcfIndex++;
+                        columnsHeader.push({ key: 'value', header: 'Custom ' + ele.type });
+                        data.push(`${vcfData[vcfIndex].value}`);
+                    }
+                    finally {
+                        _d = true;
+                    }
+                }
+            }
+            catch (e_1_1) { e_1 = { error: e_1_1 }; }
+            finally {
+                try {
+                    if (!_d && !_a && (_b = vcfData_1.return)) yield _b.call(vcfData_1);
+                }
+                finally { if (e_1) throw e_1.error; }
             }
             worksheet.addRow(data);
             console.log("data", data);
         }
         ;
+        worksheet.columns = columnsHeader;
         const exportPath = path_1.default.resolve(__dirname, `users${userId}.xlsx`);
         console.log(exportPath);
         yield workbook.xlsx.writeFile(exportPath);
@@ -286,7 +310,7 @@ exports.exportUser = exportUser;
 // ====================================================================================================
 // ====================================================================================================
 const importUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, e_1, _b, _c, _d, e_2, _e, _f;
+    var _e, e_2, _f, _g, _h, e_3, _j, _k;
     try {
         const userId = res.locals.jwt.userId;
         const credentials = development_1.default.AWS;
@@ -316,11 +340,11 @@ const importUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         let ele;
         let duplicateData = [];
         try {
-            for (var _g = true, parsedData_1 = __asyncValues(parsedData), parsedData_1_1; parsedData_1_1 = yield parsedData_1.next(), _a = parsedData_1_1.done, !_a;) {
-                _c = parsedData_1_1.value;
-                _g = false;
+            for (var _l = true, parsedData_1 = __asyncValues(parsedData), parsedData_1_1; parsedData_1_1 = yield parsedData_1.next(), _e = parsedData_1_1.done, !_e;) {
+                _g = parsedData_1_1.value;
+                _l = false;
                 try {
-                    ele = _c;
+                    ele = _g;
                     const username = ele.username;
                     const email = ele.email;
                     const phone = ele.phone;
@@ -409,16 +433,16 @@ const importUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
                     }
                 }
                 finally {
-                    _g = true;
+                    _l = true;
                 }
             }
         }
-        catch (e_1_1) { e_1 = { error: e_1_1 }; }
+        catch (e_2_1) { e_2 = { error: e_2_1 }; }
         finally {
             try {
-                if (!_g && !_a && (_b = parsedData_1.return)) yield _b.call(parsedData_1);
+                if (!_l && !_e && (_f = parsedData_1.return)) yield _f.call(parsedData_1);
             }
-            finally { if (e_1) throw e_1.error; }
+            finally { if (e_2) throw e_2.error; }
         }
         console.log("duplicateData", duplicateData);
         if (duplicateData.length > 0) {
@@ -435,25 +459,25 @@ const importUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
                 { key: 'failedMessage', header: 'failedMessage' },
             ];
             try {
-                for (var _h = true, duplicateData_1 = __asyncValues(duplicateData), duplicateData_1_1; duplicateData_1_1 = yield duplicateData_1.next(), _d = duplicateData_1_1.done, !_d;) {
-                    _f = duplicateData_1_1.value;
-                    _h = false;
+                for (var _m = true, duplicateData_1 = __asyncValues(duplicateData), duplicateData_1_1; duplicateData_1_1 = yield duplicateData_1.next(), _h = duplicateData_1_1.done, !_h;) {
+                    _k = duplicateData_1_1.value;
+                    _m = false;
                     try {
-                        const iterator = _f;
+                        const iterator = _k;
                         const failedData = [iterator.username, iterator.name, iterator.email, iterator.dial_code, iterator.phone, iterator.country, iterator.code, iterator.failedMessage];
                         worksheet.addRow(failedData);
                     }
                     finally {
-                        _h = true;
+                        _m = true;
                     }
                 }
             }
-            catch (e_2_1) { e_2 = { error: e_2_1 }; }
+            catch (e_3_1) { e_3 = { error: e_3_1 }; }
             finally {
                 try {
-                    if (!_h && !_d && (_e = duplicateData_1.return)) yield _e.call(duplicateData_1);
+                    if (!_m && !_h && (_j = duplicateData_1.return)) yield _j.call(duplicateData_1);
                 }
-                finally { if (e_2) throw e_2.error; }
+                finally { if (e_3) throw e_3.error; }
             }
             const exportPath = path_1.default.resolve(__dirname, `failedUsers.xlsx`);
             yield workbook.xlsx.writeFile(exportPath);

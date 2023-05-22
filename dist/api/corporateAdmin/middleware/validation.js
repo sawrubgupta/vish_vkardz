@@ -167,7 +167,7 @@ const updateUserDisplayFieldValidation = (req, res, next) => __awaiter(void 0, v
         phone: joi_1.default.string().trim().min(8).max(20).trim().required(),
         email: joi_1.default.string().email().max(60).required(),
         website: joi_1.default.string().trim().max(80).min(5).allow(''),
-        address: joi_1.default.string().normalize().max(200).required(),
+        address: joi_1.default.string().normalize().max(200).allow(''),
     });
     const value = schema.validate(req.body);
     if (value.error) {

@@ -39,9 +39,9 @@ export const addBusinessHour = async (req: Request, res: Response) => {
         const [rows]: any = await pool.query(result);
 
         if (rows.affectedRows > 0) {
-            return await apiResponse.successResponse(res, "Business Hours Added Successfully", null);
+            return apiResponse.successResponse(res, "Business Hours Added Successfully", null);
         } else {
-            return await apiResponse.errorMessage(res, 400, "Failed to insert, try again");
+            return apiResponse.errorMessage(res, 400, "Failed to insert, try again");
         }
     } catch (error) {
         console.log(error);

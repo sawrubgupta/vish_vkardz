@@ -66,14 +66,18 @@ const enquiryList = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         const sql = `SELECT id, name, email, phone_num, msg, created_at FROM user_contacts WHERE user_id = ${userId} ORDER BY id DESC LIMIT ${page_size} OFFSET ${offset}`;
         const [rows] = yield db_1.default.query(sql);
         const getFeatureStatus = `SELECT status FROM users_features WHERE user_id = ${userId} AND feature_id = 11`;
-        const [featureStatus] = yield db_1.default.query(getFeatureStatus);
+        let [featureStatus] = yield db_1.default.query(getFeatureStatus);
+        if (featureStatus.length === 0) {
+            featureStatus[0] = {};
+            featureStatus[0].status = 0;
+        }
         let totalPages = result.length / page_size;
         let totalPage = Math.ceil(totalPages);
         if (rows.length > 0) {
             return res.status(200).json({
                 status: true,
                 data: rows,
-                featureStatus: featureStatus[0].status,
+                featureStatus: featureStatus[0].status || "",
                 totalPage: totalPage,
                 currentPage: page,
                 totalLength: result.length,
@@ -105,7 +109,7 @@ const deleteEnquiry = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         // const userId:string = res.locals.jwt.userId;
         let userId;
         const type = req.query.type; //type = business, user, null
-        if (type && type === development_1.default.businessType) {
+        if (type && type == development_1.default.businessType) {
             userId = req.query.userId;
         }
         else {
@@ -118,7 +122,12 @@ const deleteEnquiry = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         const sql = `DELETE FROM user_contacts WHERE user_id = ? AND id = ?`;
         const VALUES = [userId, enquiryId];
         const [rows] = yield db_1.default.query(sql, VALUES);
-        return apiResponse.successResponse(res, "Enquiry Deleted Successfuly", null);
+        if (rows.affectedRows > 0) {
+            return apiResponse.successResponse(res, "Enquiry Deleted Successfuly", null);
+        }
+        else {
+            return apiResponse.errorMessage(res, 400, "Failed to delete, try again");
+        }
     }
     catch (error) {
         console.log(error);

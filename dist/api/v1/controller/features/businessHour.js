@@ -94,10 +94,10 @@ const addBusinessHour = (req, res) => __awaiter(void 0, void 0, void 0, function
         }
         const [rows] = yield db_1.default.query(result);
         if (rows.affectedRows > 0) {
-            return yield apiResponse.successResponse(res, "Business Hours Added Successfully", null);
+            return apiResponse.successResponse(res, "Business Hours Added Successfully", null);
         }
         else {
-            return yield apiResponse.errorMessage(res, 400, "Failed to insert, try again");
+            return apiResponse.errorMessage(res, 400, "Failed to insert, try again");
         }
     }
     catch (error) {

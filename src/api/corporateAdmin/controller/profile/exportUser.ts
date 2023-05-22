@@ -37,7 +37,7 @@ export const exportUser = async (req: Request, res: Response) => {
         const workbook = new Excel.Workbook();
         const worksheet = workbook.addWorksheet('User Detail');
 
-        let columns = [
+        let columnsHeader:any = [
             { key: 'username', header: 'username' },
             { key: 'card_number', header: 'Card Number' },
             { key: 'name', header: 'Full Name' },
@@ -48,90 +48,101 @@ export const exportUser = async (req: Request, res: Response) => {
             { key: 'designation', header: 'Designation' },
             { key: 'website', header: 'Website' },
             { key: 'address', header: 'Address' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
-            { key: 'lable', header: 'Social Site' },
+            { key: 'value', header: 'Facebook' },
+            { key: 'value', header: 'Twitter' },
+            { key: 'value', header: 'Instagram' },
+            { key: 'value', header: 'Linkedin' },
+            { key: 'value', header: 'Youtube' },
+            { key: 'value', header: 'WhatsApp' },
+            { key: 'value', header: 'Amazon' },
+            { key: 'value', header: 'Apple Pay' },
+            { key: 'value', header: 'Behance' },
+            { key: 'value', header: 'Blogger' },
+            { key: 'value', header: 'Clubhouse' },
+            { key: 'value', header: 'Custom Link' },
+            { key: 'value', header: 'Discord' },
+            { key: 'value', header: 'Discord' },
+            { key: 'value', header: 'Drive' },
+            { key: 'value', header: 'Dropbox' },
+            { key: 'value', header: 'Email' },
+            { key: 'value', header: 'Evanto' },
+            { key: 'value', header: 'Evernote' },
+            { key: 'value', header: 'Fiver' },
+            { key: 'value', header: 'Freelance' },
+            { key: 'value', header: 'Github' },
+            { key: 'value', header: 'Gmail' },
+            { key: 'value', header: 'Google Plus' },
+            { key: 'value', header: 'Google Pay' },
+            { key: 'value', header: 'Keybase' },
+            { key: 'value', header: 'Messenger' },
+            { key: 'value', header: 'Line' },
+            { key: 'value', header: 'Medium' },
+            { key: 'value', header: 'Menu' },
+            { key: 'value', header: 'Patreon' },
+            { key: 'value', header: 'Paypal' },
+            { key: 'value', header: 'Phone' },
+            { key: 'value', header: 'Pinterest' },
+            { key: 'value', header: 'Quora' },
+            { key: 'value', header: 'Qzone' },
+            { key: 'value', header: 'Razorpay' },
+            { key: 'value', header: 'Reddit' },
+            { key: 'value', header: 'Rss' },
+            { key: 'value', header: 'Skype' },
+            { key: 'value', header: 'Slack' },
+            { key: 'value', header: 'Sms' },
+            { key: 'value', header: 'Snapchat' },
+            { key: 'value', header: 'Soundcloud' },
+            { key: 'value', header: 'Stripe' },
+            { key: 'value', header: 'Telegram' },
+            { key: 'value', header: 'Threema' },
+            { key: 'value', header: 'Tiktok' },
+            { key: 'value', header: 'Tumbler' },
+            { key: 'value', header: 'Twitch' },
+            { key: 'value', header: 'Upwork' },
+            { key: 'value', header: 'Viber' },
+            { key: 'value', header: 'Vimeo' },
+            { key: 'value', header: 'Vine' },
+            { key: 'value', header: 'Vk' },
+            { key: 'value', header: 'Wechat' },
+            { key: 'value', header: 'Zoom' },
         ];
-        worksheet.columns = columns;
 
         // rows.forEach(async(element: any) => {
         for (const element of rows) {
-            const sociaSiteSql = `SELECT label, value FROM vcard_social_sites WHERE user_id = ${element.user_id} AND status = 1`;
+            const sociaSiteSql = `SELECT social_sites.name, vcard_social_sites.label, vcard_social_sites.value FROM social_sites LEFT JOIN vcard_social_sites ON vcard_social_sites.site_id = social_sites.id AND vcard_social_sites.user_id = ${element.user_id} WHERE social_sites.status = 1 ORDER BY social_sites.id ASC`;
             const [socialRows]:any = await pool.query(sociaSiteSql);
+
+            // console.log("socialRows", socialRows);
+            // for (let i = 0; i < socialRows.length; i++) {
+            //     const element = socialRows[i];
+            //     columnsHeader.push({ key: 'value', header: socialRows[i].name })
+
+            //     // data.push(`${socialRows[i].label}: ${socialRows[i].value}`)
+            // } 
+            // columns.push({ key: 'value', header: socialRows[i]. })
 
             const data = [element.username, element.card_number, element.name, element.display_email, element.display_dial_code, element.display_number, element.company_name, element.designation, element.website, element.address];
 
             for (let i = 0; i < socialRows.length; i++) {
-                const element = socialRows[i];
-                data.push(`${socialRows[i].label}: ${socialRows[i].value}`)
+                data.push(`${socialRows[i].value}`)
+            }
+            
+            const vcfSql = `SELECT value, type FROM vcf_custom_field WHERE user_id = ${element.user_id} AND status = 1`;
+            const [vcfData]:any= await pool.query(vcfSql);
+
+            let vcfIndex = -1;
+            for await (const ele of vcfData) {
+                vcfIndex++;
+                columnsHeader.push({ key: 'value', header: 'Custom ' + ele.type });
+                data.push(`${vcfData[vcfIndex].value}`)
             }
             
             worksheet.addRow(data);
             console.log("data", data);
 
         };
+
+        worksheet.columns = columnsHeader;
 
         const exportPath: any = path.resolve(__dirname, `users${userId}.xlsx`);
         console.log(exportPath);

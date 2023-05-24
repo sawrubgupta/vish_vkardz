@@ -39,6 +39,7 @@ exports.uploadImage = void 0;
 const db_1 = __importDefault(require("../../../../db"));
 const apiResponse = __importStar(require("../../helper/apiResponse"));
 const utility = __importStar(require("../../helper/utility"));
+//not used
 const uploadImage = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // let userId:any; 

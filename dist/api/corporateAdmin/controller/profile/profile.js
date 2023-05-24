@@ -41,7 +41,12 @@ const apiResponse = __importStar(require("../../helper/apiResponse"));
 const development_1 = __importDefault(require("../../config/development"));
 const userList = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const userId = res.locals.jwt.userId;
+        let userId = res.locals.jwt.userId;
+        const checkSubAdmin = `SELECT admin_id FROM business_admin WHERE id = ${userId} AND type = '${development_1.default.memberType}' LIMIT 1`;
+        const [subAdminData] = yield db_1.default.query(checkSubAdmin);
+        if (subAdminData.length > 0) {
+            userId = subAdminData[0].admin_id;
+        }
         const keyword = req.query.keyword;
         var getPage = req.query.page;
         var page = parseInt(getPage);
@@ -91,7 +96,12 @@ exports.userList = userList;
 // ====================================================================================================
 const userDetail = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const userId = res.locals.jwt.userId;
+        let userId = res.locals.jwt.userId;
+        const checkSubAdmin = `SELECT admin_id FROM business_admin WHERE id = ${userId} AND type = '${development_1.default.memberType}' LIMIT 1`;
+        const [subAdminData] = yield db_1.default.query(checkSubAdmin);
+        if (subAdminData.length > 0) {
+            userId = subAdminData[0].admin_id;
+        }
         const sql = `SELECT id, username, name, email, phone, designation, website, thumb, cover_photo, company_name, address, primary_profile_link, website,  FROM users WHERE admin_id = ${userId} `;
         const [rows] = yield db_1.default.query(sql);
         return apiResponse.successResponse(res, "Data retrieved Successfully", null);
@@ -110,6 +120,11 @@ const updateUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         const type = req.body.type; //type = business, user, null
         if (type && type === development_1.default.businessType) {
             userId = req.body.userId;
+            const checkSubAdmin = `SELECT admin_id FROM business_admin WHERE id = ${userId} AND type = '${development_1.default.memberType}' LIMIT 1`;
+            const [subAdminData] = yield db_1.default.query(checkSubAdmin);
+            if (subAdminData.length > 0) {
+                userId = subAdminData[0].admin_id;
+            }
         }
         else {
             userId = res.locals.jwt.userId;
@@ -172,6 +187,11 @@ const updateUserDisplayField = (req, res) => __awaiter(void 0, void 0, void 0, f
         const type = req.query.type; //type = business, user, null
         if (type && type === development_1.default.businessType) {
             userId = req.query.userId;
+            const checkSubAdmin = `SELECT admin_id FROM business_admin WHERE id = ${userId} AND type = '${development_1.default.memberType}' LIMIT 1`;
+            const [subAdminData] = yield db_1.default.query(checkSubAdmin);
+            if (subAdminData.length > 0) {
+                userId = subAdminData[0].admin_id;
+            }
         }
         else {
             userId = res.locals.jwt.userId;

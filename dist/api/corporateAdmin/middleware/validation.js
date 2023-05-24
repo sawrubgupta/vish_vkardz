@@ -35,7 +35,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateUserDisplayFieldValidation = exports.updateAdminDetailValidation = exports.updateUserDetailValidation = exports.ChangeUserPasswordValidation = exports.ChangeAdminPasswordValidation = exports.adminLoginValidation = exports.adminRegistrationValidation = void 0;
+exports.updateTeamMemberValidation = exports.teamMemberValidation = exports.updateUserDisplayFieldValidation = exports.updateAdminDetailValidation = exports.updateUserDetailValidation = exports.ChangeUserPasswordValidation = exports.ChangeAdminPasswordValidation = exports.adminLoginValidation = exports.adminRegistrationValidation = void 0;
 const apiResponse = __importStar(require("../helper/apiResponse"));
 const joi_1 = __importDefault(require("joi"));
 function validationCheck(value) {
@@ -177,3 +177,48 @@ const updateUserDisplayFieldValidation = (req, res, next) => __awaiter(void 0, v
     next();
 });
 exports.updateUserDisplayFieldValidation = updateUserDisplayFieldValidation;
+// ====================================================================================================
+// ====================================================================================================
+const teamMemberValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const schema = joi_1.default.object({
+        name: joi_1.default.string().required(),
+        email: joi_1.default.string().email().required(),
+        password: joi_1.default.string().min(3).max(80).required(),
+        image: joi_1.default.string().allow('').allow(null),
+        permissions: joi_1.default.array().items({
+            permissionId: joi_1.default.number().required(),
+            action: joi_1.default.string().trim().required(),
+        })
+    });
+    const value = schema.validate(req.body);
+    if (value.error) {
+        const errMsg = yield validationCheck(value);
+        return yield apiResponse.errorMessage(res, 400, errMsg);
+    }
+    next();
+});
+exports.teamMemberValidation = teamMemberValidation;
+// ====================================================================================================
+// ====================================================================================================
+const updateTeamMemberValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const schema = joi_1.default.object({
+        memberId: joi_1.default.number().required(),
+        name: joi_1.default.string().required(),
+        email: joi_1.default.string().email().required(),
+        password: joi_1.default.string().min(3).max(80).required(),
+        image: joi_1.default.string().allow('').allow(null),
+        permissions: joi_1.default.array().items({
+            permissionId: joi_1.default.number().required(),
+            action: joi_1.default.string().trim().required(),
+        })
+    });
+    const value = schema.validate(req.body);
+    if (value.error) {
+        const errMsg = yield validationCheck(value);
+        return yield apiResponse.errorMessage(res, 400, errMsg);
+    }
+    next();
+});
+exports.updateTeamMemberValidation = updateTeamMemberValidation;
+// ====================================================================================================
+// ====================================================================================================

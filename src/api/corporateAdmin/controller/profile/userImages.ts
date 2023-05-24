@@ -5,7 +5,7 @@ import * as utility from "../../helper/utility";
 import config from "../../config/development";
 import md5 from "md5";
 
-
+//not used
 export const uploadImage =async (req:Request, res:Response) => {
     try {
         // let userId:any; 

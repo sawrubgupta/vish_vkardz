@@ -63,9 +63,15 @@ const getProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             const [cardData] = yield db_1.default.query(getCardQuery);
             const getThemes = `SELECT users.themes as themeId, vkard_layouts.vkard_style, vkard_layouts.image FROM users LEFT JOIN vkard_layouts ON users.vcard_layouts = vkard_layouts.id WHERE users.id = ${userId} LIMIT 1`;
             const [themeData] = yield db_1.default.query(getThemes);
+            const cartSql = `SELECT COUNT(id) AS totalCartItem FROM cart_details WHERE user_id = ${userId}`;
+            const [cartRows] = yield db_1.default.query(cartSql);
+            const wishlistSql = `SELECT COUNT(id) AS totalWishlistItem FROM wishlist WHERE user_id = ${userId}`;
+            const [wishlistRows] = yield db_1.default.query(wishlistSql);
             userRows[0].social_sites = socialRows || [];
             userRows[0].cardData = cardData || [];
             userRows[0].activeTheme = themeData[0] || {};
+            userRows[0].totalCartItem = cartRows[0].totalCartItem || 0;
+            userRows[0].totalWishlistItem = wishlistRows[0].totalWishlistItem || 0;
             return apiResponse.successResponse(res, "Get user profile data!", userRows[0]);
         }
         else {

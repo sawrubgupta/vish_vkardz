@@ -20,6 +20,64 @@ name api's
 database changes:
 
 ------------------------------new changes--------------------------------
+23-05-2023
+ALTER TABLE `assign_member_permissions` ADD `updated_at` DATETIME NULL DEFAULT NULL AFTER `created_at`;
+ALTER TABLE `business_admin` ADD `updated_at` DATETIME NULL DEFAULT NULL AFTER `created_at`;
+
+22-05-2023
+CREATE TABLE `assign_member_permissions` ( `id` int(11) NOT NULL PRIMARY KEY AUTO_INCREMENT, `member_id` INT(11) NOT NULL , `permission_id` INT(11) NOT NULL , `action` VARCHAR(25) NOT NULL , `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ) ENGINE = InnoDB;
+
+ALTER TABLE `business_admin` ADD `type` VARCHAR(25) NOT NULL DEFAULT 'admin' AFTER `id`, ADD `admin_id` INT(11) NULL DEFAULT NULL AFTER `type`;
+
+CREATE TABLE `team_permissions` (
+  `id` int(11) NOT NULL,
+  `permission` varchar(55) NOT NULL,
+  `slug` varchar(55) NOT NULL,
+  `status` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `team_permissions`
+--
+
+INSERT INTO `team_permissions` (`id`, `permission`, `slug`, `status`, `created_at`) VALUES
+(1, 'Basic Details', 'basic-detail', 1, '2023-05-22 16:27:09'),
+(2, 'Social Media Links', 'social-site', 1, '2023-05-22 16:27:46'),
+(3, 'Password', 'password', 1, '2023-05-22 16:27:46'),
+(4, 'Theme', 'theme', 1, '2023-05-22 16:27:46'),
+(5, 'Profile Picture', 'thumb', 1, '2023-05-22 16:27:46'),
+(6, 'Cover Photo', 'cover', 1, '2023-05-22 16:27:46'),
+(7, 'Username', 'username', 1, '2023-05-22 16:27:46'),
+(8, 'Gallery', 'portfolio', 1, '2023-05-22 16:27:46'),
+(9, 'About Us', 'about', 1, '2023-05-22 16:27:46'),
+(10, 'Product', 'services', 1, '2023-05-22 16:27:46'),
+(11, 'Enquiry', 'contacts', 1, '2023-05-22 16:51:36'),
+(12, 'Business Hours', 'business-hour', 1, '2023-05-22 16:51:36'),
+(13, 'Appointment', 'appointment', 1, '2023-05-22 16:51:54'),
+(14, 'Features', 'feature', 0, '2023-05-22 16:55:25');
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `team_permissions`
+--
+ALTER TABLE `team_permissions`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `team_permissions`
+--
+ALTER TABLE `team_permissions`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+COMMIT;
+
 25-05-2023
 ALTER TABLE `business_admin` ADD `dial_code` VARCHAR(25) NULL DEFAULT NULL AFTER `email`;
 

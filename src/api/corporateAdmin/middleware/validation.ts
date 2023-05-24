@@ -165,3 +165,55 @@ export const updateUserDisplayFieldValidation =async (req:Request, res:Response,
     }
     next();
 };
+
+// ====================================================================================================
+// ====================================================================================================
+
+export const teamMemberValidation = async (req: Request, res: Response, next: NextFunction) => {
+    const schema = Joi.object({
+        name: Joi.string().required(),
+        email: Joi.string().email().required(),
+        password: Joi.string().min(3).max(80).required(),
+        image: Joi.string().allow('').allow(null),
+        permissions: Joi.array().items({
+            permissionId: Joi.number().required(),
+            action: Joi.string().trim().required(),
+        })
+    });
+
+    const value = schema.validate(req.body);
+
+    if (value.error) {
+        const errMsg = await validationCheck(value);
+        return await apiResponse.errorMessage(res,400, errMsg);
+    }
+    next();
+};
+
+// ====================================================================================================
+// ====================================================================================================
+
+export const updateTeamMemberValidation = async (req: Request, res: Response, next: NextFunction) => {
+    const schema = Joi.object({
+        memberId: Joi.number().required(),
+        name: Joi.string().required(),
+        email: Joi.string().email().required(),
+        password: Joi.string().min(3).max(80).required(),
+        image: Joi.string().allow('').allow(null),
+        permissions: Joi.array().items({
+            permissionId: Joi.number().required(),
+            action: Joi.string().trim().required(),
+        })
+    });
+
+    const value = schema.validate(req.body);
+
+    if (value.error) {
+        const errMsg = await validationCheck(value);
+        return await apiResponse.errorMessage(res,400, errMsg);
+    }
+    next();
+};
+
+// ====================================================================================================
+// ====================================================================================================

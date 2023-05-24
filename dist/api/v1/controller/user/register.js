@@ -228,8 +228,8 @@ const socialRegister = (req, res) => __awaiter(void 0, void 0, void 0, function*
                 message: msg,
             });
         }
-        const sql = `INSERT INTO users(name, full_name, email, display_email, password, username, dial_code, qr_code, phone, display_dial_code, display_number, country, referral_code, offer_coin, quick_active_status, is_deactived, is_verify, is_payment, is_active, is_expired, post_time, start_date, login_time, end_date, account_type, primary_profile_slug, primary_profile_link, fcm_token, facebook_id, google_id, apple_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-        const VALUES = [name, name, email, email, hash, username, dial_code, qrData.data, phone, dial_code, phone, country, referralCode, 100, 1, 0, 1, 1, 1, 0, justDate, justDate, justDate, endDate, 16, 'vcard', primaryProfileLink, fcmToken, facebookId, googleId, appleId];
+        const sql = `INSERT INTO users(name, full_name, email, display_email, password, username, dial_code, qr_code, phone, currency_code, display_dial_code, display_number, country, referral_code, offer_coin, quick_active_status, is_deactived, is_verify, is_payment, is_active, is_expired, post_time, start_date, login_time, end_date, account_type, primary_profile_slug, primary_profile_link, fcm_token, facebook_id, google_id, apple_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+        const VALUES = [name, name, email, email, hash, username, dial_code, qrData.data, phone, 'USD', dial_code, phone, country, referralCode, 100, 1, 0, 1, 1, 1, 0, justDate, justDate, justDate, endDate, 16, 'vcard', primaryProfileLink, fcmToken, facebookId, googleId, appleId];
         const [userData] = yield db_1.default.query(sql, VALUES);
         if (userData.affectedRows > 0) {
             const getUserName = `SELECT * FROM users WHERE id = ${userData.insertId} LIMIT 1`;

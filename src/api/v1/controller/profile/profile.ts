@@ -34,9 +34,17 @@ export const getProfile =async (req:Request, res:Response) => {
             const getThemes = `SELECT users.themes as themeId, vkard_layouts.vkard_style, vkard_layouts.image FROM users LEFT JOIN vkard_layouts ON users.vcard_layouts = vkard_layouts.id WHERE users.id = ${userId} LIMIT 1`;
             const [themeData]:any = await pool.query(getThemes);
 
+            const cartSql = `SELECT COUNT(id) AS totalCartItem FROM cart_details WHERE user_id = ${userId}`;
+            const [cartRows]:any = await pool.query(cartSql);
+
+            const wishlistSql = `SELECT COUNT(id) AS totalWishlistItem FROM wishlist WHERE user_id = ${userId}`;
+            const [wishlistRows]:any = await pool.query(wishlistSql);
+
             userRows[0].social_sites = socialRows || [];
             userRows[0].cardData = cardData || [];
             userRows[0].activeTheme = themeData[0] || {};
+            userRows[0].totalCartItem = cartRows[0].totalCartItem || 0
+            userRows[0].totalWishlistItem = wishlistRows[0].totalWishlistItem || 0
 
             return apiResponse.successResponse(res, "Get user profile data!", userRows[0]);
         } else {

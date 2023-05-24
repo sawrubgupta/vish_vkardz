@@ -20,7 +20,6 @@ export default function (app: Express) {
     app.use(morgan('common', {
         stream: fs.createWriteStream(__dirname+ '/access.log', {flags: 'a'})
     }));
-    
     app.use(express.static(__dirname+"./public_html"))
     app.use('/api', apiRouter);
     app.use('*', (req, res) => {

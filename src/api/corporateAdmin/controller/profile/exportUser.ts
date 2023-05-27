@@ -400,7 +400,7 @@ export const importUser =async (req:Request, res:Response) => {
             const email = ele.email;
             const phone = ele.phone || '';
             const code = ele.code;
-            const name = ele.name;
+            const name = ele.name || '';
             const dial_code = ele.dial_code || '';
             const country = ele.country || '';
             const password = ele.password;
@@ -408,6 +408,11 @@ export const importUser =async (req:Request, res:Response) => {
             const designation = ele.designation || '';
             const website = ele.website || '';
             const address = ele.address || '';
+            const profile_pin:number = ele.profile_pin;
+            let is_password_enable:number = 1;
+            if (!profile_pin || profile_pin === null) {
+                is_password_enable = 0
+            }
             const hashPasswwoed = md5(password);
             const qrData = await getQr(username);
 
@@ -420,21 +425,24 @@ export const importUser =async (req:Request, res:Response) => {
             }
             const cardNumber = cardData[0].card_number;
             const packageId = cardData[0].package_type; //account_type
-            const primaryProfileLink = (config.vcardLink)+(cardNumber);
+            const primaryProfileLink = (config.vcardLink)+(username);
 
             const emailSql = `SELECT * FROM users WHERE deleted_at IS NULL AND (email = ? OR username = ? OR phone = ? OR card_number = ? OR card_number_fix = ?) LIMIT 1`;
             const emailVALUES = [email, username, phone, cardNumber, cardNumber];
             const [dupliRows]:any = await pool.query(emailSql, emailVALUES);
             if (dupliRows.length > 0) {
                 let dupliKey:any;
-                if (dupliRows[0].email === email) {
+                if (dupliRows[0].email === email || !email || email === null) {
                     dupliKey =  'email ' + email;
                 }
-                if (dupliRows[0].username === username) {
+                if (dupliRows[0].username === username || !username || username === null) {
                     dupliKey =  'username ' + username;
                 }
-                if (dupliRows[0].card_number === cardNumber || dupliRows[0].card_number_fix === cardNumber) {
+                if (dupliRows[0].card_number === cardNumber || dupliRows[0].card_number_fix === cardNumber || !cardNumber || cardNumber === null) {
                     dupliKey =  'code ' + cardNumber;
+                }
+                if (!code || code === null) {
+                    dupliKey =  'code ' + code;
                 }
                 // if (dupliRows[0].phone === element.phone) {
                 //     // dupli.push("phone");
@@ -444,8 +452,8 @@ export const importUser =async (req:Request, res:Response) => {
                 continue;
             }
 
-            const sql = `INSERT INTO users(admin_id, name, full_name, email, display_email, password, username, card_number, dial_code, company_name, designation, website, address, qr_code, phone, display_dial_code, display_number, country, offer_coin, quick_active_status, is_deactived, is_verify, is_payment, is_active, is_expired, is_card_linked, post_time, start_date, verify_time, login_time, end_date, account_type, primary_profile_slug, primary_profile_link) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-            const VALUES = [userId, name, name, email, email, hashPasswwoed, username, cardNumber, dial_code, company_name, designation, website, address, qrData.data, phone, dial_code, phone, country, 100, 1, 0, 1, 1, 1, 0, 1, justDate, justDate, justDate, justDate, endDate, packageId, 'vcard', primaryProfileLink];  
+            const sql = `INSERT INTO users(admin_id, name, full_name, email, display_email, password, username, card_number, dial_code, company_name, designation, website, address, qr_code, phone, display_dial_code, display_number, country, offer_coin, quick_active_status, is_deactived, is_verify, is_payment, is_active, is_expired, is_card_linked, post_time, start_date, verify_time, login_time, end_date, account_type, is_password_enable, set_password, primary_profile_slug) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+            const VALUES = [userId, name, name, email, email, hashPasswwoed, username, cardNumber, dial_code, company_name, designation, website, address, qrData.data, phone, dial_code, phone, country, 100, 1, 0, 1, 1, 1, 0, 1, justDate, justDate, justDate, justDate, endDate, packageId, is_password_enable, profile_pin, 'vcard'];  
             const [rows]:any = await pool.query(sql, VALUES);
             if (rows.affectedRows > 0) {
                 const getFeatures = `SELECT * FROM features WHERE status = 1`
@@ -552,7 +560,7 @@ export const importUser =async (req:Request, res:Response) => {
             excelBucket.upload({
                 // ACL: 'public-read', 
                 Body: fs.createReadStream(exportPath), 
-                Key: `${userId}failedUsers.xlsx`, // file upload by below name
+                Key: `${duplicateData.length}failedUsers${createdAt}.xlsx`, // file upload by below name
                 // ContentType: 'application/octet-stream' // force download if it's accessed as a top location
             },async(err:any, response:any) => {
                 if (err) {
@@ -575,7 +583,7 @@ export const importUser =async (req:Request, res:Response) => {
             });   
             
         } else {
-            return apiResponse.successResponse(res, "Users inserted successfully", null);
+            return apiResponse.successResponse(res, "Users inserted successfully", '');
         }
         
     } catch (error) {
@@ -587,13 +595,27 @@ export const importUser =async (req:Request, res:Response) => {
 // ====================================================================================================
 // ====================================================================================================
 
+export const importSampleFile =async (req:Request, res:Response) => {
+    try {
+        const excelUrl = 'https://imagefurb.s3.ap-south-1.amazonaws.com/staticFiles/vkImportSampleFile.xlsx';
+
+        return apiResponse.successResponse(res, "Data Retrieved Successfully", excelUrl);
+    } catch (error) {
+        console.log(error);
+        return apiResponse.errorMessage(res, 400, "Something went wrong");
+    }
+}
+
+// ====================================================================================================
+// ===================================================================================================
 
 
 //not used
 export const exportUserOld = async (req: Request, res: Response) => {
     try {
         const userId = res.locals.jwt.userId;
-
+const sql1 = `INSERT INTO tableName (Circle Name, Region Name, Division Name, Office Name, Pincode, OfficeType, Delivery, District, StateName) VALUES ('Andhra Pradesh Circle', 'Kurnool Region', 'Anantapur Division', 'A Narayanapuram B.O', '515004', 'BO', 'Delivery', 'ANANTHAPUR', 'Andhra Pradesh');
+`
         // type data = {
         //     user_id: number;
         //     username: string;

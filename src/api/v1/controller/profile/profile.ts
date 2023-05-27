@@ -75,24 +75,24 @@ export const updateProfile =async (req:Request, res:Response) => {
 
         const { name, designation, companyName, dialCode, phone, email, website, address } = req.body;
 
-        const checkUser = `SELECT * FROM users where deleted_at IS NULL AND (phone = ? || email = ?) AND id != ? LIMIT 1`;
-        const checkUserVALUES = [phone, email, userId];
-        const [rows]:any = await pool.query(checkUser, checkUserVALUES);
+        // const checkUser = `SELECT * FROM users where deleted_at IS NULL AND (phone = ? || email = ?) AND id != ? LIMIT 1`;
+        // const checkUserVALUES = [phone, email, userId];
+        // const [rows]:any = await pool.query(checkUser, checkUserVALUES);
 
-        if (rows.length > 0) {
-            const dupli = [];
-            if(email === rows[0].email){
-                dupli.push("email")
-            }
-            if(phone === rows[0].phone){
-                 dupli.push("phone")
-             }
-             if (dupli.length > 0) {
-                return await apiResponse.errorMessage(res,400,`${dupli.join()} is already exist, Please change`);
-             }
-        }
+        // if (rows.length > 0) {
+        //     const dupli = [];
+        //     if(email === rows[0].email){
+        //         dupli.push("email")
+        //     }
+        //     if(phone === rows[0].phone){
+        //          dupli.push("phone")
+        //      }
+        //      if (dupli.length > 0) {
+        //         return await apiResponse.errorMessage(res,400,`${dupli.join()} is already exist, Please change`);
+        //      }
+        // }
 
-        const updateQuery = `UPDATE users SET name = ?, designation = ?, company_name = ?, dial_code = ?, phone = ?, email = ?, website = ?, address = ? WHERE id = ?`;
+        const updateQuery = `UPDATE users SET full_name = ?, designation = ?, company_name = ?, display_dial_code = ?, display_number = ?, display_email = ?, website = ?, address = ? WHERE id = ?`;
         const VALUES = [name, designation, companyName, dialCode, phone, email, website, address, userId];
         const [data]:any = await pool.query(updateQuery, VALUES);
 

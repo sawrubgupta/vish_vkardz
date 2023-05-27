@@ -64,7 +64,7 @@ exports.getPermissionList = getPermissionList;
 // ====================================================================================================
 const addTeamMember = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, e_1, _b, _c;
-    const client = yield db_1.default.getConnection();
+    // const client = await pool.getConnection();
     try {
         const userId = res.locals.jwt.userId;
         const { name, email, password, image } = req.body;
@@ -90,10 +90,10 @@ const addTeamMember = (req, res) => __awaiter(void 0, void 0, void 0, function* 
                 message: msg,
             });
         }
-        yield client.query("START TRANSACTION");
+        // await client.query("START TRANSACTION");
         const sql = `INSERT INTO business_admin(type, admin_id, name, email, password, image, created_at) VALUES(?, ?, ?, ?, ?, ?, ?)`;
         const VALUES = [development_1.default.memberType, userId, name, email, hash, image, createdAt];
-        const [rows] = yield client.query(sql, VALUES);
+        const [rows] = yield db_1.default.query(sql, VALUES);
         const memberId = rows.insertId;
         let result;
         if (rows.affectedRows > 0) {
@@ -121,8 +121,8 @@ const addTeamMember = (req, res) => __awaiter(void 0, void 0, void 0, function* 
                 }
                 finally { if (e_1) throw e_1.error; }
             }
-            const [memberRows] = yield client.query(result);
-            yield client.query("COMMIT");
+            const [memberRows] = yield db_1.default.query(result);
+            // await client.query("COMMIT");
             // const getMemberSql = `Select * from business_admin where email = '${email}' LIMIT 1`;
             // const [getMemberRows]:any = await pool.query(getMemberSql);
             // let token = await utility.jwtGenerate(getMemberRows[0].id);
@@ -143,9 +143,9 @@ const addTeamMember = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         console.log(error);
         return apiResponse.errorMessage(res, 400, "Something went wrong");
     }
-    finally {
-        yield client.release();
-    }
+    // finally {
+    //     await client.release();
+    // }
 });
 exports.addTeamMember = addTeamMember;
 // ====================================================================================================

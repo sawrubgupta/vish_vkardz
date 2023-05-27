@@ -39,6 +39,7 @@ profileRouter.patch('/updateAdminDetail', authenticatingToken, validation.update
 profileRouter.get('/adminProfile', authenticatingToken, profileController.adminProfile);
 
 profileRouter.get('/exportUsers', authenticatingToken, exportController.exportUser);
+profileRouter.get('/sampleImportFile', authenticatingToken, exportController.importSampleFile);
 profileRouter.post('/importUsers', authenticatingToken, upload.single('file'), exportController.importUser);
 
 export default profileRouter;

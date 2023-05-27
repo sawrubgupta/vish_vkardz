@@ -142,7 +142,7 @@ export const cardPurchase =async (req:Request, res:Response) => {
           
     } catch (error) {
         console.log(error);
-        return await apiResponse.errorMessage(res, 400, "Something went wrong");
+        return apiResponse.errorMessage(res, 400, "Something went wrong");
     }
 }
 

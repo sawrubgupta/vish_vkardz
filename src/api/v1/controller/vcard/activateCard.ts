@@ -28,7 +28,7 @@ export const activateCard =async (req:Request, res:Response) => {
 
         const { username, code } = req.body;
 
-        const splitCode = code.split('https://www.vkardz.com/');
+        const splitCode = code.split(config.vcardLink);
         let newCardNum:any = splitCode[1] || '';
 
         let splitNewCardNumber = newCardNum.split('/');

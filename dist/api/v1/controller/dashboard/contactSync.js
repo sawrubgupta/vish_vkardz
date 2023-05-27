@@ -35,10 +35,99 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.contactSync = void 0;
+exports.contactSyncold = exports.contactSync = exports.favUserScan = void 0;
 const db_1 = __importDefault(require("../../../../db"));
 const apiResponse = __importStar(require("../../helper/apiResponse"));
+const favUserScan = (users, uid, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const sql = `SELECT fav_uid FROM favourite where uid = '${uid}' `;
+    let [data] = yield db_1.default.query(sql);
+    if (data.length === 0) {
+        users.forEach((element, index) => {
+            users[index].isFavourite = false;
+        });
+    }
+    else {
+        users.forEach((ele, i) => {
+            for (let j = 0; j < data.rowCount; j++) {
+                if (users[i].uid == data.rows[j].fav_uid) {
+                    users[i].isFavourite = true;
+                    break;
+                }
+                else {
+                    users[i].isFavourite = false;
+                }
+            }
+            delete users[i].uid;
+        });
+    }
+    return users;
+});
+exports.favUserScan = favUserScan;
 const contactSync = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        let contactArray = req.body;
+        let linkedContact = [];
+        let unlinkedContact = [];
+        let singleResultObject = {};
+        const userId = res.locals.jwt.userId;
+        if (contactArray.length > 100)
+            return apiResponse.errorMessage(res, 400, "Please limit contact for 100 at a time !");
+        const stringValue = contactArray.map((value) => `'${value.number.replace(/\s+/g, '').trim()}'`).join(',');
+        // const stringValue = contactArray.map((value:any) => `'${value}'`).join(',');
+        if (contactArray.length < 1)
+            return apiResponse.errorMessage(res, 400, "Please pass the contact pay ");
+        const contactSql = `SELECT phone_number, email, username, image, full_name, uid FROM users where phone_number IN(${stringValue}) and uid != '${userId}' and deleted_at is null LIMIT  100`;
+        const [contactData] = yield db_1.default.query(contactSql);
+        const dbData = contactData.rows;
+        if (contactData.length < 1) {
+            // singleResultObject.linkdLength = dbData.length;
+            // singleResultObject.unlinkdLength = contactArray.length;
+            singleResultObject.linkedContact = [];
+            singleResultObject.unlinkedContact = contactArray;
+            return apiResponse.successResponse(res, singleResultObject, "No data found");
+        }
+        let i = -1;
+        for (const element of contactArray) {
+            i++;
+            let j = -1;
+            let found = 0;
+            for (const dbDataIndex of dbData) {
+                j++;
+                if ((contactArray[i].number).replace(/\s+/g, '').trim() === dbDataIndex.phone_number) {
+                    contactArray[i].email = dbDataIndex.email;
+                    contactArray[i].username = dbDataIndex.username;
+                    contactArray[i].image = dbDataIndex.image;
+                    contactArray[i].full_name = dbDataIndex.full_name;
+                    contactArray[i].phone_number = dbDataIndex.phone_number;
+                    contactArray[i].uid = dbDataIndex.uid;
+                    linkedContact.push(contactArray[i]);
+                    found++;
+                    break;
+                }
+            }
+            if (found === 0) {
+                unlinkedContact.push(contactArray[i]);
+            }
+        }
+        const data = yield (0, exports.favUserScan)(linkedContact, userId, res);
+        data.forEach((element, index) => {
+            delete data[index].uid;
+        });
+        // singleResultObject.linkdLength = data.length;
+        // singleResultObject.unlinkdLength = unlinkedContact.length;
+        singleResultObject.linkedContact = data;
+        singleResultObject.unlinkedContact = unlinkedContact;
+        apiResponse.successResponse(res, singleResultObject, "Contact list here");
+    }
+    catch (e) {
+        console.log(e);
+        yield apiResponse.errorMessage(res, 400, "Something went wrong");
+    }
+});
+exports.contactSync = contactSync;
+// ====================================================================================================
+// ====================================================================================================
+const contactSyncold = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const contacts = req.body.contacts;
         if (contacts.length > 100) {
@@ -102,10 +191,10 @@ const contactSync = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             const [data] = yield db_1.default.query(result);
             console.log("finalArr", finalArr);
             if (data.affectedRows > 0) {
-                return yield apiResponse.successResponse(res, "Contact Insert Successfully", null);
+                return apiResponse.successResponse(res, "Contact Insert Successfully", null);
             }
             else {
-                return yield apiResponse.errorMessage(res, 400, "Failed!");
+                return apiResponse.errorMessage(res, 400, "Failed!");
             }
         }
         else {
@@ -117,6 +206,6 @@ const contactSync = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         return apiResponse.errorMessage(res, 400, "Something Went Wrong");
     }
 });
-exports.contactSync = contactSync;
+exports.contactSyncold = contactSyncold;
 // ====================================================================================================
 // ====================================================================================================

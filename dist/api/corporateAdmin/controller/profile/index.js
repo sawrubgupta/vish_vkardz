@@ -62,5 +62,6 @@ profileRouter.patch('/updateUserDisplayField', authorization_controller_1.tempAu
 profileRouter.patch('/updateAdminDetail', authorization_controller_1.authenticatingToken, validation.updateAdminDetailValidation, profileController.updateAdmin);
 profileRouter.get('/adminProfile', authorization_controller_1.authenticatingToken, profileController.adminProfile);
 profileRouter.get('/exportUsers', authorization_controller_1.authenticatingToken, exportController.exportUser);
+profileRouter.get('/sampleImportFile', authorization_controller_1.authenticatingToken, exportController.importSampleFile);
 profileRouter.post('/importUsers', authorization_controller_1.authenticatingToken, upload.single('file'), exportController.importUser);
 exports.default = profileRouter;

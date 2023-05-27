@@ -83,7 +83,7 @@ const setPrimaryProfile = (req, res) => __awaiter(void 0, void 0, void 0, functi
             }
         }
         else {
-            return yield apiResponse.errorMessage(res, 400, `Please add '${primaryProfileSlug}' Information`);
+            return apiResponse.errorMessage(res, 400, `Please add '${primaryProfileSlug}' Information`);
         }
     }
     catch (error) {

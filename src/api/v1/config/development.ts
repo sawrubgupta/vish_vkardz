@@ -14,7 +14,8 @@ export default {
             rejectUnauthorized: false
         }
     },
-    
+    vcardLink: `https://vkardz.com/`,
+
     AWS:{
         region: process.env.AWS_REGION,
         accessKeyId: process.env.AWS_ACCESS_KEY_ID,

@@ -155,9 +155,9 @@ export const changeAdminPassword =async (req:Request, res:Response) => {
                 const [updatePassword]:any = await pool.query(updatePassSql, VALUES)
 
                 if (updatePassword.affectedRows > 0) {                    
-                    return await apiResponse.successResponse(res,"Password updated successfully !", null);
+                    return apiResponse.successResponse(res,"Password updated successfully !", null);
                 } else {
-                    return await apiResponse.errorMessage(res,400,"Something Went Wrong, Please Try again later");
+                    return apiResponse.errorMessage(res,400,"Something Went Wrong, Please Try again later");
                 }   
             } else {
                 return apiResponse.errorMessage(res, 400, "Wrong old password !!");
@@ -205,9 +205,9 @@ export const changeUserPassword =async (req:Request, res:Response) => {
                 const [updatePassword]:any = await pool.query(updatePassSql, VALUES)
 
                 if (updatePassword.affectedRows > 0) {                    
-                    return await apiResponse.successResponse(res,"Password updated successfully !", null);
+                    return apiResponse.successResponse(res,"Password updated successfully !", null);
                 } else {
-                    return await apiResponse.errorMessage(res,400,"Something Went Wrong, Please Try again later");
+                    return apiResponse.errorMessage(res,400,"Something Went Wrong, Please Try again later");
                 }   
         } else{
             return apiResponse.errorMessage(res, 400, "User not found !")

@@ -62,7 +62,7 @@ const activateCard = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         let featureStatus;
         let featureResult;
         const { username, code } = req.body;
-        const splitCode = code.split('https://www.vkardz.com/');
+        const splitCode = code.split(development_1.default.vcardLink);
         let newCardNum = splitCode[1] || '';
         let splitNewCardNumber = newCardNum.split('/');
         let newCardNumber = splitNewCardNumber[0] || newCardNum;

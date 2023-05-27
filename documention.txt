@@ -20,6 +20,15 @@ name api's
 database changes:
 
 ------------------------------new changes--------------------------------
+25-05-2023
+ALTER TABLE `delivery_charges` ADD `district` VARCHAR(55) NULL DEFAULT NULL AFTER `zipcode`;
+
+ALTER TABLE `delivery_charges` CHANGE `inr_price` `inr_price` DOUBLE NULL DEFAULT '1800';
+ALTER TABLE `delivery_charges` CHANGE `usd_price` `usd_price` DOUBLE NULL DEFAULT '22';
+ALTER TABLE `delivery_charges` ADD `is_delivered` BOOLEAN NOT NULL DEFAULT FALSE AFTER `is_cod`;
+ALTER TABLE `delivery_charges` CHANGE `zipcode` `zipcode` VARCHAR(22) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL;
+ALTER TABLE `delivery_charges` CHANGE `is_cod` `is_cod` VARCHAR(55) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT '0';
+
 23-05-2023
 ALTER TABLE `assign_member_permissions` ADD `updated_at` DATETIME NULL DEFAULT NULL AFTER `created_at`;
 ALTER TABLE `business_admin` ADD `updated_at` DATETIME NULL DEFAULT NULL AFTER `created_at`;

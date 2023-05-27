@@ -21,7 +21,7 @@ export const getPermissionList = async (req: Request, res: Response) => {
 // ====================================================================================================
 
 export const addTeamMember = async (req: Request, res: Response) => {
-    const client = await pool.getConnection();
+    // const client = await pool.getConnection();
     try {
         const userId = res.locals.jwt.userId;
         const { name, email, password, image } = req.body;
@@ -49,11 +49,11 @@ export const addTeamMember = async (req: Request, res: Response) => {
                 message: msg,
             });
         }
-        await client.query("START TRANSACTION");
+        // await client.query("START TRANSACTION");
 
         const sql = `INSERT INTO business_admin(type, admin_id, name, email, password, image, created_at) VALUES(?, ?, ?, ?, ?, ?, ?)`;
         const VALUES = [config.memberType, userId, name, email, hash, image, createdAt];
-        const [rows]: any = await client.query(sql, VALUES);
+        const [rows]: any = await pool.query(sql, VALUES);
 
         const memberId = rows.insertId;
         let result: any;
@@ -66,9 +66,9 @@ export const addTeamMember = async (req: Request, res: Response) => {
                 memberSql = memberSql + `(${memberId}, ${permissionId}, '${action}', '${createdAt}'),`;
                 result = memberSql.substring(0, memberSql.lastIndexOf(','));
             }
-            const [memberRows]: any = await client.query(result);
+            const [memberRows]: any = await pool.query(result);
 
-            await client.query("COMMIT");
+            // await client.query("COMMIT");
 
             // const getMemberSql = `Select * from business_admin where email = '${email}' LIMIT 1`;
             // const [getMemberRows]:any = await pool.query(getMemberSql);
@@ -90,9 +90,10 @@ export const addTeamMember = async (req: Request, res: Response) => {
     } catch (error) {
         console.log(error);
         return apiResponse.errorMessage(res, 400, "Something went wrong");
-    } finally {
-        await client.release();
-    }
+    } 
+    // finally {
+    //     await client.release();
+    // }
 }
 
 // ====================================================================================================

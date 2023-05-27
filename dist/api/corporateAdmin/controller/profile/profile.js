@@ -39,9 +39,11 @@ exports.adminProfile = exports.updateAdmin = exports.updateUserDisplayField = ex
 const db_1 = __importDefault(require("../../../../db"));
 const apiResponse = __importStar(require("../../helper/apiResponse"));
 const development_1 = __importDefault(require("../../config/development"));
+const vcardLink = (development_1.default.vcardLink);
 const userList = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         let userId = res.locals.jwt.userId;
+        const vcardLink = (development_1.default.vcardLink);
         const checkSubAdmin = `SELECT admin_id FROM business_admin WHERE id = ${userId} AND type = '${development_1.default.memberType}' LIMIT 1`;
         const [subAdminData] = yield db_1.default.query(checkSubAdmin);
         if (subAdminData.length > 0) {
@@ -57,7 +59,8 @@ const userList = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const offset = (page - 1) * page_size;
         const getPageQuery = `SELECT id FROM users WHERE admin_id = ${userId}`;
         const [result] = yield db_1.default.query(getPageQuery);
-        const sql = `SELECT id, username, name, email, phone, dial_code, card_number, card_number_fix, is_card_linked, is_deactived, designation, website, account_type, thumb, cover_photo, primary_profile_link, display_dial_code, display_email, display_number FROM users WHERE admin_id = ${userId} AND (username LIKE '%${keyword}%' OR name LIKE '%${keyword}%') ORDER BY username asc limit ${page_size} offset ${offset}`;
+        const sql = `SELECT id, username, name, email, phone, dial_code, card_number, card_number_fix, is_card_linked, is_deactived, designation, website, account_type, thumb, cover_photo, CONCAT('${vcardLink}', username) AS primary_profile_link, display_dial_code, display_email, display_number FROM users WHERE admin_id = ${userId} AND (username LIKE '%${keyword}%' OR name LIKE '%${keyword}%') ORDER BY username asc limit ${page_size} offset ${offset}`;
+        console.log(sql);
         const [rows] = yield db_1.default.query(sql);
         const adminSql = `SELECT * FROM business_admin WHERE id = ${userId} LIMIT 1`;
         const [adminRows] = yield db_1.default.query(adminSql);
@@ -94,6 +97,7 @@ const userList = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 exports.userList = userList;
 // ====================================================================================================
 // ====================================================================================================
+//not used
 const userDetail = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         let userId = res.locals.jwt.userId;
@@ -102,7 +106,7 @@ const userDetail = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         if (subAdminData.length > 0) {
             userId = subAdminData[0].admin_id;
         }
-        const sql = `SELECT id, username, name, email, phone, designation, website, thumb, cover_photo, company_name, address, primary_profile_link, website,  FROM users WHERE admin_id = ${userId} `;
+        const sql = `SELECT id, username, name, email, phone, designation, website, thumb, cover_photo, company_name, address, CONCAT('${vcardLink}', username) AS primary_profile_link, website,  FROM users WHERE admin_id = ${userId} `;
         const [rows] = yield db_1.default.query(sql);
         return apiResponse.successResponse(res, "Data retrieved Successfully", null);
     }

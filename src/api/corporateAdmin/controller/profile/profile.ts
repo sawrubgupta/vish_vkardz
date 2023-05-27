@@ -4,10 +4,12 @@ import * as apiResponse from '../../helper/apiResponse';
 import * as utility from "../../helper/utility";
 import config from "../../config/development";
 import md5 from "md5";
+const vcardLink = (config.vcardLink);
 
 export const userList =async (req:Request, res:Response) => {
     try {
         let userId = res.locals.jwt.userId;
+        const vcardLink = (config.vcardLink);
 
         const checkSubAdmin = `SELECT admin_id FROM business_admin WHERE id = ${userId} AND type = '${config.memberType}' LIMIT 1`;
         const [subAdminData]:any = await pool.query(checkSubAdmin);
@@ -27,7 +29,9 @@ export const userList =async (req:Request, res:Response) => {
         const getPageQuery = `SELECT id FROM users WHERE admin_id = ${userId}`;
         const [result]: any = await pool.query(getPageQuery);
 
-        const sql = `SELECT id, username, name, email, phone, dial_code, card_number, card_number_fix, is_card_linked, is_deactived, designation, website, account_type, thumb, cover_photo, primary_profile_link, display_dial_code, display_email, display_number FROM users WHERE admin_id = ${userId} AND (username LIKE '%${keyword}%' OR name LIKE '%${keyword}%') ORDER BY username asc limit ${page_size} offset ${offset}`;
+        const sql = `SELECT id, username, name, email, phone, dial_code, card_number, card_number_fix, is_card_linked, is_deactived, designation, website, account_type, thumb, cover_photo, CONCAT('${vcardLink}', username) AS primary_profile_link, display_dial_code, display_email, display_number FROM users WHERE admin_id = ${userId} AND (username LIKE '%${keyword}%' OR name LIKE '%${keyword}%') ORDER BY username asc limit ${page_size} offset ${offset}`;
+        console.log(sql);
+        
         const [rows]:any = await pool.query(sql);
 
         const adminSql = `SELECT * FROM business_admin WHERE id = ${userId} LIMIT 1`;
@@ -66,6 +70,7 @@ export const userList =async (req:Request, res:Response) => {
 // ====================================================================================================
 // ====================================================================================================
 
+//not used
 export const userDetail =async (req:Request, res:Response) => {
     try {
         let userId = res.locals.jwt.userId;
@@ -76,7 +81,7 @@ export const userDetail =async (req:Request, res:Response) => {
         }
 
 
-        const sql = `SELECT id, username, name, email, phone, designation, website, thumb, cover_photo, company_name, address, primary_profile_link, website,  FROM users WHERE admin_id = ${userId} `;
+        const sql = `SELECT id, username, name, email, phone, designation, website, thumb, cover_photo, company_name, address, CONCAT('${vcardLink}', username) AS primary_profile_link, website,  FROM users WHERE admin_id = ${userId} `;
         const [rows]:any = await pool.query(sql);
 
         return apiResponse.successResponse(res, "Data retrieved Successfully", null);

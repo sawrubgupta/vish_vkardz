@@ -17,7 +17,7 @@ export const dealOfTheDay =async (req:Request, res:Response) => {
 
     } catch (error) {
         console.log(error);
-        return await apiResponse.errorMessage(res, 400, "Somethong went wrong")
+        return apiResponse.errorMessage(res, 400, "Somethong went wrong")
     }
 }
 

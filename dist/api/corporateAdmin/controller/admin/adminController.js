@@ -180,10 +180,10 @@ const changeAdminPassword = (req, res) => __awaiter(void 0, void 0, void 0, func
                 const VALUES = [hash, userId];
                 const [updatePassword] = yield db_1.default.query(updatePassSql, VALUES);
                 if (updatePassword.affectedRows > 0) {
-                    return yield apiResponse.successResponse(res, "Password updated successfully !", null);
+                    return apiResponse.successResponse(res, "Password updated successfully !", null);
                 }
                 else {
-                    return yield apiResponse.errorMessage(res, 400, "Something Went Wrong, Please Try again later");
+                    return apiResponse.errorMessage(res, 400, "Something Went Wrong, Please Try again later");
                 }
             }
             else {
@@ -230,10 +230,10 @@ const changeUserPassword = (req, res) => __awaiter(void 0, void 0, void 0, funct
             const VALUES = [hash, userId];
             const [updatePassword] = yield db_1.default.query(updatePassSql, VALUES);
             if (updatePassword.affectedRows > 0) {
-                return yield apiResponse.successResponse(res, "Password updated successfully !", null);
+                return apiResponse.successResponse(res, "Password updated successfully !", null);
             }
             else {
-                return yield apiResponse.errorMessage(res, 400, "Something Went Wrong, Please Try again later");
+                return apiResponse.errorMessage(res, 400, "Something Went Wrong, Please Try again later");
             }
         }
         else {

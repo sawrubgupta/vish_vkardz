@@ -193,7 +193,7 @@ const cardPurchase = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     }
     catch (error) {
         console.log(error);
-        return yield apiResponse.errorMessage(res, 400, "Something went wrong");
+        return apiResponse.errorMessage(res, 400, "Something went wrong");
     }
 });
 exports.cardPurchase = cardPurchase;

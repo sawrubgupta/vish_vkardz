@@ -74,20 +74,20 @@ exports.addToCart = addToCart;
 // ====================================================================================================
 // ====================================================================================================
 const getCart = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const client = yield db_1.default.getConnection();
+    // const client = await pool.getConnection();
     try {
         const userId = res.locals.jwt.userId;
         if (!userId || userId === "" || userId === undefined) {
             return apiResponse.errorMessage(res, 401, "Please login !");
         }
-        yield client.query("START TRANSACTION");
+        // await client.query("START TRANSACTION");
         const cartQuery = `SELECT cart_details.product_id, cart_details.qty, products.name, products.slug, products.description, products.price, products.mrp_price, products.discount_percent, products.product_image, products.image_back, products.image_other, products.material, products.bg_color, products.print, products.dimention, products.weight, products.thickness, products.alt_title, products.is_customizable, product_price.usd_selling_price, product_price.usd_mrp_price, product_price.aed_selling_price, product_price.aed_mrp_price, product_price.inr_selling_price, product_price.inr_mrp_price, product_price.qar_selling_price, product_price.qar_mrp_price, COUNT(product_rating.id) AS totalRating, AVG(COALESCE(product_rating.rating, 0)) AS averageRating, cart_details.created_at FROM products LEFT JOIN cart_details on cart_details.product_id = products.product_id LEFT JOIN product_price ON products.product_id = product_price.product_id LEFT JOIN product_rating ON products.product_id = product_rating.product_id WHERE cart_details.user_id = ${userId} GROUP BY products.product_id ORDER BY created_at DESC`;
-        const [rows] = yield client.query(cartQuery);
+        const [rows] = yield db_1.default.query(cartQuery);
         if (rows.length > 0) {
             const addressQuery = `SELECT * FROM delivery_addresses WHERE user_id = ${userId} ORDER BY is_default = 1 DESC LIMIT 1`;
-            const [addressRows] = yield client.query(addressQuery);
+            const [addressRows] = yield db_1.default.query(addressQuery);
             const userDetailQuery = `SELECT username, name, email, phone, country, thumb FROM users WHERE id = ${userId} LIMIT 1`;
-            const [userRows] = yield client.query(userDetailQuery);
+            const [userRows] = yield db_1.default.query(userDetailQuery);
             const gstInPercent = 18;
             var totatAmount = 0;
             let amount;
@@ -101,18 +101,22 @@ const getCart = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             // }
             for (let i = 0; i < rows.length; i++) {
                 if (addressRows.length > 0) {
+                    // const checkDeliveryCharges = `SELECT is_delivered, usd_price, inr_price FROM delivery_charges WHERE zipcode = '${addressRows[0].pincode}' LIMIT 1`;
+                    // const [deliveryChargesRows]:any = await pool.query(checkDeliveryCharges);
+                    // if (deliveryChargesRows.length === 0) return apiResponse.errorMessage(res, 400, "Invalid zipcode or Delivery not available in this pincode!");
+                    // if (deliveryChargesRows[0].is_delivered === 0) return apiResponse.errorMessage(res, 400, "Delivery not available in this pincode!");
                     if (addressRows[0].currency_code == '91' || addressRows[0].currency_code == '+91') {
                         amount = rows[i].inr_selling_price * rows[i].qty;
                         totatAmount = totatAmount + amount;
                         gstPrice = (totatAmount * gstInPercent) / 100;
-                        deliveryCharges = 0;
+                        deliveryCharges = 100; //deliveryChargesRows[0].inr_price || 100;
                         grandTotal = totatAmount + deliveryCharges + gstPrice;
                     }
                     else {
                         amount = rows[i].usd_selling_price * rows[i].qty;
                         totatAmount = totatAmount + amount;
                         gstPrice = 0;
-                        deliveryCharges = 0;
+                        deliveryCharges = 22; //deliveryChargesRows[0].usd_price || 22;
                         grandTotal = totatAmount + deliveryCharges;
                     }
                 }
@@ -121,21 +125,21 @@ const getCart = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                         amount = rows[i].inr_selling_price * rows[i].qty;
                         totatAmount = totatAmount + amount;
                         gstPrice = (totatAmount * gstInPercent) / 100;
-                        deliveryCharges = 0;
+                        deliveryCharges = 100;
                         grandTotal = totatAmount + deliveryCharges + gstPrice;
                     }
                     else {
                         amount = rows[i].usd_selling_price * rows[i].qty;
                         totatAmount = totatAmount + amount;
                         gstPrice = 0;
-                        deliveryCharges = 0;
+                        deliveryCharges = 22;
                         grandTotal = totatAmount + deliveryCharges;
                     }
                     // amount = rows[i].inr_selling_price * rows[i].qty;
                 }
                 rows[i].totalPriceWithQty = amount;
             }
-            yield client.query("COMMIT");
+            // await client.query("COMMIT");
             userRows[0].cardProducts = rows || [];
             userRows[0].userAddress = addressRows[0] || null;
             userRows[0].deliveryCharge = deliveryCharges;
@@ -153,9 +157,9 @@ const getCart = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         console.log(error);
         return apiResponse.errorMessage(res, 400, "Something went wrong");
     }
-    finally {
-        yield client.release();
-    }
+    // finally {
+    //     await client.release();
+    // }
 });
 exports.getCart = getCart;
 // ====================================================================================================
@@ -247,6 +251,11 @@ const addDeliveryAddresess = (req, res) => __awaiter(void 0, void 0, void 0, fun
         const userId = res.locals.jwt.userId;
         const { name, addressType, phone, address, locality, city, state, pincode, currencyCode } = req.body;
         const createdAt = utility.dateWithFormat();
+        const checkDeliveryCharges = `SELECT is_delivered, usd_price, inr_price FROM delivery_charges WHERE zipcode = '${pincode}' LIMIT 1`;
+        const [deliveryChargesRows] = yield db_1.default.query(checkDeliveryCharges);
+        if (deliveryChargesRows.length === 0)
+            return apiResponse.errorMessage(res, 400, "Invalid zipcode or Delivery not available in this pincode!");
+        // if (deliveryChargesRows[0].is_delivered === 0) return apiResponse.errorMessage(res, 400, "Delivery not available in this pincode!");
         const sql = `INSERT INTO delivery_addresses(user_id, currency_code, address_type, name, phone, address, locality, city, state, pincode, created_at) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
         const VALUES = [userId, currencyCode, addressType, name, phone, address, locality, city, state, pincode, createdAt];
         const [rows] = yield db_1.default.query(sql, VALUES);
@@ -271,6 +280,10 @@ const updateDeliveryAddresess = (req, res) => __awaiter(void 0, void 0, void 0, 
         const addressId = req.body.addressId;
         const { name, addressType, phone, address, locality, city, state, pincode, currencyCode } = req.body;
         const createdAt = utility.dateWithFormat();
+        const checkDeliveryCharges = `SELECT is_delivered, usd_price, inr_price FROM delivery_charges WHERE zipcode = '${pincode}' LIMIT 1`;
+        const [deliveryChargesRows] = yield db_1.default.query(checkDeliveryCharges);
+        if (deliveryChargesRows.length === 0)
+            return apiResponse.errorMessage(res, 400, "Invalid zipcode or Delivery not available in this pincode!");
         const sql = `UPDATE delivery_addresses SET currency_code = ?, address_type = ?, name = ?, phone = ?, address = ?, locality = ?, city = ?, state = ?, pincode = ? WHERE user_id = ? AND id = ?`;
         const VALUES = [currencyCode, addressType, name, phone, address, locality, city, state, pincode, userId, addressId];
         const [rows] = yield db_1.default.query(sql, VALUES);

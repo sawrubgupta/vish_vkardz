@@ -50,7 +50,7 @@ export const setPrimaryProfile =async (req:Request, res:Response) => {
                 return apiResponse.errorMessage(res, 400, "Failed to Add Primary Profile, try again!");
             }
         } else {
-            return await apiResponse.errorMessage(res, 400, `Please add '${primaryProfileSlug}' Information`);
+            return apiResponse.errorMessage(res, 400, `Please add '${primaryProfileSlug}' Information`);
         }
     } catch (error) {
         console.log(error);

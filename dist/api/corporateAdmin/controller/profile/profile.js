@@ -57,9 +57,9 @@ const userList = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         }
         var page_size = development_1.default.pageSize;
         const offset = (page - 1) * page_size;
-        const getPageQuery = `SELECT id FROM users WHERE admin_id = ${userId}`;
+        const getPageQuery = `SELECT id FROM users WHERE deleted_at IS NULL AND admin_id = ${userId}`;
         const [result] = yield db_1.default.query(getPageQuery);
-        const sql = `SELECT id, username, name, email, phone, dial_code, card_number, card_number_fix, is_card_linked, is_deactived, designation, website, account_type, thumb, cover_photo, CONCAT('${vcardLink}', username) AS primary_profile_link, display_dial_code, display_email, display_number FROM users WHERE admin_id = ${userId} AND (username LIKE '%${keyword}%' OR name LIKE '%${keyword}%') ORDER BY username asc limit ${page_size} offset ${offset}`;
+        const sql = `SELECT id, username, name, email, phone, dial_code, card_number, card_number_fix, is_card_linked, is_deactived, designation, website, account_type, thumb, cover_photo, CONCAT('${vcardLink}', username) AS primary_profile_link, display_dial_code, display_email, display_number FROM users WHERE deleted_at IS NULL AND admin_id = ${userId} AND (username LIKE '%${keyword}%' OR name LIKE '%${keyword}%') ORDER BY username asc limit ${page_size} offset ${offset}`;
         console.log(sql);
         const [rows] = yield db_1.default.query(sql);
         const adminSql = `SELECT * FROM business_admin WHERE id = ${userId} LIMIT 1`;

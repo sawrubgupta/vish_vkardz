@@ -231,7 +231,7 @@ export const teamMemberDetail =async (req:Request, res:Response) => {
         const [rows]:any = await pool.query(sql);
 
         if (rows.length > 0) {
-            const permissionSql = `SELECT * FROM assign_member_permissions WHERE member_id = ${memberId}`;
+            const permissionSql = `SELECT assign_member_permissions.*, team_permissions.permission, team_permissions.slug FROM assign_member_permissions LEFT JOIN team_permissions ON team_permissions.id = assign_member_permissions.permission_id WHERE member_id = ${memberId}`;
             const [memberRows]:any = await pool.query(permissionSql);
 
             rows[0].permissions = memberRows || [];

@@ -303,7 +303,7 @@ const teamMemberDetail = (req, res) => __awaiter(void 0, void 0, void 0, functio
         const sql = `SELECT id, name, email, image, created_at FROM business_admin WHERE deleted_at IS NULL AND type = '${development_1.default.memberType}' AND id = ${memberId} AND admin_id = ${userId} LIMIT 1`;
         const [rows] = yield db_1.default.query(sql);
         if (rows.length > 0) {
-            const permissionSql = `SELECT * FROM assign_member_permissions WHERE member_id = ${memberId}`;
+            const permissionSql = `SELECT assign_member_permissions.*, team_permissions.permission, team_permissions.slug FROM assign_member_permissions LEFT JOIN team_permissions ON team_permissions.id = assign_member_permissions.permission_id WHERE member_id = ${memberId}`;
             const [memberRows] = yield db_1.default.query(permissionSql);
             rows[0].permissions = memberRows || [];
             return apiResponse.successResponse(res, "Data Retrieved Successfully", rows[0]);

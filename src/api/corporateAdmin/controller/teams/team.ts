@@ -103,10 +103,10 @@ export const updateTeamMember = async (req: Request, res: Response) => {
     const client = await pool.getConnection();
     try {
         const userId = res.locals.jwt.userId;
-        const { memberId, name, email, password, image } = req.body;
+        const { memberId, name, email, image } = req.body;
         const permissions = req.body.permissions;
         const createdAt = utility.dateWithFormat();
-        const hash = md5(password);
+        // const hash = md5(password);
 
         const checkDupliSql = `SELECT * FROM business_admin WHERE deleted_at IS NULL AND email = ? AND id != ${memberId} LIMIT 1`;
         const dupliVALUES = [email];
@@ -131,8 +131,8 @@ export const updateTeamMember = async (req: Request, res: Response) => {
         await client.query("START TRANSACTION");
 
         // const sql = `INSERT INTO business_admin(type, admin_id, name, email, password, image, created_at) VALUES(?, ?, ?, ?, ?, ?, ?)`;
-        const sql = `UPDATE business_admin SET name = ?, email = ?, password = ?, image = ?, updated_at = ? WHERE id = ? AND admin_id = ?`
-        const VALUES = [name, email, hash, image, createdAt, memberId, userId];
+        const sql = `UPDATE business_admin SET name = ?, email = ?, image = ?, updated_at = ? WHERE id = ? AND admin_id = ?`
+        const VALUES = [name, email, image, createdAt, memberId, userId];
         const [rows]: any = await client.query(sql, VALUES);
 
         if (rows.affectedRows > 0) {
@@ -227,7 +227,7 @@ export const teamMemberDetail =async (req:Request, res:Response) => {
             return apiResponse.errorMessage(res, 400, "Member Id is required!");
         }
 
-        const sql = `SELECT id, name, email, image, created_at FROM business_admin WHERE deleted_at IS NULL AND type = '${config.memberType}' AND id = ${memberId} AND admin_id = ${userId} LIMIT 1`;
+        const sql = `SELECT id, name, email, image, created_at FROM business_admin WHERE deleted_at IS NULL AND type = '${config.memberType}' AND id = ${memberId} LIMIT 1`;
         const [rows]:any = await pool.query(sql);
 
         if (rows.length > 0) {

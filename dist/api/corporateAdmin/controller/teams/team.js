@@ -155,10 +155,10 @@ const updateTeamMember = (req, res) => __awaiter(void 0, void 0, void 0, functio
     const client = yield db_1.default.getConnection();
     try {
         const userId = res.locals.jwt.userId;
-        const { memberId, name, email, password, image } = req.body;
+        const { memberId, name, email, image } = req.body;
         const permissions = req.body.permissions;
         const createdAt = utility.dateWithFormat();
-        const hash = (0, md5_1.default)(password);
+        // const hash = md5(password);
         const checkDupliSql = `SELECT * FROM business_admin WHERE deleted_at IS NULL AND email = ? AND id != ${memberId} LIMIT 1`;
         const dupliVALUES = [email];
         const [dupliRows] = yield db_1.default.query(checkDupliSql, dupliVALUES);
@@ -180,8 +180,8 @@ const updateTeamMember = (req, res) => __awaiter(void 0, void 0, void 0, functio
         }
         yield client.query("START TRANSACTION");
         // const sql = `INSERT INTO business_admin(type, admin_id, name, email, password, image, created_at) VALUES(?, ?, ?, ?, ?, ?, ?)`;
-        const sql = `UPDATE business_admin SET name = ?, email = ?, password = ?, image = ?, updated_at = ? WHERE id = ? AND admin_id = ?`;
-        const VALUES = [name, email, hash, image, createdAt, memberId, userId];
+        const sql = `UPDATE business_admin SET name = ?, email = ?, image = ?, updated_at = ? WHERE id = ? AND admin_id = ?`;
+        const VALUES = [name, email, image, createdAt, memberId, userId];
         const [rows] = yield client.query(sql, VALUES);
         if (rows.affectedRows > 0) {
             try {
@@ -300,7 +300,7 @@ const teamMemberDetail = (req, res) => __awaiter(void 0, void 0, void 0, functio
         if (!memberId || memberId === null || memberId === '') {
             return apiResponse.errorMessage(res, 400, "Member Id is required!");
         }
-        const sql = `SELECT id, name, email, image, created_at FROM business_admin WHERE deleted_at IS NULL AND type = '${development_1.default.memberType}' AND id = ${memberId} AND admin_id = ${userId} LIMIT 1`;
+        const sql = `SELECT id, name, email, image, created_at FROM business_admin WHERE deleted_at IS NULL AND type = '${development_1.default.memberType}' AND id = ${memberId} LIMIT 1`;
         const [rows] = yield db_1.default.query(sql);
         if (rows.length > 0) {
             const permissionSql = `SELECT assign_member_permissions.*, team_permissions.permission, team_permissions.slug FROM assign_member_permissions LEFT JOIN team_permissions ON team_permissions.id = assign_member_permissions.permission_id WHERE member_id = ${memberId}`;

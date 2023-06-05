@@ -2,14 +2,19 @@ import { Request, Response } from "express";
 import pool from '../../../../db';
 import * as apiResponse from '../../helper/apiResponse';
 import * as utility from "../../helper/utility";
+import _ from 'lodash';
 
 
 export const contactSync =async (req:Request, res:Response) => {
     try {
-        const contacts:any = req.body.contacts;
+        let contacts:any = req.body.contacts;
         if (contacts.length > 100) {
             return apiResponse.errorMessage(res, 400, "Max Length is 100");
         }
+        console.log("contacts", contacts);
+        
+        contacts = _.uniqBy(contacts, 'phone');
+        console.log("uniq cotacts", contacts);
         
         let arr:any = [];
         for (const ele of contacts) {

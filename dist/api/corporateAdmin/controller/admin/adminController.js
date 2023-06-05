@@ -104,7 +104,7 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             if (isLoggedIn) {
                 let token = yield utility.jwtGenerate(userData[0].id);
                 delete userData[0].password;
-                delete userData[0].id;
+                // delete userData[0].id;
                 return res.status(200).json({
                     status: true,
                     token,

@@ -76,7 +76,7 @@ export const login =async (req:Request, res:Response) => {
 
                 let token = await utility.jwtGenerate(userData[0].id);
                 delete userData[0].password;
-                delete userData[0].id;
+                // delete userData[0].id;
                 
                 return res.status(200).json({
                     status:true,

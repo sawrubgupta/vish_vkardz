@@ -205,7 +205,7 @@ const updateTeamMemberValidation = (req, res, next) => __awaiter(void 0, void 0,
         memberId: joi_1.default.number().required(),
         name: joi_1.default.string().required(),
         email: joi_1.default.string().email().required(),
-        password: joi_1.default.string().min(3).max(80).required(),
+        // password: Joi.string().min(3).max(80).required(),
         image: joi_1.default.string().allow('').allow(null),
         permissions: joi_1.default.array().items({
             permissionId: joi_1.default.number().required(),

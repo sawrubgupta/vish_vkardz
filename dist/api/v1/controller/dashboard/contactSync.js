@@ -46,12 +46,16 @@ exports.contactSyncSG = exports.favUserScan = exports.contactSync = void 0;
 const db_1 = __importDefault(require("../../../../db"));
 const apiResponse = __importStar(require("../../helper/apiResponse"));
 const utility = __importStar(require("../../helper/utility"));
+const lodash_1 = __importDefault(require("lodash"));
 const contactSync = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const contacts = req.body.contacts;
+        let contacts = req.body.contacts;
         if (contacts.length > 100) {
             return apiResponse.errorMessage(res, 400, "Max Length is 100");
         }
+        console.log("contacts", contacts);
+        contacts = lodash_1.default.uniqBy(contacts, 'phone');
+        console.log("uniq cotacts", contacts);
         let arr = [];
         for (const ele of contacts) {
             let phones = ele.phone;

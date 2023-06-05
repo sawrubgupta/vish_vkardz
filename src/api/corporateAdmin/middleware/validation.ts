@@ -198,7 +198,7 @@ export const updateTeamMemberValidation = async (req: Request, res: Response, ne
         memberId: Joi.number().required(),
         name: Joi.string().required(),
         email: Joi.string().email().required(),
-        password: Joi.string().min(3).max(80).required(),
+        // password: Joi.string().min(3).max(80).required(),
         image: Joi.string().allow('').allow(null),
         permissions: Joi.array().items({
             permissionId: Joi.number().required(),

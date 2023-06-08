@@ -63,7 +63,7 @@ exports.getPermissionList = getPermissionList;
 // ====================================================================================================
 // ====================================================================================================
 const addTeamMember = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, e_1, _b, _c;
+    var _a, e_1, _b, _c, _d, e_2, _e, _f;
     // const client = await pool.getConnection();
     try {
         const userId = res.locals.jwt.userId;
@@ -71,6 +71,36 @@ const addTeamMember = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         const permissions = req.body.permissions;
         const createdAt = utility.dateWithFormat();
         const hash = (0, md5_1.default)(password);
+        let arr = [];
+        for (const ele of permissions) {
+            let permissionId = ele.permissionId;
+            arr.push(permissionId);
+        }
+        const checkPermissionsql = `SELECT * FROM team_permissions WHERE status = 1 AND id NOT IN(${arr})`;
+        const [permissionRows] = yield db_1.default.query(checkPermissionsql);
+        try {
+            for (var _g = true, permissionRows_1 = __asyncValues(permissionRows), permissionRows_1_1; permissionRows_1_1 = yield permissionRows_1.next(), _a = permissionRows_1_1.done, !_a;) {
+                _c = permissionRows_1_1.value;
+                _g = false;
+                try {
+                    const iterator = _c;
+                    permissions.push({
+                        permissionId: iterator.id,
+                        action: "none"
+                    });
+                }
+                finally {
+                    _g = true;
+                }
+            }
+        }
+        catch (e_1_1) { e_1 = { error: e_1_1 }; }
+        finally {
+            try {
+                if (!_g && !_a && (_b = permissionRows_1.return)) yield _b.call(permissionRows_1);
+            }
+            finally { if (e_1) throw e_1.error; }
+        }
         const checkDupliSql = `SELECT * FROM business_admin WHERE deleted_at IS NULL AND email = ? LIMIT 1`;
         const dupliVALUES = [email];
         const [dupliRows] = yield db_1.default.query(checkDupliSql, dupliVALUES);
@@ -99,27 +129,31 @@ const addTeamMember = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         if (rows.affectedRows > 0) {
             let memberSql = `INSERT INTO assign_member_permissions(member_id, permission_id, action, created_at) VALUES`;
             try {
-                for (var _d = true, permissions_1 = __asyncValues(permissions), permissions_1_1; permissions_1_1 = yield permissions_1.next(), _a = permissions_1_1.done, !_a;) {
-                    _c = permissions_1_1.value;
-                    _d = false;
+                for (var _h = true, permissions_1 = __asyncValues(permissions), permissions_1_1; permissions_1_1 = yield permissions_1.next(), _d = permissions_1_1.done, !_d;) {
+                    _f = permissions_1_1.value;
+                    _h = false;
                     try {
-                        const element = _c;
+                        const element = _f;
+                        // for (const permissionEle of permissionRows) {
+                        //     if (permissionEle.id) {
+                        //     }
+                        // }
                         const permissionId = element.permissionId;
                         const action = element.action;
                         memberSql = memberSql + `(${memberId}, ${permissionId}, '${action}', '${createdAt}'),`;
                         result = memberSql.substring(0, memberSql.lastIndexOf(','));
                     }
                     finally {
-                        _d = true;
+                        _h = true;
                     }
                 }
             }
-            catch (e_1_1) { e_1 = { error: e_1_1 }; }
+            catch (e_2_1) { e_2 = { error: e_2_1 }; }
             finally {
                 try {
-                    if (!_d && !_a && (_b = permissions_1.return)) yield _b.call(permissions_1);
+                    if (!_h && !_d && (_e = permissions_1.return)) yield _e.call(permissions_1);
                 }
-                finally { if (e_1) throw e_1.error; }
+                finally { if (e_2) throw e_2.error; }
             }
             const [memberRows] = yield db_1.default.query(result);
             // await client.query("COMMIT");
@@ -151,7 +185,7 @@ exports.addTeamMember = addTeamMember;
 // ====================================================================================================
 // ====================================================================================================
 const updateTeamMember = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _e, e_2, _f, _g;
+    var _j, e_3, _k, _l;
     const client = yield db_1.default.getConnection();
     try {
         const userId = res.locals.jwt.userId;
@@ -186,11 +220,11 @@ const updateTeamMember = (req, res) => __awaiter(void 0, void 0, void 0, functio
         if (rows.affectedRows > 0) {
             try {
                 // let memberSql = `INSERT INTO assign_member_permissions(member_id, permission_id, action, created_at) VALUES`;
-                for (var _h = true, permissions_2 = __asyncValues(permissions), permissions_2_1; permissions_2_1 = yield permissions_2.next(), _e = permissions_2_1.done, !_e;) {
-                    _g = permissions_2_1.value;
-                    _h = false;
+                for (var _m = true, permissions_2 = __asyncValues(permissions), permissions_2_1; permissions_2_1 = yield permissions_2.next(), _j = permissions_2_1.done, !_j;) {
+                    _l = permissions_2_1.value;
+                    _m = false;
                     try {
-                        const element = _g;
+                        const element = _l;
                         const permissionId = element.permissionId;
                         const action = element.action;
                         const permissionSql = `UPDATE assign_member_permissions SET action = ?, updated_at = ? WHERE permission_id = ? AND member_id = ?`;
@@ -198,16 +232,16 @@ const updateTeamMember = (req, res) => __awaiter(void 0, void 0, void 0, functio
                         const [permissionRows] = yield client.query(permissionSql, permissionVALUES);
                     }
                     finally {
-                        _h = true;
+                        _m = true;
                     }
                 }
             }
-            catch (e_2_1) { e_2 = { error: e_2_1 }; }
+            catch (e_3_1) { e_3 = { error: e_3_1 }; }
             finally {
                 try {
-                    if (!_h && !_e && (_f = permissions_2.return)) yield _f.call(permissions_2);
+                    if (!_m && !_j && (_k = permissions_2.return)) yield _k.call(permissions_2);
                 }
-                finally { if (e_2) throw e_2.error; }
+                finally { if (e_3) throw e_3.error; }
             }
             yield client.query("COMMIT");
             return apiResponse.successResponse(res, "Data updated successfully !", null);
@@ -228,7 +262,7 @@ exports.updateTeamMember = updateTeamMember;
 // ====================================================================================================
 // ====================================================================================================
 const teamMemberList = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _j, e_3, _k, _l;
+    var _o, e_4, _p, _q;
     try {
         const userId = res.locals.jwt.userId;
         const sql = `SELECT id, name, email, image, created_at FROM business_admin WHERE deleted_at IS NULL AND type = '${development_1.default.memberType}' AND admin_id = ${userId}`;
@@ -236,27 +270,27 @@ const teamMemberList = (req, res) => __awaiter(void 0, void 0, void 0, function*
         if (rows.length > 0) {
             let rowsIndex = -1;
             try {
-                for (var _m = true, rows_1 = __asyncValues(rows), rows_1_1; rows_1_1 = yield rows_1.next(), _j = rows_1_1.done, !_j;) {
-                    _l = rows_1_1.value;
-                    _m = false;
+                for (var _r = true, rows_1 = __asyncValues(rows), rows_1_1; rows_1_1 = yield rows_1.next(), _o = rows_1_1.done, !_o;) {
+                    _q = rows_1_1.value;
+                    _r = false;
                     try {
-                        const element = _l;
+                        const element = _q;
                         rowsIndex++;
                         const permissionSql = `SELECT * FROM assign_member_permissions WHERE member_id = ${element.id}`;
                         const [permissionRows] = yield db_1.default.query(permissionSql);
                         rows[rowsIndex].permissions = permissionRows || [];
                     }
                     finally {
-                        _m = true;
+                        _r = true;
                     }
                 }
             }
-            catch (e_3_1) { e_3 = { error: e_3_1 }; }
+            catch (e_4_1) { e_4 = { error: e_4_1 }; }
             finally {
                 try {
-                    if (!_m && !_j && (_k = rows_1.return)) yield _k.call(rows_1);
+                    if (!_r && !_o && (_p = rows_1.return)) yield _p.call(rows_1);
                 }
-                finally { if (e_3) throw e_3.error; }
+                finally { if (e_4) throw e_4.error; }
             }
             return apiResponse.successResponse(res, "Data Retrieved Successfully", rows);
         }
@@ -297,6 +331,7 @@ const teamMemberDetail = (req, res) => __awaiter(void 0, void 0, void 0, functio
     try {
         const userId = res.locals.jwt.userId;
         const memberId = req.query.memberId;
+        const permissionArray = [];
         if (!memberId || memberId === null || memberId === '') {
             return apiResponse.errorMessage(res, 400, "Member Id is required!");
         }
@@ -305,7 +340,15 @@ const teamMemberDetail = (req, res) => __awaiter(void 0, void 0, void 0, functio
         if (rows.length > 0) {
             const permissionSql = `SELECT assign_member_permissions.*, team_permissions.permission, team_permissions.slug FROM assign_member_permissions LEFT JOIN team_permissions ON team_permissions.id = assign_member_permissions.permission_id WHERE member_id = ${memberId}`;
             const [memberRows] = yield db_1.default.query(permissionSql);
-            rows[0].permissions = memberRows || [];
+            let permission = {};
+            let memberRowsIndex = -1;
+            for (const ele of memberRows) {
+                permission[ele.slug] = ele.action;
+                memberRowsIndex++;
+                //.push(`${ele.slug}`+': '+ele.action)
+            }
+            console.log("permissionArray", permissionArray);
+            rows[0].permissions = permission || [];
             return apiResponse.successResponse(res, "Data Retrieved Successfully", rows[0]);
         }
         else {

@@ -4,6 +4,7 @@ import * as apiResponse from '../../helper/apiResponse';
 // import { dateWithFormat } from "../utility/utility";
 // import fcmSend from "../../helper/notification";
 import config from '../../config/development';
+import * as notify from "../../helper/notification"
 
 export const getNotification =async (req:Request, res: Response) => {
     try {
@@ -43,5 +44,51 @@ export const getNotification =async (req:Request, res: Response) => {
     } catch (error) {
         console.log(error);
         return apiResponse.errorMessage(res, 400, "Something Went Wrong");
+    }
+}
+
+// ====================================================================================================
+// ====================================================================================================
+
+export const sendNotification =async (req:Request, res:Response) => {
+    try {
+        const notificationData = req.body.notification;
+        const sendTo = req.body.sendTo;
+        let fcmTokens:any[] = [];
+        let fcmSql:any;
+
+        if (sendTo === config.allUsers) {
+            fcmSql = `SELECT fcm_token FROM users WHERE deleted_at IS NULL`;
+        } else if (sendTo === config.activateUsers) {
+            fcmSql = `SELECT fcm_token FROM users WHERE deleted_at IS NULL AND (card_number IS NOT NULL OR card_number != '')`;
+        } else if (sendTo === config.deactivateUsers) {
+            fcmSql = `SELECT fcm_token FROM users WHERE deleted_at IS NULL AND (card_number IS NULL OR card_number = '')`;
+        } else if (sendTo === config.basicPlan) {
+            fcmSql = `SELECT fcm_token FROM users WHERE deleted_at IS NULL AND account_type = 16`;
+        } else if (sendTo === config.propersonalizePlan) {
+            fcmSql = `SELECT fcm_token FROM users WHERE deleted_at IS NULL AND account_type = 18`;
+        } else {
+            fcmSql = `SELECT fcm_token FROM users WHERE deleted_at IS NULL`;
+        }
+        const [rows]:any = await pool.query(fcmSql);
+
+        // console.log("rows", rows);
+        
+        for await (const ele of rows) {
+            fcmTokens.push(ele.fcm_token)
+        }
+        var payload = notificationData.payload;
+        var sendData = {
+            title:notificationData.data.title,
+            body:notificationData.data.body
+        }
+
+        // console.log("fcmTokens", fcmTokens);
+        const result = await notify.fcmSend(sendData, fcmTokens, payload)
+
+        return apiResponse.successResponse(res, "Notification send successfully", null);
+    } catch (error) {
+        console.log("error", error);
+        
     }
 }

@@ -29,4 +29,5 @@ const authorization_controller_1 = require("../../middleware/authorization.contr
 const notificationRouter = (0, express_1.Router)();
 //orderRouter.get("/billing", authenticatingToken, checkDeliveryAvailController.getBilling);
 notificationRouter.get("/notificationList", authorization_controller_1.authenticatingToken, notificationController.getNotification);
+notificationRouter.post("/sendNotification", notificationController.sendNotification);
 exports.default = notificationRouter;

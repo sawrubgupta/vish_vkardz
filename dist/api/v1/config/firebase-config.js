@@ -24,7 +24,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const admin = __importStar(require("firebase-admin"));
-const serviceAccount = __importStar(require("./google-services.json"));
+const serviceAccount = __importStar(require("./vkardz-324bb-firebase-adminsdk-rcph9-835f33eb7b.json"));
 const credentialObject = serviceAccount;
 admin.initializeApp({
     credential: admin.credential.cert(credentialObject)

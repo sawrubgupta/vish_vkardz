@@ -22,6 +22,12 @@ export default {
         secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
     },
 
+    allUsers: 'all',
+    activateUsers: 'activateUsers',
+    deactivateUsers: 'deactivateUsers',
+    basicPlan: 'basic',
+    propersonalizePlan: 'propersonalize',
+
     secretKey:"nss6DpYlq5CHw6Hn0jPqXJwtkHXuMDdYynDiRFNS6_Y", //process.env.SECRET,
     resumeLimit:10,
     vKardzPhone: "+91 6377256382",

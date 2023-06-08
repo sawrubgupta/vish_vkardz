@@ -31,16 +31,24 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __asyncValues = (this && this.__asyncValues) || function (o) {
+    if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
+    var m = o[Symbol.asyncIterator], i;
+    return m ? m.call(o) : (o = typeof __values === "function" ? __values(o) : o[Symbol.iterator](), i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function () { return this; }, i);
+    function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }
+    function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getNotification = void 0;
+exports.sendNotification = exports.getNotification = void 0;
 const db_1 = __importDefault(require("../../../../db"));
 const apiResponse = __importStar(require("../../helper/apiResponse"));
 // import { dateWithFormat } from "../utility/utility";
 // import fcmSend from "../../helper/notification";
 const development_1 = __importDefault(require("../../config/development"));
+const notify = __importStar(require("../../helper/notification"));
 const getNotification = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userId = res.locals.jwt.userId;
@@ -79,3 +87,66 @@ const getNotification = (req, res) => __awaiter(void 0, void 0, void 0, function
     }
 });
 exports.getNotification = getNotification;
+// ====================================================================================================
+// ====================================================================================================
+const sendNotification = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, e_1, _b, _c;
+    try {
+        const notificationData = req.body.notification;
+        const sendTo = req.body.sendTo;
+        let fcmTokens = [];
+        let fcmSql;
+        if (sendTo === development_1.default.allUsers) {
+            fcmSql = `SELECT fcm_token FROM users WHERE deleted_at IS NULL`;
+        }
+        else if (sendTo === development_1.default.activateUsers) {
+            fcmSql = `SELECT fcm_token FROM users WHERE deleted_at IS NULL AND (card_number IS NOT NULL OR card_number != '')`;
+        }
+        else if (sendTo === development_1.default.deactivateUsers) {
+            fcmSql = `SELECT fcm_token FROM users WHERE deleted_at IS NULL AND (card_number IS NULL OR card_number = '')`;
+        }
+        else if (sendTo === development_1.default.basicPlan) {
+            fcmSql = `SELECT fcm_token FROM users WHERE deleted_at IS NULL AND account_type = 16`;
+        }
+        else if (sendTo === development_1.default.propersonalizePlan) {
+            fcmSql = `SELECT fcm_token FROM users WHERE deleted_at IS NULL AND account_type = 18`;
+        }
+        else {
+            fcmSql = `SELECT fcm_token FROM users WHERE deleted_at IS NULL`;
+        }
+        const [rows] = yield db_1.default.query(fcmSql);
+        try {
+            // console.log("rows", rows);
+            for (var _d = true, rows_1 = __asyncValues(rows), rows_1_1; rows_1_1 = yield rows_1.next(), _a = rows_1_1.done, !_a;) {
+                _c = rows_1_1.value;
+                _d = false;
+                try {
+                    const ele = _c;
+                    fcmTokens.push(ele.fcm_token);
+                }
+                finally {
+                    _d = true;
+                }
+            }
+        }
+        catch (e_1_1) { e_1 = { error: e_1_1 }; }
+        finally {
+            try {
+                if (!_d && !_a && (_b = rows_1.return)) yield _b.call(rows_1);
+            }
+            finally { if (e_1) throw e_1.error; }
+        }
+        var payload = notificationData.payload;
+        var sendData = {
+            title: notificationData.data.title,
+            body: notificationData.data.body
+        };
+        // console.log("fcmTokens", fcmTokens);
+        const result = yield notify.fcmSend(sendData, fcmTokens, payload);
+        return apiResponse.successResponse(res, "Notification send successfully", null);
+    }
+    catch (error) {
+        console.log("error", error);
+    }
+});
+exports.sendNotification = sendNotification;

@@ -110,6 +110,57 @@ export const updateProfile =async (req:Request, res:Response) => {
 // ====================================================================================================
 // ====================================================================================================
 
+export const updateVcardinfo =async (req:Request, res:Response) => {
+    try {
+        // const userId: string = res.locals.jwt.userId;
+        let userId:any; 
+        const type = req.query.type; //type = business, user, null
+        if (type && type === config.businessType) {
+            userId = req.query.userId;
+        } else {
+            userId = res.locals.jwt.userId;
+        }
+        if (!userId || userId === "" || userId === undefined) {
+            return apiResponse.errorMessage(res, 401, "Please login !")
+        }
+
+        const { name, dialCode, phone, email, country, gender } = req.body;
+
+        const checkUser = `SELECT * FROM users where deleted_at IS NULL AND (phone = ? || email = ?) AND id != ? LIMIT 1`;
+        const checkUserVALUES = [phone, email, userId];
+        const [rows]:any = await pool.query(checkUser, checkUserVALUES);
+
+        if (rows.length > 0) {
+            const dupli = [];
+            if(email === rows[0].email){
+                dupli.push("email")
+            }
+            if(phone === rows[0].phone){
+                 dupli.push("phone")
+             }
+             if (dupli.length > 0) {
+                return await apiResponse.errorMessage(res,400,`${dupli.join()} is already exist, Please change`);
+             }
+        }
+
+        const updateQuery = `UPDATE users SET name = ?, dial_code = ?, phone = ?, email = ?, country = ?, gender = ? WHERE id = ?`;
+        const VALUES = [name, dialCode, phone, email, country, gender, userId];
+        const [data]:any = await pool.query(updateQuery, VALUES);
+
+        if (data.affectedRows > 0) {
+            return apiResponse.successResponse(res,"Profile updated successfully !", null);
+        } else {
+            return apiResponse.errorMessage(res, 400, "Failed to update the user, please try again later !");
+        }
+    } catch (error) {
+        console.log(error);
+        return apiResponse.errorMessage(res, 400, "Something went wrong");
+    }
+}
+
+// ====================================================================================================
+// ====================================================================================================
+
 export const updateImage =async (req:Request, res:Response) => {
     // const userId: string = res.locals.jwt.userId;
     let userId:any; 

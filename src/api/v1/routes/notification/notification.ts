@@ -8,6 +8,7 @@ const notificationRouter = Router();
 
 //orderRouter.get("/billing", authenticatingToken, checkDeliveryAvailController.getBilling);
 notificationRouter.get("/notificationList", authenticatingToken, notificationController.getNotification);
+notificationRouter.post("/sendNotification", notificationController.sendNotification);
 
 
 export default notificationRouter;

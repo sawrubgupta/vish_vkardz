@@ -29,6 +29,21 @@ export const addTeamMember = async (req: Request, res: Response) => {
         const createdAt = utility.dateWithFormat();
         const hash = md5(password);
 
+        let arr:any = [];
+        for (const ele of permissions) {
+            let permissionId = ele.permissionId;
+            arr.push(permissionId);
+        }
+
+        const checkPermissionsql = `SELECT * FROM team_permissions WHERE status = 1 AND id NOT IN(${arr})`;
+        const [permissionRows]:any = await pool.query(checkPermissionsql);
+
+        for await (const iterator of permissionRows) {
+            permissions.push({
+                permissionId: iterator.id,
+                action: "none"
+            })
+        }
         const checkDupliSql = `SELECT * FROM business_admin WHERE deleted_at IS NULL AND email = ? LIMIT 1`;
         const dupliVALUES = [email];
         const [dupliRows]: any = await pool.query(checkDupliSql, dupliVALUES);
@@ -60,6 +75,11 @@ export const addTeamMember = async (req: Request, res: Response) => {
         if (rows.affectedRows > 0) {
             let memberSql = `INSERT INTO assign_member_permissions(member_id, permission_id, action, created_at) VALUES`;
             for await (const element of permissions) {
+                // for (const permissionEle of permissionRows) {
+                //     if (permissionEle.id) {
+                        
+                //     }
+                // }
                 const permissionId = element.permissionId;
                 const action = element.action;
 
@@ -223,6 +243,7 @@ export const teamMemberDetail =async (req:Request, res:Response) => {
         const userId = res.locals.jwt.userId;
         const memberId = req.query.memberId;
 
+        const permissionArray:any = [];
         if (!memberId || memberId === null || memberId === '') {
             return apiResponse.errorMessage(res, 400, "Member Id is required!");
         }
@@ -234,7 +255,16 @@ export const teamMemberDetail =async (req:Request, res:Response) => {
             const permissionSql = `SELECT assign_member_permissions.*, team_permissions.permission, team_permissions.slug FROM assign_member_permissions LEFT JOIN team_permissions ON team_permissions.id = assign_member_permissions.permission_id WHERE member_id = ${memberId}`;
             const [memberRows]:any = await pool.query(permissionSql);
 
-            rows[0].permissions = memberRows || [];
+            let permission:any = {};
+            let memberRowsIndex = -1;
+            for (const ele of memberRows) {
+                permission[ele.slug] = ele.action;
+                memberRowsIndex++;
+                //.push(`${ele.slug}`+': '+ele.action)
+            }
+            console.log("permissionArray", permissionArray);
+            
+            rows[0].permissions = permission || [];
 
             return apiResponse.successResponse(res, "Data Retrieved Successfully", rows[0]);
         } else {

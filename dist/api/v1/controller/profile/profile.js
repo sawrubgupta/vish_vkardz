@@ -35,7 +35,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateImage = exports.updateProfile = exports.getProfile = void 0;
+exports.updateImage = exports.updateVcardinfo = exports.updateProfile = exports.getProfile = void 0;
 const db_1 = __importDefault(require("../../../../db"));
 const apiResponse = __importStar(require("../../helper/apiResponse"));
 const development_1 = __importDefault(require("../../config/development"));
@@ -132,6 +132,54 @@ const updateProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     }
 });
 exports.updateProfile = updateProfile;
+// ====================================================================================================
+// ====================================================================================================
+const updateVcardinfo = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        // const userId: string = res.locals.jwt.userId;
+        let userId;
+        const type = req.query.type; //type = business, user, null
+        if (type && type === development_1.default.businessType) {
+            userId = req.query.userId;
+        }
+        else {
+            userId = res.locals.jwt.userId;
+        }
+        if (!userId || userId === "" || userId === undefined) {
+            return apiResponse.errorMessage(res, 401, "Please login !");
+        }
+        const { name, dialCode, phone, email, country, gender } = req.body;
+        const checkUser = `SELECT * FROM users where deleted_at IS NULL AND (phone = ? || email = ?) AND id != ? LIMIT 1`;
+        const checkUserVALUES = [phone, email, userId];
+        const [rows] = yield db_1.default.query(checkUser, checkUserVALUES);
+        if (rows.length > 0) {
+            const dupli = [];
+            if (email === rows[0].email) {
+                dupli.push("email");
+            }
+            if (phone === rows[0].phone) {
+                dupli.push("phone");
+            }
+            if (dupli.length > 0) {
+                return yield apiResponse.errorMessage(res, 400, `${dupli.join()} is already exist, Please change`);
+            }
+        }
+        const updateQuery = `UPDATE users SET name = ?, dial_code = ?, phone = ?, email = ?, country = ?, gender = ? WHERE id = ?`;
+        const VALUES = [name, dialCode, phone, email, country, gender, userId];
+        const [data] = yield db_1.default.query(updateQuery, VALUES);
+        if (data.affectedRows > 0) {
+            return apiResponse.successResponse(res, "Profile updated successfully !", null);
+        }
+        else {
+            return apiResponse.errorMessage(res, 400, "Failed to update the user, please try again later !");
+        }
+    }
+    catch (error) {
+        console.log(error);
+        return apiResponse.errorMessage(res, 400, "Something went wrong");
+    }
+});
+exports.updateVcardinfo = updateVcardinfo;
 // ====================================================================================================
 // ====================================================================================================
 const updateImage = (req, res) => __awaiter(void 0, void 0, void 0, function* () {

@@ -68,19 +68,25 @@ export const activateCard =async (req:Request, res:Response) => {
                     if (deleteRows.affectedRows > 0) {
                         let addFeatures:any = `INSERT INTO users_features (feature_id, user_id, status) VALUES`;
                         await featureData.forEach(async (element: any) => {
-                            if (packageId === 18) {
-                                if (element.id === 1 || element.id === 2 || element.id === 3 || element.id === 5 || element.id === 6 || element.id === 8 || element.id === 10 ||element.id === 11 || element.id === 13 || element.id === 14 || element.id === 15) {
-                                    featureStatus = 1;
-                                } else {
-                                    featureStatus = 0;
-                                }
+                            // if (packageId === 18) {
+                            //     if (element.id === 1 || element.id === 2 || element.id === 3 || element.id === 5 || element.id === 6 || element.id === 8 || element.id === 10 ||element.id === 11 || element.id === 13 || element.id === 14 || element.id === 15) {
+                            //         featureStatus = 1;
+                            //     } else {
+                            //         featureStatus = 0;
+                            //     }
+                            // } else {
+                            //     if (element.id === 1 || element.id === 2 || element.id === 13 || element.id === 14 || element.id === 15) {
+                            //         featureStatus = 1;
+                            //     } else {
+                            //         featureStatus = 0;
+                            //     }
+                            // }
+                            if (element.id === 1 || element.id === 2 || element.id === 13 || element.id === 14 || element.id === 15) {
+                                featureStatus = 1;
                             } else {
-                                if (element.id === 1 || element.id === 2 || element.id === 13 || element.id === 14 || element.id === 15) {
-                                    featureStatus = 1;
-                                } else {
-                                    featureStatus = 0;
-                                }
+                                featureStatus = 0;
                             }
+    
                             addFeatures = addFeatures + `(${element.id},${userId},${featureStatus}), `;
                             featureResult = addFeatures.substring(0,addFeatures.lastIndexOf(','));
                         })

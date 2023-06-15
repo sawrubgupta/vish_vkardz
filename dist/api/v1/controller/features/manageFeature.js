@@ -121,10 +121,10 @@ const updateUserFeaturesStatus = (req, res) => __awaiter(void 0, void 0, void 0,
             finally { if (e_1) throw e_1.error; }
         }
         if (data.affectedRows > 0) {
-            return apiResponse.successResponse(res, "Fatures updated successfully", null);
+            return apiResponse.successResponse(res, "Features updated successfully", null);
         }
         else {
-            return apiResponse.errorMessage(res, 400, "Failed to update user featyre, try again");
+            return apiResponse.errorMessage(res, 400, "Failed to update user feature, try again");
         }
     }
     catch (error) {

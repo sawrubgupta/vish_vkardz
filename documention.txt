@@ -20,6 +20,23 @@ name api's
 database changes:
 
 ------------------------------new changes--------------------------------
+15-06-2023
+ALTER TABLE delivery_addresses add COLUMN email varchar(200) DEFAULT null AFTER phone
+
+12-06-2023
+CREATE TABLE `sample_files` (
+ `id` INT(11) NOT NULL AUTO_INCREMENT ,
+ `name` VARCHAR(55) NULL DEFAULT NULL ,
+ `slug` VARCHAR(55) NOT NULL ,
+ `value` VARCHAR(255) NOT NULL ,
+ `status` BOOLEAN NOT NULL DEFAULT TRUE ,
+ `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ,
+ `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ,
+ PRIMARY KEY (`id`)
+) ENGINE = InnoDB;
+
+INSERT INTO `sample_files`(`slug`, `value`) VALUES ('import_sample','https://vkardz.s3.ap-south-1.amazonaws.com/sampleFiles/vkImportSampleFile+(4).xlsx');
+
 06-06-2023
 UPDATE `team_permissions` SET `permission` = 'Login Details' WHERE `team_permissions`.`id` = 7;
 INSERT INTO `team_permissions`( `permission`, `slug`, `status`) VALUES ('Import','import', 1), ('Export','export', 1)

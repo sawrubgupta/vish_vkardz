@@ -22,6 +22,7 @@ database changes:
 ------------------------------new changes--------------------------------
 16-06-2023
 ALTER TABLE `delivery_addresses` ADD COLUMN country varchar(55) DEFAULT null after state;
+ALTER TABLE dashboard_banner ADD COLUMN status tinyint not null DEFAULT 1;
 
 15-06-2023
 ALTER TABLE delivery_addresses add COLUMN email varchar(200) DEFAULT null AFTER phone

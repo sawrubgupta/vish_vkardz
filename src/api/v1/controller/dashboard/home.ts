@@ -9,7 +9,7 @@ export const home =async (req:Request, res:Response) => {
         const type = req.query.type;
         const userId:any = res.locals.jwt.userId;
 
-        const getBannerQuery = `SELECT * FROM dashboard_banner`;
+        const getBannerQuery = `SELECT * FROM dashboard_banner WHERE status = 1`;
         const [bannerData]:any = await pool.query(getBannerQuery);
 
         const customizeData = {

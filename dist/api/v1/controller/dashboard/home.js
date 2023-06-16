@@ -43,7 +43,7 @@ const home = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const type = req.query.type;
         const userId = res.locals.jwt.userId;
-        const getBannerQuery = `SELECT * FROM dashboard_banner`;
+        const getBannerQuery = `SELECT * FROM dashboard_banner WHERE status = 1`;
         const [bannerData] = yield db_1.default.query(getBannerQuery);
         const customizeData = {
             redirectUrl: "https://wa.me/916377256382"

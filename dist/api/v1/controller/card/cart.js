@@ -279,10 +279,9 @@ const updateDeliveryAddresess = (req, res) => __awaiter(void 0, void 0, void 0, 
         const addressId = req.body.addressId;
         const { name, addressType, phone, email, address, locality, city, state, pincode, country, currencyCode } = req.body;
         const createdAt = utility.dateWithFormat();
-        const checkDeliveryCharges = `SELECT is_delivered, usd_price, inr_price FROM delivery_charges WHERE zipcode = '${pincode}' LIMIT 1`;
-        const [deliveryChargesRows] = yield db_1.default.query(checkDeliveryCharges);
-        if (deliveryChargesRows.length === 0)
-            return apiResponse.errorMessage(res, 400, "Invalid zipcode or Delivery not available in this pincode!");
+        // const checkDeliveryCharges = `SELECT is_delivered, usd_price, inr_price FROM delivery_charges WHERE zipcode = '${pincode}' LIMIT 1`;
+        // const [deliveryChargesRows]:any = await pool.query(checkDeliveryCharges);
+        // if (deliveryChargesRows.length === 0) return apiResponse.errorMessage(res, 400, "Invalid zipcode or Delivery not available in this pincode!");
         const sql = `UPDATE delivery_addresses SET currency_code = ?, address_type = ?, name = ?, phone = ?, email = ?, address = ?, locality = ?, city = ?, state = ?, pincode = ?, country = ? WHERE user_id = ? AND id = ?`;
         const VALUES = [currencyCode, addressType, name, phone, email, address, locality, city, state, pincode, country, userId, addressId];
         const [rows] = yield db_1.default.query(sql, VALUES);

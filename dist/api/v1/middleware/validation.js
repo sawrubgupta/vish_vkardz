@@ -506,6 +506,7 @@ const deliveryAddressValidation = (req, res, next) => __awaiter(void 0, void 0, 
         city: joi_1.default.string().required(),
         state: joi_1.default.string().required(),
         pincode: joi_1.default.required(),
+        country: joi_1.default.allow('').allow(null),
     });
     const value = schema.validate(req.body);
     if (value.error) {
@@ -530,6 +531,7 @@ const updateDdeliveryAddressValidation = (req, res, next) => __awaiter(void 0, v
         city: joi_1.default.string().required(),
         state: joi_1.default.string().required(),
         pincode: joi_1.default.required(),
+        country: joi_1.default.allow('').allow(null),
     });
     const value = schema.validate(req.body);
     if (value.error) {

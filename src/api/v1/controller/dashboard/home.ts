@@ -15,6 +15,9 @@ export const home =async (req:Request, res:Response) => {
         const customizeData = {
             redirectUrl: "https://wa.me/916377256382"
         }
+        const supportUrl = {
+            redirectUrl: "https://wa.me/916377256382"
+        }
 
         if (userId) {
             const getCardQuery = `SELECT products.product_id, products.name, products.sub_cat, products.slug, products.description, products.price, products.mrp_price, products.discount_percent, products.product_image, products.image_back, products.image_other, products.material, products.bg_color, products.print, products.dimention, products.weight, products.thickness, products.alt_title, product_price.usd_selling_price, product_price.usd_mrp_price, product_price.aed_selling_price, product_price.aed_mrp_price, product_price.inr_selling_price, product_price.inr_mrp_price, product_price.qar_selling_price, product_price.qar_mrp_price, COUNT(product_rating.id) AS totalRating, AVG(COALESCE(product_rating.rating, 0)) AS averageRating FROM products LEFT JOIN product_price ON products.product_id = product_price.product_id LEFT JOIN product_rating ON products.product_id = product_rating.product_id WHERE products.sub_cat = 'best-seller' AND products.status = 1 GROUP BY product_rating.product_id LIMIT 5`;
@@ -57,7 +60,7 @@ export const home =async (req:Request, res:Response) => {
             })
             return res.status(200).json({
                 status: true,
-                bannerData, bestSellerProductsRows, customizeData,
+                bannerData, bestSellerProductsRows, customizeData, supportUrl,
                 userData: userData[0],
                 message: "Data Retrieved Successfully"
             })
@@ -66,10 +69,10 @@ export const home =async (req:Request, res:Response) => {
             const getCardQuery = `SELECT products.product_id, products.name, products.sub_cat, products.slug, products.description, products.price, products.mrp_price, products.discount_percent, products.product_image, products.image_back, products.image_other, products.material, products.bg_color, products.print, products.dimention, products.weight, products.thickness, products.alt_title, product_price.usd_selling_price, product_price.usd_mrp_price, product_price.aed_selling_price, product_price.aed_mrp_price, product_price.inr_selling_price, product_price.inr_mrp_price, product_price.qar_selling_price, product_price.qar_mrp_price, COUNT(product_rating.id) AS totalRating, AVG(COALESCE(product_rating.rating, 0)) AS averageRating FROM products LEFT JOIN product_price ON products.product_id = product_price.product_id LEFT JOIN product_rating ON products.product_id = product_rating.product_id WHERE products.sub_cat = 'best-seller' AND products.status = 1 GROUP BY product_rating.product_id LIMIT 5`;
             const [bestSellerProductsRows]:any = await pool.query(getCardQuery);
     
-            bestSellerProductsRows.forEach((element:any, index:any) => {
+                bestSellerProductsRows.forEach((element:any, index:any) => {
                 bestSellerProductsRows[index].isAddedToWishlist = false;
                 bestSellerProductsRows[index].isAddedToCart = false;
-            });
+        });
 
             const userData = {
                 name: "",
@@ -78,7 +81,7 @@ export const home =async (req:Request, res:Response) => {
             }
             return res.status(200).json({
                 status: true,
-                bannerData, bestSellerProductsRows, customizeData,
+                bannerData, bestSellerProductsRows, customizeData, supportUrl,
                 userData: userData,
                 message: "Data Retrieved Successfully"
             })

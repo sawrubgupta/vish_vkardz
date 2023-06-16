@@ -304,7 +304,7 @@ exports.updateDeliveryAddresess = updateDeliveryAddresess;
 const getDeliveryAddresses = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userId = res.locals.jwt.userId;
-        const sql = `SELECT id, address_type, currency_code, name, email, phone, address, locality, city, state, pincode, is_default FROM delivery_addresses WHERE user_id = ${userId} ORDER BY is_default DESC`;
+        const sql = `SELECT * FROM delivery_addresses WHERE user_id = ${userId} ORDER BY is_default DESC`;
         const [rows] = yield db_1.default.query(sql);
         if (rows.length > 0) {
             return apiResponse.successResponse(res, "Address list are here", rows);

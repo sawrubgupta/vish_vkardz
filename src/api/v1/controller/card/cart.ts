@@ -302,7 +302,7 @@ export const getDeliveryAddresses =async (req:Request, res:Response) => {
     try {
         const userId:string = res.locals.jwt.userId;
 
-        const sql = `SELECT id, address_type, currency_code, name, email, phone, address, locality, city, state, pincode, is_default FROM delivery_addresses WHERE user_id = ${userId} ORDER BY is_default DESC`;
+        const sql = `SELECT * FROM delivery_addresses WHERE user_id = ${userId} ORDER BY is_default DESC`;
         const [rows]:any = await pool.query(sql);
 
         if (rows.length > 0) {

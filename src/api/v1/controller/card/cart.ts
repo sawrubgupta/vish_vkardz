@@ -250,7 +250,7 @@ export const addDeliveryAddresess =async (req:Request, res:Response) => {
 
         // if (deliveryChargesRows[0].is_delivered === 0) return apiResponse.errorMessage(res, 400, "Delivery not available in this pincode!");
 
-        const sql = `INSERT INTO delivery_addresses(user_id, currency_code, address_type, name, phone, email, address, locality, city, state, pincode, country, created_at) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+        const sql = `INSERT INTO delivery_addresses(user_id, currency_code, address_type, name, phone, email, address, locality, city, state, pincode, country, created_at) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
         const VALUES = [userId, currencyCode, addressType, name, phone, email, address, locality, city, state, pincode, country, createdAt];
         const [rows]:any = await pool.query(sql, VALUES);
 

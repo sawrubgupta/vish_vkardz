@@ -255,7 +255,7 @@ const addDeliveryAddresess = (req, res) => __awaiter(void 0, void 0, void 0, fun
         // const [deliveryChargesRows]:any = await pool.query(checkDeliveryCharges);
         // if (deliveryChargesRows.length === 0) return apiResponse.errorMessage(res, 400, "Invalid zipcode or Delivery not available in this pincode!");
         // if (deliveryChargesRows[0].is_delivered === 0) return apiResponse.errorMessage(res, 400, "Delivery not available in this pincode!");
-        const sql = `INSERT INTO delivery_addresses(user_id, currency_code, address_type, name, phone, email, address, locality, city, state, pincode, country, created_at) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+        const sql = `INSERT INTO delivery_addresses(user_id, currency_code, address_type, name, phone, email, address, locality, city, state, pincode, country, created_at) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
         const VALUES = [userId, currencyCode, addressType, name, phone, email, address, locality, city, state, pincode, country, createdAt];
         const [rows] = yield db_1.default.query(sql, VALUES);
         if (rows.affectedRows > 0) {

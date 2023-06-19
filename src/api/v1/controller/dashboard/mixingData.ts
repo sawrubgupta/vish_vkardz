@@ -12,18 +12,18 @@ export const mixingData = async (req: Request, res: Response) => {
 
         const appVersionRows: object = {
             android: {
-                forceUpdate: appVersionData.force_android_update,
-                packageName: appVersionData.description,
-                launchUrl: appVersionData.android_url,
-                versionName: appVersionData.android_version,
-                versionCode: appVersionData.android_code,
+                forceUpdate: appVersionData[0].force_android_update,
+                packageName: appVersionData[0].description,
+                launchUrl: appVersionData[0].android_url,
+                versionName: appVersionData[0].android_version,
+                versionCode: appVersionData[0].android_code,
             },
             ios: {
-                forceUpdate: appVersionData.force_ios_update,
-                packageName: appVersionData.description,
-                launchUrl: appVersionData.ios_url,
-                versionName: appVersionData.ios_version,
-                versionCode: appVersionData.ios_code,
+                forceUpdate: appVersionData[0].force_ios_update,
+                packageName: appVersionData[0].description,
+                launchUrl: appVersionData[0].ios_url,
+                versionName: appVersionData[0].ios_version,
+                versionCode: appVersionData[0].ios_code,
             }
         }
 

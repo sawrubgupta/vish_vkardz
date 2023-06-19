@@ -124,7 +124,11 @@ const businessHourList = (req, res) => __awaiter(void 0, void 0, void 0, functio
         }
         const sql = `SELECT * FROM business_hours WHERE user_id = ${userId}`;
         const [rows] = yield db_1.default.query(sql);
+        const getFeatureStatus = `SELECT status FROM users_features WHERE user_id = ${userId} AND feature_id = 6`;
+        const [featureStatusRRows] = yield db_1.default.query(getFeatureStatus);
+        let featureStatus = featureStatusRRows[0].status;
         if (rows.length > 0) {
+            rows[0].featureStatus = featureStatus;
             delete rows[0].user_id;
             return apiResponse.successResponse(res, "Data Retrieved Successfully", rows);
         }
@@ -185,7 +189,12 @@ const businessHourList = (req, res) => __awaiter(void 0, void 0, void 0, functio
                     "status": 0,
                     "created_at": null
                 }];
-            return apiResponse.successResponse(res, "No data found", data);
+            // return apiResponse.successResponse(res, "No data found", data);
+            return res.status(200).json({
+                status: true,
+                data: data, featureStatus,
+                message: "No Data Found"
+            });
         }
     }
     catch (error) {

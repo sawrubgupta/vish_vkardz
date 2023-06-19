@@ -32,7 +32,7 @@ export const exportUser = async (req: Request, res: Response) => {
         //   };
 
 
-        const sql = `SELECT id as user_id, username, card_number, name, email, display_email, display_dial_code, display_number, phone, designation, website, address, company_name FROM users WHERE admin_id = ${userId} ORDER BY username asc`;
+        const sql = `SELECT id as user_id, username, card_number, name, email, display_email, display_dial_code, display_number, phone, designation, website, address, company_name, hit, share_link FROM users WHERE admin_id = ${userId} ORDER BY username asc`;
         const [rows]: any = await pool.query(sql);
 
         const workbook = new Excel.Workbook();
@@ -49,6 +49,7 @@ export const exportUser = async (req: Request, res: Response) => {
             { key: 'designation', header: 'Designation' },
             { key: 'website', header: 'Website' },
             { key: 'address', header: 'Address' },
+            { key: 'hit', header: 'Total View' },
             { key: 'value', header: 'Facebook' },
             { key: 'value', header: 'Twitter' },
             { key: 'value', header: 'Instagram' },
@@ -123,7 +124,7 @@ export const exportUser = async (req: Request, res: Response) => {
             // } 
             // columns.push({ key: 'value', header: socialRows[i]. })
 
-            const data = [element.username, element.card_number, element.name, element.display_email, element.display_dial_code, element.display_number, element.company_name, element.designation, element.website, element.address];
+            const data = [element.username, element.card_number, element.name, element.display_email, element.display_dial_code, element.display_number, element.company_name, element.designation, element.website, element.address, element.hit];
 
             for (let i = 0; i < socialRows.length; i++) {
                 data.push(`${socialRows[i].value}`)

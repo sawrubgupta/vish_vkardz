@@ -20,6 +20,10 @@ name api's
 database changes:
 
 ------------------------------new changes--------------------------------
+19-06-2023
+ALTER TABLE `app_update` add COLUMN ios_url varchar(255) not null DEFAULT 'https://www.apple.com/in/app-store/' AFTER description;
+ALTER TABLE `app_update` add COLUMN android_url varchar(255) not null DEFAULT 'https://play.google.com/' AFTER description;
+
 16-06-2023
 ALTER TABLE `delivery_addresses` ADD COLUMN country varchar(55) DEFAULT null after state;
 ALTER TABLE dashboard_banner ADD COLUMN status tinyint not null DEFAULT 1;

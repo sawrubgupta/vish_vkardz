@@ -42,12 +42,28 @@ const mixingData = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     try {
         const geturls = `SELECT slug, url FROM app_setting WHERE status = 1`;
         const [url] = yield db_1.default.query(geturls);
-        const appVersionQuery = `SELECT * FROM app_update`;
+        const appVersionQuery = `SELECT * FROM app_update LIMIT 1`;
         const [appVersionData] = yield db_1.default.query(appVersionQuery);
+        const appVersionRows = {
+            android: {
+                forceUpdate: appVersionData.force_android_update,
+                packageName: appVersionData.description,
+                launchUrl: appVersionData.android_url,
+                versionName: appVersionData.android_version,
+                versionCode: appVersionData.android_code,
+            },
+            ios: {
+                forceUpdate: appVersionData.force_ios_update,
+                packageName: appVersionData.description,
+                launchUrl: appVersionData.ios_url,
+                versionName: appVersionData.ios_version,
+                versionCode: appVersionData.ios_code,
+            }
+        };
         // return apiResponse.successResponse(res, "Data Retrieved Successfully", data);\
         return res.status(200).json({
             status: true,
-            url, appVersionData,
+            url, appVersionRows,
             message: "Data Retrieved Successfully"
         });
     }

@@ -109,7 +109,6 @@ export const exportUser = async (req: Request, res: Response) => {
         ];
 
         worksheet.columns = columnsHeader;
-        let data:any = [];
         // rows.forEach(async(element: any) => {
         for (const element of rows) {
             const sociaSiteSql = `SELECT social_sites.name, vcard_social_sites.label, vcard_social_sites.value FROM social_sites LEFT JOIN vcard_social_sites ON vcard_social_sites.site_id = social_sites.id AND vcard_social_sites.user_id = ${element.user_id} WHERE social_sites.status = 1 ORDER BY social_sites.id ASC`;
@@ -124,7 +123,7 @@ export const exportUser = async (req: Request, res: Response) => {
             // } 
             // columns.push({ key: 'value', header: socialRows[i]. })
 
-            data = [element.username, element.card_number, element.name, element.display_email, element.display_dial_code, element.display_number, element.company_name, element.designation, element.website, element.address];
+            const data = [element.username, element.card_number, element.name, element.display_email, element.display_dial_code, element.display_number, element.company_name, element.designation, element.website, element.address];
 
             for (let i = 0; i < socialRows.length; i++) {
                 data.push(`${socialRows[i].value}`)
@@ -139,9 +138,11 @@ export const exportUser = async (req: Request, res: Response) => {
                 columnsHeader.push({ key: 'value', header: 'Custom ' + ele.type });
                 data.push(`${vcfData[vcfIndex].value}`)
             }
+            
+            worksheet.addRow(data);
+            console.log("data", data);
+
         };
-        worksheet.addRow(data);
-        console.log("data", data);
 
 
         const exportPath: any = path.resolve(__dirname, `users${userId}.xlsx`);
@@ -160,6 +161,7 @@ export const exportUser = async (req: Request, res: Response) => {
             bold: true,
             size: 13,
         };
+        console.log("exportPath", exportPath);
         
         var excelBucket:any = new AWS.S3({
             credentials,
@@ -188,86 +190,85 @@ export const exportUser = async (req: Request, res: Response) => {
             return apiResponse.successResponse(res, "Success", response.Location);
         });   
         
-/*
-        let result;
-        const fileStream = fs.createReadStream(path.resolve(__dirname, `Screenshot 2023-03-02 212441.png`));
-        let form = new FormData();
-        form.append('file', fileStream);
-        const config = {
-            headers: {
-              'content-type': 'multipart/form-data',
-            },
-          };
-          await axios.post('https://vkardz.com/api/uploadFile.php', form, config)
-          .then((response) => {
-            result = response.data
-            console.log(response.data);
-          })
-          .catch((error) => {
-            result = error
-            console.log(error);
-          });          
-        // form.append('extractArchive', 'false');
 
-        //         let investorExist_response = await axios.post(
-        //             'https://vkardz.com/api/uploadFile.php',
+//         let result;
+//         const fileStream = fs.createReadStream(path.resolve(__dirname, `Screenshot 2023-03-02 212441.png`));
+//         let form = new FormData();
+//         form.append('file', fileStream);
+//         const config = {
+//             headers: {
+//               'content-type': 'multipart/form-data',
+//             },
+//           };
+//           await axios.post('https://vkardz.com/api/uploadFile.php', form, config)
+//           .then((response) => {
+//             result = response.data
+//             console.log(response.data);
+//           })
+//           .catch((error) => {
+//             result = error
+//             console.log(error);
+//           });          
+//         // form.append('extractArchive', 'false');
 
-        //             form,
-        //             {
-        //               headers: {
-        //                 // "Content-Type": "multipart/form-data",
-        //                 "Content-Type": "application/x-www-form-urlencoded"
-        //               },
-        //             }
-        //           );
-        //           console.log("investorExist_response", investorExist_response);
+//         //         let investorExist_response = await axios.post(
+//         //             'https://vkardz.com/api/uploadFile.php',
 
-        //           console.log("investorExist_response.data", investorExist_response.data);
-        //   res.send("done");
-        //   return        
-        // console.log("form", form);
+//         //             form,
+//         //             {
+//         //               headers: {
+//         //                 // "Content-Type": "multipart/form-data",
+//         //                 "Content-Type": "application/x-www-form-urlencoded"
+//         //               },
+//         //             }
+//         //           );
+//         //           console.log("investorExist_response", investorExist_response);
 
-        // const response = await axios({   
-        //     'post',
-        //     url: `https://vkardz.com/api/uploadFile.php`,
-        //     data: "",
+//         //           console.log("investorExist_response.data", investorExist_response.data);
+//         //   res.send("done");
+//         //   return        
+//         // console.log("form", form);
 
-        // });
-        // result = response.data;
+//         // const response = await axios({   
+//         //     'post',
+//         //     url: `https://vkardz.com/api/uploadFile.php`,
+//         //     data: "",
 
-        // let header = form.getHeaders()
-        // console.log("header", header);
+//         // });
+//         // result = response.data;
 
+//         // let header = form.getHeaders()
+//         // console.log("header", header);
 
-        await axios.post('https://vkardz.com/api/uploadFile.php', form, {
-            // headers: {"content-type": "multipart/form-data"},
-            // headers: { "content-type": "application/x-www-form-urlencoded" },
-            headers: form.getHeaders()
+// /*
+//         await axios.post('https://vkardz.com/api/uploadFile.php', form, {
+//             // headers: {"content-type": "multipart/form-data"},
+//             // headers: { "content-type": "application/x-www-form-urlencoded" },
+//             headers: form.getHeaders()
 
-            // headers: form.getHeaders()
-            // headers: {"content-type": "multipart/form-data"}
-        })
-            .then((response) => {
-                console.log("response.data", response.data);
-                result = response.data;
-            })
-            .catch((error) => {
-                console.log("error", error);
-                result = false;
-            });
+//             // headers: form.getHeaders()
+//             // headers: {"content-type": "multipart/form-data"}
+//         })
+//             .then((response) => {
+//                 console.log("response.data", response.data);
+//                 result = response.data;
+//             })
+//             .catch((error) => {
+//                 console.log("error", error);
+//                 result = false;
+//             });
+// */
+//         // let result:any = utility.uploadFile(exportPath);
+//         // console.log("result", result);
+//         // if (result === false) {
+//         //     return apiResponse.errorMessage(res, 400, "Failed to generate excel, try again");
+//         // } 
+//         // fs.unlink(exportPath, (err) => {
+//         //     if (err) throw err //handle your error the way you want to;
+//         //     console.log('file was deleted');//or else the file will be deleted
+//         // });
 
-        // let result:any = utility.uploadFile(exportPath);
-        // console.log("result", result);
-        // if (result === false) {
-        //     return apiResponse.errorMessage(res, 400, "Failed to generate excel, try again");
-        // } 
-        // fs.unlink(exportPath, (err) => {
-        //     if (err) throw err //handle your error the way you want to;
-        //     console.log('file was deleted');//or else the file will be deleted
-        // });
-
-        return apiResponse.successResponse(res, "Exported Successfully", result);
-*/
+//         return apiResponse.successResponse(res, "Exported Successfully", result);
 
     } catch (error) {
         console.log(error);

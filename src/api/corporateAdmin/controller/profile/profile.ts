@@ -17,7 +17,6 @@ export const userList =async (req:Request, res:Response) => {
             userId = subAdminData[0].admin_id
         }
 
-        
         const keyword = req.query.keyword;
         var getPage: any = req.query.page;
         var page = parseInt(getPage);
@@ -30,7 +29,7 @@ export const userList =async (req:Request, res:Response) => {
         const getPageQuery = `SELECT id FROM users WHERE deleted_at IS NULL AND admin_id = ${userId}`;
         const [result]: any = await pool.query(getPageQuery);
 
-        const sql = `SELECT id, username, name, email, phone, dial_code, card_number, card_number_fix, is_card_linked, is_deactived, designation, website, account_type, thumb, cover_photo, CONCAT('${vcardLink}', username) AS primary_profile_link, display_dial_code, display_email, display_number FROM users WHERE deleted_at IS NULL AND admin_id = ${userId} AND (username LIKE '%${keyword}%' OR name LIKE '%${keyword}%') ORDER BY username asc limit ${page_size} offset ${offset}`;
+        const sql = `SELECT id, username, name, email, phone, dial_code, card_number, card_number_fix, is_card_linked, is_deactived, designation, website, account_type, thumb, cover_photo, CONCAT('${vcardLink}', username) AS primary_profile_link, display_dial_code, display_email, display_number, hit, share_link FROM users WHERE deleted_at IS NULL AND admin_id = ${userId} AND (username LIKE '%${keyword}%' OR name LIKE '%${keyword}%') ORDER BY username asc limit ${page_size} offset ${offset}`;
         console.log(sql);
         
         const [rows]:any = await pool.query(sql);

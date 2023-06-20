@@ -51,6 +51,7 @@ const mixingData = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
                 launchUrl: appVersionData[0].android_url,
                 versionName: appVersionData[0].android_version,
                 versionCode: appVersionData[0].android_code,
+                isRequired: appVersionData[0].is_required,
             },
             ios: {
                 forceUpdate: appVersionData[0].force_ios_update,
@@ -58,6 +59,7 @@ const mixingData = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
                 launchUrl: appVersionData[0].ios_url,
                 versionName: appVersionData[0].ios_version,
                 versionCode: appVersionData[0].ios_code,
+                isRequired: appVersionData[0].is_required,
             }
         };
         // return apiResponse.successResponse(res, "Data Retrieved Successfully", data);\

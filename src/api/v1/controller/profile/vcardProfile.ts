@@ -25,10 +25,10 @@ export const vcardProfile =async (req:Request, res:Response) => {
             delete userRows[0].id;
             delete userRows[0].password;
 
-            if (userRows[0].is_password_enable === 1) {
-                const profilePin = req.query.profilePin;
-                if (profilePin !== userRows[0].set_password || !profilePin) return apiResponse.errorMessage(res, 400, "Invalid pin!");
-            }
+            // if (userRows[0].is_password_enable === 1) {
+            //     const profilePin = req.query.profilePin;
+            //     if (profilePin !== userRows[0].set_password || !profilePin) return apiResponse.errorMessage(res, 400, "Invalid pin!");
+            // }
             const getSocialSiteQuery = `SELECT social_sites.id, social_sites.name, social_sites.social_link, social_sites.social_img, social_sites.type, social_sites.status, social_sites.primary_profile, vcard_social_sites.value, vcard_social_sites.label, vcard_social_sites.orders FROM social_sites LEFT JOIN vcard_social_sites ON social_sites.id = vcard_social_sites.site_id AND vcard_social_sites.user_id = ${userId} HAVING vcard_social_sites.value IS NOT NULL ORDER BY vcard_social_sites.value DESC, vcard_social_sites.orders IS NULL ASC`;
             const [socialRows]:any = await pool.query(getSocialSiteQuery);
 

@@ -28,6 +28,13 @@ export default {
     basicPlan: 'basic',
     propersonalizePlan: 'propersonalize',
 
+    vcfNumber: 'number',
+    vcfPhone: 'phone',
+    vcfAddress: 'address',
+    vcfWebsite: 'website',
+    vcfEmail: 'email',
+    vcfCompany: 'company',
+
     secretKey:"nss6DpYlq5CHw6Hn0jPqXJwtkHXuMDdYynDiRFNS6_Y", //process.env.SECRET,
     resumeLimit:10,
     vKardzPhone: "+91 6377256382",

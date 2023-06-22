@@ -17,15 +17,27 @@ export const vcardProfile =async (req:Request, res:Response) => {
         let splitNewCardNumber = newCardNum.split('/');
         let newCardNumber = splitNewCardNumber[0] || newCardNum;
 
-        // const getUserQuery = `SELECT * FROM users WHERE deleted_at IS NULL AND (username = '${key}' OR username = '${newCardNumber}' OR card_number = '${key}' OR card_number = '${newCardNumber}' OR card_number_fix = '${key}' OR card_number_fix = '${newCardNumber}') LIMIT 1`;
-        const getUserQuery = `SELECT * FROM users WHERE deleted_at IS NULL AND username = 'abhi76' LIMIT 1`;
+        const getUserQuery = `SELECT * FROM users WHERE deleted_at IS NULL AND (username = '${key}' OR username = '${newCardNumber}' OR card_number = '${key}' OR card_number = '${newCardNumber}' OR card_number_fix = '${key}' OR card_number_fix = '${newCardNumber}') LIMIT 1`;
+        // const getUserQuery = `SELECT * FROM users WHERE deleted_at IS NULL AND username = 'abhi76' LIMIT 1`;
 
         const [userRows]:any = await pool.query(getUserQuery);
         const userId:any = userRows[0].id;
 
+        let display_number = [userRows[0].display_number];
+        let display_email = [userRows[0].display_email];
+        let address = [userRows[0].address];
+        let website = [userRows[0].website];
+        let company_name = [userRows[0].company_name];
+
         if (userRows.length > 0) {
             delete userRows[0].id;
             delete userRows[0].password;
+
+            delete userRows[0].display_number;
+            delete userRows[0].display_email;
+            delete userRows[0].address;
+            delete userRows[0].website;
+            delete userRows[0].company_name;
 
             // if (userRows[0].is_password_enable === 1) {
             //     const profilePin = req.query.profilePin;
@@ -39,9 +51,28 @@ export const vcardProfile =async (req:Request, res:Response) => {
             // const getThemes = `SELECT users.themes as themeId, vkard_layouts.vkard_style, vkard_layouts.image FROM users LEFT JOIN vkard_layouts ON users.vcard_layouts = vkard_layouts.id WHERE users.id = ${userId} LIMIT 1`;
             // const [themeData]:any = await pool.query(getThemes);
 
+            for await (const ele of vcfRows) {
+                if (ele.type === config.vcfNumber || ele.type === config.vcfPhone) {
+                    display_number.push(ele.value);
+                } else if (ele.type === config.vcfEmail) {
+                    display_email.push(ele.value);
+                } else if (ele.type === config.vcfAddress) {
+                    address.push(ele.value);
+                } else if (ele.type === config.vcfCompany) {
+                    company_name.push(ele.value);
+                } else if (ele.type === config.vcfWebsite) {
+                    website.push(ele.value);
+                }
+            }
+
+            userRows[0].display_number = display_number || [];
+            userRows[0].display_email = display_email || [];
+            userRows[0].address = address || [];
+            userRows[0].company_name = company_name || [];
+            userRows[0].website = website || [];
 
             userRows[0].socialSites = socialRows || [];
-            userRows[0].customField = vcfRows || [];
+            // userRows[0].customField = vcfRows || [];
             // userRows[0].activeTheme = themeData[0] || {};
 
             return apiResponse.successResponse(res, "Data Retrieved Successfuly", userRows[0]);

@@ -31,6 +31,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __asyncValues = (this && this.__asyncValues) || function (o) {
+    if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
+    var m = o[Symbol.asyncIterator], i;
+    return m ? m.call(o) : (o = typeof __values === "function" ? __values(o) : o[Symbol.iterator](), i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function () { return this; }, i);
+    function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }
+    function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -40,6 +47,7 @@ const db_1 = __importDefault(require("../../../../db"));
 const apiResponse = __importStar(require("../../helper/apiResponse"));
 const development_1 = __importDefault(require("../../config/development"));
 const vcardProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, e_1, _b, _c;
     try {
         let key = req.query.key;
         if (!key || key === null)
@@ -48,13 +56,23 @@ const vcardProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         let newCardNum = splitCode[1] || '';
         let splitNewCardNumber = newCardNum.split('/');
         let newCardNumber = splitNewCardNumber[0] || newCardNum;
-        // const getUserQuery = `SELECT * FROM users WHERE deleted_at IS NULL AND (username = '${key}' OR username = '${newCardNumber}' OR card_number = '${key}' OR card_number = '${newCardNumber}' OR card_number_fix = '${key}' OR card_number_fix = '${newCardNumber}') LIMIT 1`;
-        const getUserQuery = `SELECT * FROM users WHERE deleted_at IS NULL AND username = 'abhi76' LIMIT 1`;
+        const getUserQuery = `SELECT * FROM users WHERE deleted_at IS NULL AND (username = '${key}' OR username = '${newCardNumber}' OR card_number = '${key}' OR card_number = '${newCardNumber}' OR card_number_fix = '${key}' OR card_number_fix = '${newCardNumber}') LIMIT 1`;
+        // const getUserQuery = `SELECT * FROM users WHERE deleted_at IS NULL AND username = 'abhi76' LIMIT 1`;
         const [userRows] = yield db_1.default.query(getUserQuery);
         const userId = userRows[0].id;
+        let display_number = [userRows[0].display_number];
+        let display_email = [userRows[0].display_email];
+        let address = [userRows[0].address];
+        let website = [userRows[0].website];
+        let company_name = [userRows[0].company_name];
         if (userRows.length > 0) {
             delete userRows[0].id;
             delete userRows[0].password;
+            delete userRows[0].display_number;
+            delete userRows[0].display_email;
+            delete userRows[0].address;
+            delete userRows[0].website;
+            delete userRows[0].company_name;
             // if (userRows[0].is_password_enable === 1) {
             //     const profilePin = req.query.profilePin;
             //     if (profilePin !== userRows[0].set_password || !profilePin) return apiResponse.errorMessage(res, 400, "Invalid pin!");
@@ -63,10 +81,49 @@ const vcardProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             const [socialRows] = yield db_1.default.query(getSocialSiteQuery);
             const customFieldSql = `SELECT icon, value, type FROM vcf_custom_field WHERE user_id = ${userId} AND status = 1`;
             const [vcfRows] = yield db_1.default.query(customFieldSql);
-            // const getThemes = `SELECT users.themes as themeId, vkard_layouts.vkard_style, vkard_layouts.image FROM users LEFT JOIN vkard_layouts ON users.vcard_layouts = vkard_layouts.id WHERE users.id = ${userId} LIMIT 1`;
-            // const [themeData]:any = await pool.query(getThemes);
+            try {
+                // const getThemes = `SELECT users.themes as themeId, vkard_layouts.vkard_style, vkard_layouts.image FROM users LEFT JOIN vkard_layouts ON users.vcard_layouts = vkard_layouts.id WHERE users.id = ${userId} LIMIT 1`;
+                // const [themeData]:any = await pool.query(getThemes);
+                for (var _d = true, vcfRows_1 = __asyncValues(vcfRows), vcfRows_1_1; vcfRows_1_1 = yield vcfRows_1.next(), _a = vcfRows_1_1.done, !_a;) {
+                    _c = vcfRows_1_1.value;
+                    _d = false;
+                    try {
+                        const ele = _c;
+                        if (ele.type === development_1.default.vcfNumber || ele.type === development_1.default.vcfPhone) {
+                            display_number.push(ele.value);
+                        }
+                        else if (ele.type === development_1.default.vcfEmail) {
+                            display_email.push(ele.value);
+                        }
+                        else if (ele.type === development_1.default.vcfAddress) {
+                            address.push(ele.value);
+                        }
+                        else if (ele.type === development_1.default.vcfCompany) {
+                            company_name.push(ele.value);
+                        }
+                        else if (ele.type === development_1.default.vcfWebsite) {
+                            website.push(ele.value);
+                        }
+                    }
+                    finally {
+                        _d = true;
+                    }
+                }
+            }
+            catch (e_1_1) { e_1 = { error: e_1_1 }; }
+            finally {
+                try {
+                    if (!_d && !_a && (_b = vcfRows_1.return)) yield _b.call(vcfRows_1);
+                }
+                finally { if (e_1) throw e_1.error; }
+            }
+            userRows[0].display_number = display_number || [];
+            userRows[0].display_email = display_email || [];
+            userRows[0].address = address || [];
+            userRows[0].company_name = company_name || [];
+            userRows[0].website = website || [];
             userRows[0].socialSites = socialRows || [];
-            userRows[0].customField = vcfRows || [];
+            // userRows[0].customField = vcfRows || [];
             // userRows[0].activeTheme = themeData[0] || {};
             return apiResponse.successResponse(res, "Data Retrieved Successfuly", userRows[0]);
         }

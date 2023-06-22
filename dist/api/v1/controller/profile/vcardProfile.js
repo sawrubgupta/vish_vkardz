@@ -59,13 +59,13 @@ const vcardProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         const getUserQuery = `SELECT * FROM users WHERE deleted_at IS NULL AND (username = '${key}' OR username = '${newCardNumber}' OR card_number = '${key}' OR card_number = '${newCardNumber}' OR card_number_fix = '${key}' OR card_number_fix = '${newCardNumber}') LIMIT 1`;
         // const getUserQuery = `SELECT * FROM users WHERE deleted_at IS NULL AND username = 'abhi76' LIMIT 1`;
         const [userRows] = yield db_1.default.query(getUserQuery);
-        const userId = userRows[0].id;
-        let display_number = [userRows[0].display_number];
-        let display_email = [userRows[0].display_email];
-        let address = [userRows[0].address];
-        let website = [userRows[0].website];
-        let company_name = [userRows[0].company_name];
         if (userRows.length > 0) {
+            const userId = userRows[0].id;
+            let display_number = [userRows[0].display_number];
+            let display_email = [userRows[0].display_email];
+            let address = [userRows[0].address];
+            let website = [userRows[0].website];
+            let company_name = [userRows[0].company_name];
             delete userRows[0].id;
             delete userRows[0].password;
             delete userRows[0].display_number;

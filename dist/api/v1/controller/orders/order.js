@@ -121,7 +121,7 @@ const orderSummary = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             const orderStatusQuery = `SELECT * FROM order_tracking WHERE user_id = ${userId} AND order_id = ${orderId}`;
             const [orderStatusRows] = yield db_1.default.query(orderStatusQuery);
             const orderStatus = development_1.default.orderStatus;
-            rows[0].itemsTotal = orderRows[0].itemTotal;
+            rows[0].itemsTotal = parseInt(orderRows[0].itemTotal);
             rows[0].orderDetal = orderRows || [];
             rows[0].userDetail = userRows[0] || {};
             rows[0].addressDetail = addressRows[0] || {};

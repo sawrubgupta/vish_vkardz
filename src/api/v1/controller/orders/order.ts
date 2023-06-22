@@ -99,7 +99,7 @@ export const orderSummary =async (req:Request, res:Response) => {
             
             const orderStatus = config.orderStatus;
 
-            rows[0].itemsTotal = orderRows[0].itemTotal;
+            rows[0].itemsTotal = parseInt(orderRows[0].itemTotal);
             rows[0].orderDetal = orderRows || [];
             rows[0].userDetail = userRows[0] || {};
             rows[0].addressDetail = addressRows[0] || {};

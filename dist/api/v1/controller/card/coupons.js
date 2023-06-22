@@ -47,7 +47,7 @@ const coupnDiscount = (req, res) => __awaiter(void 0, void 0, void 0, function* 
             return apiResponse.errorMessage(res, 400, "Please enter a coupon code");
         }
         const createdAt = utility.dateWithFormat();
-        const checkCouponCodeQuery = `SELECT coupon_code, discount_amount, discount_type FROM coupons WHERE coupon_code = ? AND expiration_date >= ?`;
+        const checkCouponCodeQuery = `SELECT * FROM coupons WHERE coupon_code = ? AND expiration_date >= ?`;
         const VALUES = [couponCode, createdAt];
         console.log(VALUES);
         const [rows] = yield db_1.default.query(checkCouponCodeQuery, VALUES);

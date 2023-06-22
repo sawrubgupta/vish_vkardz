@@ -108,10 +108,11 @@ const orderSummary = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         if (!orderId || orderId === null || orderId === undefined) {
             return apiResponse.errorMessage(res, 400, "Invalid Order Id!");
         }
-        const sql = `SELECT all_payment_info.*, (price - delivery_charges - coupon_discount - gst_amount) AS itemsTotal FROM all_payment_info WHERE id = ${orderId} AND user_id = ${userId} LIMIT 1`;
+        // const sql = `SELECT all_payment_info.*, (price - delivery_charges - coupon_discount - gst_amount) AS itemsTotal FROM all_payment_info WHERE id = ${orderId} AND user_id = ${userId} LIMIT 1`;
+        const sql = `SELECT all_payment_info.* FROM all_payment_info WHERE id = ${orderId} AND user_id = ${userId} LIMIT 1`;
         const [rows] = yield db_1.default.query(sql);
         if (rows.length > 0) {
-            const orderListSql = `SELECT orderlist.order_id, orderlist.qty, orderlist.product_id, orderlist.sub_total, products.name, products.slug, products.description, products.price, products.mrp_price, products.discount_percent, products.product_image, products.image_back, products.image_other, products.material, products.bg_color, products.print, products.dimention, products.weight, products.thickness, products.alt_title, product_price.usd_selling_price, product_price.usd_mrp_price, product_price.aed_selling_price, product_price.aed_mrp_price, product_price.inr_selling_price, product_price.inr_mrp_price, product_price.qar_selling_price, product_price.qar_mrp_price, COUNT(product_rating.id) AS totalRating, AVG(COALESCE(product_rating.rating, 0)) AS averageRating FROM orderlist LEFT JOIN products ON products.product_id = orderlist.product_id LEFT JOIN product_price ON products.product_id = product_price.product_id LEFT JOIN product_rating ON products.product_id = product_rating.product_id WHERE orderlist.user_id = ${userId} AND orderlist.order_id = ${orderId} GROUP BY products.product_id ORDER BY orderlist.created_at DESC`;
+            const orderListSql = `SELECT orderlist.order_id, orderlist.qty, orderlist.product_id, orderlist.sub_total, SUM(orderlist.sub_total) as itemTotal, products.name, products.slug, products.description, products.price, products.mrp_price, products.discount_percent, products.product_image, products.image_back, products.image_other, products.material, products.bg_color, products.print, products.dimention, products.weight, products.thickness, products.alt_title, product_price.usd_selling_price, product_price.usd_mrp_price, product_price.aed_selling_price, product_price.aed_mrp_price, product_price.inr_selling_price, product_price.inr_mrp_price, product_price.qar_selling_price, product_price.qar_mrp_price, COUNT(product_rating.id) AS totalRating, AVG(COALESCE(product_rating.rating, 0)) AS averageRating FROM orderlist LEFT JOIN products ON products.product_id = orderlist.product_id LEFT JOIN product_price ON products.product_id = product_price.product_id LEFT JOIN product_rating ON products.product_id = product_rating.product_id WHERE orderlist.user_id = ${userId} AND orderlist.order_id = ${orderId} GROUP BY products.product_id ORDER BY orderlist.created_at DESC`;
             const [orderRows] = yield db_1.default.query(orderListSql);
             const userDetailQuery = `SELECT username, name, email, phone, country, thumb FROM users WHERE id = ${userId} LIMIT 1`;
             const [userRows] = yield db_1.default.query(userDetailQuery);
@@ -120,6 +121,7 @@ const orderSummary = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             const orderStatusQuery = `SELECT * FROM order_tracking WHERE user_id = ${userId} AND order_id = ${orderId}`;
             const [orderStatusRows] = yield db_1.default.query(orderStatusQuery);
             const orderStatus = development_1.default.orderStatus;
+            rows[0].itemsTotal = orderRows[0].itemTotal;
             rows[0].orderDetal = orderRows || [];
             rows[0].userDetail = userRows[0] || {};
             rows[0].addressDetail = addressRows[0] || {};

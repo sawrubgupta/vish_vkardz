@@ -105,7 +105,7 @@ const getCart = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                     // const [deliveryChargesRows]:any = await pool.query(checkDeliveryCharges);
                     // if (deliveryChargesRows.length === 0) return apiResponse.errorMessage(res, 400, "Invalid zipcode or Delivery not available in this pincode!");
                     // if (deliveryChargesRows[0].is_delivered === 0) return apiResponse.errorMessage(res, 400, "Delivery not available in this pincode!");
-                    if (addressRows[0].currency_code == '91' || addressRows[0].currency_code == '+91') {
+                    if (addressRows[0].country == '91' || addressRows[0].currency_code == '+91') {
                         amount = rows[i].inr_selling_price * rows[i].qty;
                         totatAmount = totatAmount + amount;
                         gstPrice = (totatAmount * gstInPercent) / 100;

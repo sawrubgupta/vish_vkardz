@@ -4,7 +4,7 @@ import * as apiResponse from "../../helper/apiResponse";
 
 export const mixingData = async (req: Request, res: Response) => {
     try {
-        const geturls = `SELECT slug, url FROM app_setting WHERE status = 1`;
+        const geturls = `SELECT name, slug, url FROM app_setting WHERE status = 1`;
         const [url]: any = await pool.query(geturls);
 
         const appVersionQuery = `SELECT * FROM app_update LIMIT 1`;

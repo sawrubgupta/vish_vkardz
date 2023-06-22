@@ -40,7 +40,7 @@ const db_1 = __importDefault(require("../../../../db"));
 const apiResponse = __importStar(require("../../helper/apiResponse"));
 const mixingData = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const geturls = `SELECT slug, url FROM app_setting WHERE status = 1`;
+        const geturls = `SELECT name, slug, url FROM app_setting WHERE status = 1`;
         const [url] = yield db_1.default.query(geturls);
         const appVersionQuery = `SELECT * FROM app_update LIMIT 1`;
         const [appVersionData] = yield db_1.default.query(appVersionQuery);

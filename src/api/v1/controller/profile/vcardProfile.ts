@@ -17,7 +17,9 @@ export const vcardProfile =async (req:Request, res:Response) => {
         let splitNewCardNumber = newCardNum.split('/');
         let newCardNumber = splitNewCardNumber[0] || newCardNum;
 
-        const getUserQuery = `SELECT * FROM users WHERE deleted_at IS NULL AND ((username = '${key}' OR username = '${newCardNumber}') OR (card_number = '${key}' OR card_number = '${newCardNumber}') OR (card_number_fix = '${key}' OR card_number_fix = '${newCardNumber}')) LIMIT 1`;
+        // const getUserQuery = `SELECT * FROM users WHERE deleted_at IS NULL AND (username = '${key}' OR username = '${newCardNumber}' OR card_number = '${key}' OR card_number = '${newCardNumber}' OR card_number_fix = '${key}' OR card_number_fix = '${newCardNumber}') LIMIT 1`;
+        const getUserQuery = `SELECT * FROM users WHERE deleted_at IS NULL AND username = 'abhi76' LIMIT 1`;
+
         const [userRows]:any = await pool.query(getUserQuery);
         const userId:any = userRows[0].id;
 

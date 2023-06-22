@@ -55,7 +55,8 @@ const vcardProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         const splitCode = key.split(development_1.default.vcardLink);
         let newCardNum = splitCode[1] || '';
         let splitNewCardNumber = newCardNum.split('/');
-        let newCardNumber = splitNewCardNumber[0] || newCardNum;
+        let newCardNumber = splitNewCardNumber[0] || newCardNum || key;
+        console.log("newCardNumber", newCardNumber);
         const getUserQuery = `SELECT * FROM users WHERE deleted_at IS NULL AND (username = '${key}' OR username = '${newCardNumber}' OR card_number = '${key}' OR card_number = '${newCardNumber}' OR card_number_fix = '${key}' OR card_number_fix = '${newCardNumber}') LIMIT 1`;
         // const getUserQuery = `SELECT * FROM users WHERE deleted_at IS NULL AND username = 'abhi76' LIMIT 1`;
         const [userRows] = yield db_1.default.query(getUserQuery);

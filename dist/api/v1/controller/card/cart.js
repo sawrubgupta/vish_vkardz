@@ -249,14 +249,14 @@ exports.addCostmizeCard = addCostmizeCard;
 const addDeliveryAddresess = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userId = res.locals.jwt.userId;
-        const { name, addressType, phone, email, address, locality, city, state, pincode, country, currencyCode } = req.body;
+        const { name, addressType, phone, email, address, locality, city, state, pincode, country, country_name, currencyCode } = req.body;
         const createdAt = utility.dateWithFormat();
         // const checkDeliveryCharges = `SELECT is_delivered, usd_price, inr_price FROM delivery_charges WHERE zipcode = '${pincode}' LIMIT 1`;
         // const [deliveryChargesRows]:any = await pool.query(checkDeliveryCharges);
         // if (deliveryChargesRows.length === 0) return apiResponse.errorMessage(res, 400, "Invalid zipcode or Delivery not available in this pincode!");
         // if (deliveryChargesRows[0].is_delivered === 0) return apiResponse.errorMessage(res, 400, "Delivery not available in this pincode!");
-        const sql = `INSERT INTO delivery_addresses(user_id, currency_code, address_type, name, phone, email, address, locality, city, state, pincode, country, created_at) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-        const VALUES = [userId, currencyCode, addressType, name, phone, email, address, locality, city, state, pincode, country, createdAt];
+        const sql = `INSERT INTO delivery_addresses(user_id, currency_code, address_type, name, phone, email, address, locality, city, state, pincode, country, country_name, created_at) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+        const VALUES = [userId, currencyCode, addressType, name, phone, email, address, locality, city, state, pincode, country, country_name, createdAt];
         const [rows] = yield db_1.default.query(sql, VALUES);
         if (rows.affectedRows > 0) {
             return apiResponse.successResponse(res, "Delivery address added successfully", null);
@@ -277,13 +277,13 @@ const updateDeliveryAddresess = (req, res) => __awaiter(void 0, void 0, void 0, 
     try {
         const userId = res.locals.jwt.userId;
         const addressId = req.body.addressId;
-        const { name, addressType, phone, email, address, locality, city, state, pincode, country, currencyCode } = req.body;
+        const { name, addressType, phone, email, address, locality, city, state, pincode, country, country_name, currencyCode } = req.body;
         const createdAt = utility.dateWithFormat();
         // const checkDeliveryCharges = `SELECT is_delivered, usd_price, inr_price FROM delivery_charges WHERE zipcode = '${pincode}' LIMIT 1`;
         // const [deliveryChargesRows]:any = await pool.query(checkDeliveryCharges);
         // if (deliveryChargesRows.length === 0) return apiResponse.errorMessage(res, 400, "Invalid zipcode or Delivery not available in this pincode!");
-        const sql = `UPDATE delivery_addresses SET currency_code = ?, address_type = ?, name = ?, phone = ?, email = ?, address = ?, locality = ?, city = ?, state = ?, pincode = ?, country = ? WHERE user_id = ? AND id = ?`;
-        const VALUES = [currencyCode, addressType, name, phone, email, address, locality, city, state, pincode, country, userId, addressId];
+        const sql = `UPDATE delivery_addresses SET currency_code = ?, address_type = ?, name = ?, phone = ?, email = ?, address = ?, locality = ?, city = ?, state = ?, pincode = ?, country = ?, country_name = ? WHERE user_id = ? AND id = ?`;
+        const VALUES = [currencyCode, addressType, name, phone, email, address, locality, city, state, pincode, country, country_name, userId, addressId];
         const [rows] = yield db_1.default.query(sql, VALUES);
         if (rows.affectedRows > 0) {
             return apiResponse.successResponse(res, "Delivery Address Updated Successfully", null);

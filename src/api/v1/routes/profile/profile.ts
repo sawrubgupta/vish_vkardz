@@ -21,7 +21,7 @@ profileRouter.patch("/updateVcardinfo", authenticatingToken, validation.updateVc
 profileRouter.post("/setProfilePin", tempAuthenticatingToken, validation.setProfilePinValidation, setPinController.setPin); //use in business type
 profileRouter.delete("/removeProfilePin", tempAuthenticatingToken, setPinController.removePin); //use in business type
 
-profileRouter.get("/getLayots", themeController.getLayout);
+profileRouter.get("/getLayots", themeController.getLayout);//use in business type
 profileRouter.patch("/updateVcardLayout", tempAuthenticatingToken, themeController.updateVcardLayout); //use in business type
 
 profileRouter.post('/addPrimaryProfile', authenticatingToken, validation.primaryProfileValidation, primaryProfileController.setPrimaryProfile);

@@ -543,6 +543,7 @@ export const deliveryAddressValidation = async (req: Request,res: Response, next
         state: Joi.string().required(),
         pincode: Joi.required(),
         country: Joi.allow('').allow(null),
+        country_name: Joi.string().allow('').allow(null),
     });
 
     const value = schema.validate(req.body);
@@ -571,6 +572,7 @@ export const updateDdeliveryAddressValidation = async (req: Request,res: Respons
         state: Joi.string().required(),
         pincode: Joi.required(),
         country: Joi.allow('').allow(null),
+        country_name: Joi.string().allow('').allow(null),
     });
 
     const value = schema.validate(req.body);

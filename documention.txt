@@ -20,6 +20,9 @@ name api's
 database changes:
 
 ------------------------------new changes--------------------------------
+22-06-2023
+ALTER TABLE delivery_addresses add COLUMN country_name varchar(55) DEFAULT null AFTER country;
+
 20-06-2023
 ALTER TABLE `coupons` ADD COLUMN coupon_type varchar(200) not null DEFAULT 'OFFER' AFTER coupon_code;
 ALTER TABLE `coupons` ADD COLUMN category_id int(11) DEFAULT null AFTER coupon_type;

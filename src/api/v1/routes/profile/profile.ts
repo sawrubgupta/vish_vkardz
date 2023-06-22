@@ -7,6 +7,7 @@ import * as primaryProfileController from '../../controller/profile/primaryProfi
 import * as switchAccountController from '../../controller/profile/privateAccount';
 import * as searchController from '../../controller/profile/searchUser';
 import * as vcfController from '../../controller/profile/customField';
+import * as vcardProfileController from '../../controller/profile/vcardProfile';
 
 import {authenticatingToken, tempAuthenticatingToken} from '../../middleware/authorization.controller';
 import * as validation from '../../middleware/validation';
@@ -33,5 +34,8 @@ profileRouter.get('/searchUser', searchController.search);
 profileRouter.post('/addUpdateVcf', tempAuthenticatingToken, validation.addVcfValidation, vcfController.addCustomField);
 profileRouter.delete('/deleteVcf', tempAuthenticatingToken, vcfController.deleteVcf);
 profileRouter.get('/getVcf', tempAuthenticatingToken, vcfController.getVcf);
+
+profileRouter.get('/checkProfilePin', vcardProfileController.checkPinEnable);
+profileRouter.get('/vcardProfile', vcardProfileController.vcardProfile);
 
 export default profileRouter;

@@ -31,6 +31,7 @@ const primaryProfileController = __importStar(require("../../controller/profile/
 const switchAccountController = __importStar(require("../../controller/profile/privateAccount"));
 const searchController = __importStar(require("../../controller/profile/searchUser"));
 const vcfController = __importStar(require("../../controller/profile/customField"));
+const vcardProfileController = __importStar(require("../../controller/profile/vcardProfile"));
 const authorization_controller_1 = require("../../middleware/authorization.controller");
 const validation = __importStar(require("../../middleware/validation"));
 const profileRouter = (0, express_1.Router)();
@@ -49,4 +50,6 @@ profileRouter.get('/searchUser', searchController.search);
 profileRouter.post('/addUpdateVcf', authorization_controller_1.tempAuthenticatingToken, validation.addVcfValidation, vcfController.addCustomField);
 profileRouter.delete('/deleteVcf', authorization_controller_1.tempAuthenticatingToken, vcfController.deleteVcf);
 profileRouter.get('/getVcf', authorization_controller_1.tempAuthenticatingToken, vcfController.getVcf);
+profileRouter.get('/checkProfilePin', vcardProfileController.checkPinEnable);
+profileRouter.get('/vcardProfile', vcardProfileController.vcardProfile);
 exports.default = profileRouter;

@@ -177,6 +177,7 @@ export const updateVcardinfoValidation =async (req:Request, res:Response, next:N
         phone: Joi.string().trim().min(8).max(20).trim().required(),
         email: Joi.string().email( ).trim().max(60).required(),
         country: Joi.number().allow(''),
+        countryName: Joi.string().allow('').allow(null),
         gender: Joi.string().max(200).allow(''),
     });
 

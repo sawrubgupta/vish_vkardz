@@ -189,6 +189,7 @@ const updateVcardinfoValidation = (req, res, next) => __awaiter(void 0, void 0, 
         phone: joi_1.default.string().trim().min(8).max(20).trim().required(),
         email: joi_1.default.string().email().trim().max(60).required(),
         country: joi_1.default.number().allow(''),
+        countryName: joi_1.default.string().allow('').allow(null),
         gender: joi_1.default.string().max(200).allow(''),
     });
     const value = schema.validate(req.body);

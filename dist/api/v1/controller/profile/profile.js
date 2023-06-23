@@ -148,7 +148,7 @@ const updateVcardinfo = (req, res) => __awaiter(void 0, void 0, void 0, function
         if (!userId || userId === "" || userId === undefined) {
             return apiResponse.errorMessage(res, 401, "Please login !");
         }
-        const { name, dialCode, phone, email, country, gender } = req.body;
+        const { name, dialCode, phone, email, country, countryName, gender } = req.body;
         const checkUser = `SELECT * FROM users where deleted_at IS NULL AND (phone = ? || email = ?) AND id != ? LIMIT 1`;
         const checkUserVALUES = [phone, email, userId];
         const [rows] = yield db_1.default.query(checkUser, checkUserVALUES);
@@ -164,8 +164,8 @@ const updateVcardinfo = (req, res) => __awaiter(void 0, void 0, void 0, function
                 return yield apiResponse.errorMessage(res, 400, `${dupli.join()} is already exist, Please change`);
             }
         }
-        const updateQuery = `UPDATE users SET name = ?, dial_code = ?, phone = ?, email = ?, country = ?, gender = ? WHERE id = ?`;
-        const VALUES = [name, dialCode, phone, email, country, gender, userId];
+        const updateQuery = `UPDATE users SET name = ?, dial_code = ?, phone = ?, email = ?, country = ?, country_name = ?, gender = ? WHERE id = ?`;
+        const VALUES = [name, dialCode, phone, email, country, countryName, gender, userId];
         const [data] = yield db_1.default.query(updateQuery, VALUES);
         if (data.affectedRows > 0) {
             return apiResponse.successResponse(res, "Profile updated successfully !", null);

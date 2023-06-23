@@ -124,7 +124,7 @@ export const updateVcardinfo =async (req:Request, res:Response) => {
             return apiResponse.errorMessage(res, 401, "Please login !")
         }
 
-        const { name, dialCode, phone, email, country, gender } = req.body;
+        const { name, dialCode, phone, email, country, countryName, gender } = req.body;
 
         const checkUser = `SELECT * FROM users where deleted_at IS NULL AND (phone = ? || email = ?) AND id != ? LIMIT 1`;
         const checkUserVALUES = [phone, email, userId];
@@ -143,8 +143,8 @@ export const updateVcardinfo =async (req:Request, res:Response) => {
              }
         }
 
-        const updateQuery = `UPDATE users SET name = ?, dial_code = ?, phone = ?, email = ?, country = ?, gender = ? WHERE id = ?`;
-        const VALUES = [name, dialCode, phone, email, country, gender, userId];
+        const updateQuery = `UPDATE users SET name = ?, dial_code = ?, phone = ?, email = ?, country = ?, country_name = ?, gender = ? WHERE id = ?`;
+        const VALUES = [name, dialCode, phone, email, country, countryName, gender, userId];
         const [data]:any = await pool.query(updateQuery, VALUES);
 
         if (data.affectedRows > 0) {

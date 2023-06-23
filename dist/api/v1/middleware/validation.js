@@ -81,7 +81,7 @@ const socialRegistrationValidation = (req, res, next) => __awaiter(void 0, void 
         username: joi_1.default.string().trim().min(2).max(50).required(),
         country: joi_1.default.number().integer().required(),
         phone: joi_1.default.string().trim().min(8).max(20).trim().required(),
-        country_name: joi_1.default.string().trim().allow(''),
+        countryName: joi_1.default.string().trim().allow(''),
         dial_code: joi_1.default.string().required(),
         fcmToken: joi_1.default.string().trim().required(),
     });

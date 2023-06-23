@@ -49,7 +49,7 @@ export const socialRegistrationValidation = async (req: Request, res: Response, 
         username: Joi.string().trim().min(2).max(50).required(),
         country: Joi.number().integer().required(),
         phone: Joi.string().trim().min(8).max(20).trim().required(),
-        country_name : Joi.string().trim().allow(''),
+        countryName : Joi.string().trim().allow(''),
         dial_code: Joi.string().required(),
         fcmToken:Joi.string().trim().required(),
     });

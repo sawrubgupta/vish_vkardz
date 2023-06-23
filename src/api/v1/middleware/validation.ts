@@ -52,6 +52,8 @@ export const socialRegistrationValidation = async (req: Request, res: Response, 
         countryName : Joi.string().trim().allow(''),
         dial_code: Joi.string().required(),
         fcmToken:Joi.string().trim().required(),
+        deviceId:Joi.allow('').allow(null),
+        deviceType: Joi.string().allow('').allow(null),
     });
 
     const value = schema.validate(req.body);

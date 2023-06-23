@@ -20,6 +20,11 @@ name api's
 database changes:
 
 ------------------------------new changes--------------------------------
+23-06-2023
+ALTER TABLE app_setting add COLUMN is_setting_page boolean not null DEFAULT 1;
+ALTER TABLE users ADD COLUMN device_id varchar(200) DEFAULT null AFTER fcm_token;
+ALTER TABLE users ADD COLUMN device_type varchar(55) DEFAULT null AFTER device_id;
+
 22-06-2023
 ALTER TABLE delivery_addresses add COLUMN country_name varchar(55) DEFAULT null AFTER country;
 

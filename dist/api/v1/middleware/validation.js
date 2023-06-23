@@ -84,6 +84,8 @@ const socialRegistrationValidation = (req, res, next) => __awaiter(void 0, void 
         countryName: joi_1.default.string().trim().allow(''),
         dial_code: joi_1.default.string().required(),
         fcmToken: joi_1.default.string().trim().required(),
+        deviceId: joi_1.default.allow('').allow(null),
+        deviceType: joi_1.default.string().allow('').allow(null),
     });
     const value = schema.validate(req.body);
     if (value.error) {

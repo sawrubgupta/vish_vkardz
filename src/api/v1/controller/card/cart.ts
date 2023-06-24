@@ -81,14 +81,16 @@ export const getCart =async (req:Request, res:Response) => {
                 // if (deliveryChargesRows[0].is_delivered === 0) return apiResponse.errorMessage(res, 400, "Delivery not available in this pincode!");
         
                 if (addressRows[0].country == '91' || addressRows[0].country == '+91') {
-                    amount = rows[i].inr_selling_price * rows[i].qty;
+                    // amount = rows[i].inr_selling_price * rows[i].qty;
+                    amount = rows[i].inr_selling_price;
                     totatAmount = totatAmount + amount;
                     gstPrice = (totatAmount*gstInPercent)/100;
                     deliveryCharges = 100; //deliveryChargesRows[0].inr_price || 100;
                     grandTotal = totatAmount+deliveryCharges+gstPrice;
             
                 } else {
-                    amount = rows[i].usd_selling_price * rows[i].qty;
+                    // amount = rows[i].usd_selling_price * rows[i].qty;
+                    amount = rows[i].usd_selling_price;
                     totatAmount = totatAmount + amount;
                     gstPrice = 0;
                     deliveryCharges = 22; //deliveryChargesRows[0].usd_price || 22;
@@ -97,7 +99,8 @@ export const getCart =async (req:Request, res:Response) => {
                 }    
             } else {
                 if (userRows[0].country == '91' || userRows[0].country == '+91') {
-                    amount = rows[i].inr_selling_price * rows[i].qty;
+                    // amount = rows[i].inr_selling_price * rows[i].qty;
+                    amount = rows[i].inr_selling_price;
                     totatAmount = totatAmount + amount;
                     gstPrice = (totatAmount*gstInPercent)/100;
                     deliveryCharges = 100;
@@ -105,7 +108,8 @@ export const getCart =async (req:Request, res:Response) => {
             
 
                 } else {
-                    amount = rows[i].usd_selling_price * rows[i].qty;
+                    // amount = rows[i].usd_selling_price * rows[i].qty;
+                    amount = rows[i].usd_selling_price;
                     totatAmount = totatAmount + amount;
                     gstPrice = 0;
                     deliveryCharges = 22;

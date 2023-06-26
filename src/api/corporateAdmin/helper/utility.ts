@@ -70,7 +70,7 @@ export const validateEmail = (email: any) => {
 export const dateWithFormat = () => {
 	const date = new Date();
 	date.setFullYear(date.getFullYear());
-	const goodDate = moment(date).format("YYYY-MM-DD HH:mm:ss");
+	const goodDate = moment(date).tz('Asia/Kolkata').format("YYYY-MM-DD HH:mm:ss");
 	return goodDate;
 };
 
@@ -82,13 +82,13 @@ export const extendedDateWithFormat = (type: string) => {
 	var endDate = "0000-00-00 00:00:00";
 	if (type === "yearly" || type === "year") {
 		date.setFullYear(date.getFullYear() + 1);
-		endDate = moment(date).format("YYYY-MM-DD HH:mm:ss");
+		endDate = moment(date).tz('Asia/Kolkata').format("YYYY-MM-DD HH:mm:ss");
 	} else if (type === "monthly" || type === "trial" || type === "month") {
 		date.setMonth(date.getMonth() + 1);
-		endDate = moment(date).format("YYYY-MM-DD HH:mm:ss");
+		endDate = moment(date).tz('Asia/Kolkata').format("YYYY-MM-DD HH:mm:ss");
 	} else if (type === "weekly" || type === "week") {
 		date.setDate(date.getDate() + 7);
-		endDate = moment(date).format("YYYY-MM-DD HH:mm:ss");
+		endDate = moment(date).tz('Asia/Kolkata').format("YYYY-MM-DD HH:mm:ss");
 	}
 	return endDate;
 };

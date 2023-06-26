@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.uploadFile = exports.jwtGenerate = exports.sendMail = exports.extendedDateWithFormat = exports.dateWithFormat = exports.validateEmail = exports.englishCheck = exports.randomNumber = exports.randomString = exports.maxChecker = void 0;
 const moment_1 = __importDefault(require("moment"));
 const nodemailer_1 = __importDefault(require("nodemailer"));
+require("moment-timezone");
 const development_1 = __importDefault(require("../config/development"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 require("dotenv/config");
@@ -78,7 +79,7 @@ exports.validateEmail = validateEmail;
 const dateWithFormat = () => {
     const date = new Date();
     date.setFullYear(date.getFullYear());
-    const goodDate = (0, moment_1.default)(date).format("YYYY-MM-DD HH:mm:ss");
+    const goodDate = (0, moment_1.default)(date).tz('Asia/Kolkata').format("YYYY-MM-DD HH:mm:ss");
     return goodDate;
 };
 exports.dateWithFormat = dateWithFormat;
@@ -89,15 +90,15 @@ const extendedDateWithFormat = (type) => {
     var endDate = "0000-00-00 00:00:00";
     if (type === "yearly" || type === "year") {
         date.setFullYear(date.getFullYear() + 1);
-        endDate = (0, moment_1.default)(date).format("YYYY-MM-DD HH:mm:ss");
+        endDate = (0, moment_1.default)(date).tz('Asia/Kolkata').format("YYYY-MM-DD HH:mm:ss");
     }
     else if (type === "monthly" || type === "trial" || type === "month") {
         date.setMonth(date.getMonth() + 1);
-        endDate = (0, moment_1.default)(date).format("YYYY-MM-DD HH:mm:ss");
+        endDate = (0, moment_1.default)(date).tz('Asia/Kolkata').format("YYYY-MM-DD HH:mm:ss");
     }
     else if (type === "weekly" || type === "week") {
         date.setDate(date.getDate() + 7);
-        endDate = (0, moment_1.default)(date).format("YYYY-MM-DD HH:mm:ss");
+        endDate = (0, moment_1.default)(date).tz('Asia/Kolkata').format("YYYY-MM-DD HH:mm:ss");
     }
     return endDate;
 };

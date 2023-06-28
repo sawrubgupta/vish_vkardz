@@ -20,6 +20,23 @@ name api's
 database changes:
 
 ------------------------------new changes--------------------------------
+
+28-06-2023
+CREATE TABLE `vkoin_limit` (
+   `id` INT(11) NOT NULL AUTO_INCREMENT , 
+   `referrer_coin` INT(4) NOT NULL COMMENT 'who invited (who makes a referral/refers another)' , 
+   `referee_coin` INT(4) NOT NULL COMMENT 'who was invited' , 
+   `contact_sync_coin` INT(4) NOT NULL , 
+   `profile_view_coin` INT(4) NOT NULL , 
+   `share_profile_coin` INT(4) NOT NULL , 
+   `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP , 
+   `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP , 
+   PRIMARY KEY (`id`)
+) ENGINE = InnoDB;
+
+
+
+----------
 23-06-2023
 ALTER TABLE app_setting add COLUMN is_setting_page boolean not null DEFAULT 1;
 ALTER TABLE users ADD COLUMN device_id varchar(200) DEFAULT null AFTER fcm_token;

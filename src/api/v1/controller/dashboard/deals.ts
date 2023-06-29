@@ -10,7 +10,7 @@ export const dealOfTheDay =async (req:Request, res:Response) => {
 
 
         if (rows.length > 0) {
-            return apiResponse.successResponse(res, "Deals of the day", rows);
+            return apiResponse.successResponse(res, "Deals of the day list", rows);
         } else {
             return apiResponse.successResponse(res, "No data found", null);
         }

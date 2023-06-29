@@ -134,7 +134,7 @@ export const cardPurchase =async (req:Request, res:Response) => {
                     message: "Purchase Successfully!"
                 })
                 } else {
-                return apiResponse.errorMessage(res, 400, "Something went wrong,please try again  later or contact our support team");
+                return apiResponse.errorMessage(res, 400, "Something went wrong, please try again later or contact our support team");
             }
         } else {
             return apiResponse.errorMessage(res, 400, "Purchase Failed, Please try again");

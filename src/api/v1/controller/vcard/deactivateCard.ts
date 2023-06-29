@@ -22,7 +22,7 @@ export const deactivateCard =async (req:Request, res:Response) => {
         const [rows]:any =await pool.query(sql, VALUES);
 
         if (rows.affectedRows > 0) {
-            return apiResponse.successResponse(res, "Your card is Deactive Now!", null);
+            return apiResponse.successResponse(res, "Your card is Deactivated!", null);
         } else {
             return apiResponse.errorMessage(res,400, "Failed to Deactive the card, please try again later !");
         }

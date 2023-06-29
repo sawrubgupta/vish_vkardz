@@ -184,7 +184,7 @@ const cardPurchase = (req, res) => __awaiter(void 0, void 0, void 0, function* (
                 });
             }
             else {
-                return apiResponse.errorMessage(res, 400, "Something went wrong,please try again  later or contact our support team");
+                return apiResponse.errorMessage(res, 400, "Something went wrong, please try again later or contact our support team");
             }
         }
         else {

@@ -31,7 +31,7 @@ export const orderHistory =async (req:Request, res:Response) => {
             return res.status(200).json({
                 status: true,
                 ongoingOrder, deliveredOrder, cancelOrder, 
-                message: "Data Rtrieved Successfully"
+                message: "Data Retrieved Successfully"
             })
             // return apiResponse.successResponse(res, "Data Rtrieved Successfully", rows);
         } else {

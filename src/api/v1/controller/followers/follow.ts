@@ -58,7 +58,7 @@ export const unfollow =async (req:Request, res:Response) => {
         const [followerRows]:any = await pool.query(checkFollowingSql);
 
         if (followerRows.length === 0) {
-            return apiResponse.errorMessage(res, 400, "You Can't follow!!");
+            return apiResponse.errorMessage(res, 400, "You Can't follow this account!!");
         }
 
         const unfollowQuery = `DELETE FROM user_followers WHERE follower_id = ${userId} AND user_id = ${followingId}`;

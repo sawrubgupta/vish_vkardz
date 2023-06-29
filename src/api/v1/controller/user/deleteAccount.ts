@@ -7,7 +7,7 @@ export const deleteAccount =async (req:Request, res:Response) => {
     try {
         const userId = res.locals.jwt.userId;
         const createdAt = utility.dateWithFormat();
-console.log(userId);
+// console.log(userId);
 
         console.log(createdAt);
         

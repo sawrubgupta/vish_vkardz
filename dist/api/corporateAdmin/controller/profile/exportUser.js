@@ -202,7 +202,7 @@ const exportUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             column.font = {
                 size: 12,
             };
-            column.width = 100;
+            // column.width = 100;
         });
         worksheet.getRow(1).font = {
             bold: true,

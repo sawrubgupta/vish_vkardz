@@ -159,11 +159,11 @@ const socialRegister = (req, res) => __awaiter(void 0, void 0, void 0, function*
         const primaryProfileLink = (vcardLink) + (username);
         const hash = (0, md5_1.default)(password);
         let referralCode;
-        referralCode = utility.randomString(6);
+        referralCode = utility.randomString(10);
         const referSql = `SELECT referral_code FROM users where referral_code = '${referralCode}' LIMIT 1`;
         const [referRows] = yield db_1.default.query(referSql);
         if (referRows.length > 0) {
-            referralCode = utility.randomString(6);
+            referralCode = utility.randomString(10);
         }
         let uName;
         let featureStatus;

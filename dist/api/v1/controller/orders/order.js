@@ -64,7 +64,7 @@ const orderHistory = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             return res.status(200).json({
                 status: true,
                 ongoingOrder, deliveredOrder, cancelOrder,
-                message: "Data Rtrieved Successfully"
+                message: "Data Retrieved Successfully"
             });
             // return apiResponse.successResponse(res, "Data Rtrieved Successfully", rows);
         }

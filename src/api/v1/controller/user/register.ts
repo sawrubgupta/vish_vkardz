@@ -127,12 +127,12 @@ export const socialRegister =async (req:Request, res:Response) => {
         const primaryProfileLink = (vcardLink)+(username);
         const hash = md5(password);
         let referralCode:any;   
-        referralCode = utility.randomString(6);
+        referralCode = utility.randomString(10);
 
         const referSql = `SELECT referral_code FROM users where referral_code = '${referralCode}' LIMIT 1`;
         const [referRows]:any = await pool.query(referSql);
         if (referRows.length > 0) {
-            referralCode = utility.randomString(6);
+            referralCode = utility.randomString(10);
         }
 
         let uName;

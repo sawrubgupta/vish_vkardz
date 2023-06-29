@@ -9,7 +9,7 @@ export const validUserName =async (req:Request, res:Response) => {
         const username = req.query.username;
         const englishCheck = utility.englishCheck(username);
         if (englishCheck != "") {
-            return apiResponse.errorMessage(res, 400, "englishCheck");
+            return apiResponse.errorMessage(res, 400, englishCheck);
         }
         if (!username) {
             return apiResponse.errorMessage(res, 400, "Enter Valid UserName.");

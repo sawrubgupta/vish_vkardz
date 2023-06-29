@@ -171,7 +171,7 @@ export const updateTeamMember = async (req: Request, res: Response) => {
 
             return apiResponse.successResponse(res, "Data updated successfully !", null);
         } else {
-            return apiResponse.errorMessage(res, 400, "Failed to Register, Please try again later");
+            return apiResponse.errorMessage(res, 400, "Failed to Update, Please try again later");
         }
 
     } catch (error) {

@@ -43,7 +43,7 @@ const deleteAccount = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     try {
         const userId = res.locals.jwt.userId;
         const createdAt = utility.dateWithFormat();
-        console.log(userId);
+        // console.log(userId);
         console.log(createdAt);
         const sql = `UPDATE users SET status = ?, deleted_at = ? WHERE id = ?`;
         const VALUES = [0, createdAt, userId];

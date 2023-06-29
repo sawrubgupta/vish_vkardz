@@ -157,7 +157,7 @@ export const exportUser = async (req: Request, res: Response) => {
             column.font = {
                 size: 12,
             };
-            column.width = 100;
+            // column.width = 100;
         });
 
         worksheet.getRow(1).font = {

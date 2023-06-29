@@ -29,11 +29,25 @@ CREATE TABLE `vkoin_limit` (
    `contact_sync_coin` INT(4) NOT NULL , 
    `profile_view_coin` INT(4) NOT NULL , 
    `share_profile_coin` INT(4) NOT NULL , 
+   `coin_in_one_inr` INT(4) NOT NULL,
+   `coin_in_one_usd` INT(4) NOT NULL,
    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP , 
    `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP , 
    PRIMARY KEY (`id`)
 ) ENGINE = InnoDB;
 
+CREATE TABLE `user_coins` (
+   `id` INT(11) NOT NULL AUTO_INCREMENT ,
+   `user_id` INT(11) NOT NULL ,
+   `type` VARCHAR(55) NOT NULL ,
+   `coin` INT(6) NOT NULL ,
+   `coin_used` INT(6) NOT NULL DEFAULT '0' ,
+   `coin_status` VARCHAR(55) NOT NULL COMMENT 'expire, redeem, active' ,
+   `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ,
+   `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ,
+   `expired_at` DATETIME NULL DEFAULT NULL ,
+   PRIMARY KEY (`id`)
+) ENGINE = InnoDB;
 
 
 ----------

@@ -832,3 +832,24 @@ export const updatePackageValidation =async (req:Request, res:Response, next:Nex
 
 // ====================================================================================================
 // ====================================================================================================
+
+export const contactUsValidation =async (req:Request, res:Response, next:NextFunction) => {
+    
+    const schema = Joi.object({
+        name: Joi.string().required(),
+        email: Joi.string().email().required(),
+        subject: Joi.string().allow('').allow(null),
+        message: Joi.string().required(),
+    })
+
+    const value = schema.validate(req.body);
+
+    if (value.error) {
+        const errMsg = await validationCheck(value);
+        return await apiResponse.errorMessage(res,400, errMsg);
+    }
+    next();
+}
+
+// ====================================================================================================
+// ====================================================================================================

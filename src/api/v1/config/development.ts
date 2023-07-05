@@ -35,6 +35,13 @@ export default {
     vcfEmail: 'email',
     vcfCompany: 'company',
 
+    referrerType: 'referrer',
+    refereeType: 'referee',
+    activeStatus: 'ACTIVE',
+    redeemStatus: 'REDEEM',
+    expiredStatus: 'EXPIRED',
+    couponRedeem: 'COUPON_REEDEM',
+
     secretKey:"nss6DpYlq5CHw6Hn0jPqXJwtkHXuMDdYynDiRFNS6_Y", //process.env.SECRET,
     resumeLimit:10,
     vKardzPhone: "+91 6377256382",

@@ -20,6 +20,20 @@ name api's
 database changes:
 
 ------------------------------new changes--------------------------------
+03-07-2023
+CREATE TABLE `contact_us` (
+ `id` INT(11) NOT NULL AUTO_INCREMENT ,
+ `name` VARCHAR(255) NOT NULL ,
+ `email` VARCHAR(255) NOT NULL ,
+ `subject` VARCHAR(255) NULL DEFAULT NULL ,
+ `message` TEXT NOT NULL ,
+ `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ,
+ PRIMARY KEY (`id`)
+) ENGINE = InnoDB;
+
+29-06-2023
+ALTER TABLE `user_coins` CHANGE `coin_used` `used_coin_amount` INT(6) NOT NULL DEFAULT '0';
+ALTER TABLE `user_coins` CHANGE `expired_at` `expired_at` DATE NULL DEFAULT NULL;
 
 28-06-2023
 CREATE TABLE `vkoin_limit` (

@@ -72,6 +72,37 @@ export const dateWithFormat = () => {
 	return goodDate;
 };
 
+
+// ====================================================================================================
+// ====================================================================================================
+
+export const getTimeAndDate =async () => {
+	var m = moment.tz('Asia/Kolkata').format('YYYY-MM-DD HH:mm');
+	const str = (m).toString().split(" ");
+	return [str[0], str[1]];
+  }
+  
+// ====================================================================================================
+// ====================================================================================================
+  
+export const extendedDateAndTime = (type: string) => {
+	const date = new Date();
+	var endDate = "0000-00-00 00:00:00";
+	if (type === "yearly" || type === "year") {
+		date.setFullYear(date.getFullYear() + 1);
+		endDate = moment(date).tz('Asia/Kolkata').format("YYYY-MM-DD HH:mm:ss");
+	} else if (type === "monthly" || type === "trial" || type === "month") {
+		date.setMonth(date.getMonth() + 1);
+		endDate = moment(date).tz('Asia/Kolkata').format("YYYY-MM-DD HH:mm:ss");
+	} else if (type === "weekly" || type === "week") {
+		date.setDate(date.getDate() + 7);
+		endDate = moment(date).tz('Asia/Kolkata').format("YYYY-MM-DD HH:mm:ss");
+	}
+	const str = (endDate).toString().split(" ");
+
+	return [str[0], str[1]];
+};
+
 // ====================================================================================================
 // ====================================================================================================
 

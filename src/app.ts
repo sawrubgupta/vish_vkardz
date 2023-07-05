@@ -7,6 +7,8 @@ import compression from "compression";
 import morgan from 'morgan';
 import helmet from 'helmet';
 import fs from 'fs';
+import cron from 'node-cron';
+import * as cronFn from './api/v1/controller/cronjobs/coinCron';
 
 export default function (app: Express) {
     app.use(cors());
@@ -28,6 +30,17 @@ export default function (app: Express) {
         });
     });
     
+// run cron job every day
+    cron.schedule("0 1 * * *", async function() {
+        cronFn.coinCron();
+        fs.appendFile("logs.txt", "running cron job every day (hh/mm/05)/n", function(err:any) {
+            if (err) throw err;
+        });
+    }, {
+        scheduled: true, //true/false
+        timezone: "Asia/Kolkata"         
+    });
+
     app.use((err: any, req: any, res: any, next: any) => {
         if(err){ 
             res.status(500).json({

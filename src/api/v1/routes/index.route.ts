@@ -9,9 +9,10 @@ import featuresRoute from "./features/features";
 import profileRoute from "./profile/profile";
 import invoiceRoute from "./invoice/invoice";
 import orderRoute from "./order/order"
-import referralRoute from "./referral/refer";
+import walletRoute from "./wallet/wallet";
 import followerRoute from "./follower/follow";
 import serviceRoute from "./service/package";
+import websiteRoute from "./website/website";
 
 // import staticDataRoute from "./static_data/staticData"
 // import subscriptionRoute from "./subscription/subscription"
@@ -34,9 +35,10 @@ indexRoute.use("/features", featuresRoute);
 indexRoute.use("/profile",profileRoute);
 indexRoute.use("/invoice", invoiceRoute);
 indexRoute.use("/order",orderRoute);
-indexRoute.use("/refer", referralRoute);
+indexRoute.use("/wallet", walletRoute);
 indexRoute.use("/userFollow", followerRoute);
 indexRoute.use("/service", serviceRoute);
+indexRoute.use("/web", websiteRoute);
 
 // indexRoute.use("/staticData",staticDataRoute);
 // indexRoute.use("/subscription",subscriptionRoute);

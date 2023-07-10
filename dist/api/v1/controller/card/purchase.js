@@ -59,6 +59,7 @@ const cardPurchase = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         //     return apiResponse.errorMessage(res, 400, "Please Accept return policy");
         // }
         const createdAt = utility.dateWithFormat();
+        const extendedDate = utility.extendedDateAndTime("yearly");
         var paymentType = '';
         const { orderType, isGiftEnable, giftMessage } = req.body;
         if (orderType !== "online" && orderType !== "offline") {
@@ -71,6 +72,9 @@ const cardPurchase = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         const orderlist = req.body.orderlist;
         let rows;
         // if (reedemCoinStatus === true) {
+        // const checkUserSql = `SELECT id, offer_coin FROM users WHERE id = ${userId} LIMIT 1`;
+        // const [userRows]:any = await pool.query(checkUserSql);
+        // if (userRows[0].offer_coin < coins) return apiResponse.errorMessage(res, 400, "Insufficient coins");
         //     if (coins > 400) {
         //         coins = 400;
         //     }
@@ -78,6 +82,11 @@ const cardPurchase = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         //     const coinVALUES = [userId, coins, createdAt];
         //     const [coinRows]:any = await pool.query(reedemCoinQuery, coinVALUES);
         // }
+        // const coinSql = `INSERT INTO user_coins(user_id, type, coin, used_coin_amount, coin_status, created_at, expired_at) VALUES(?, ?, ?, ?, ?, ?, ?)`;
+        // const coinVALUES = [userId, config.couponRedeem, coins, 0, config.activeStatus, createdAt, extendedDate];
+        // const [coinRows]:any = await pool.query(coinSql, coinVALUES);
+        // const updateUser = `UPDATE users SET offer_coin = offer_coin + ${coins} WHERE id = ${userId}`;
+        // const [userRows]:any = await pool.query(updateUser);
         if (orderType === "online") {
             if (paymentInfo.paymentType === "stripe") {
                 paymentType = '2';

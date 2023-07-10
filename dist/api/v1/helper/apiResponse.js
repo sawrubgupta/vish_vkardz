@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.errorMessage = exports.validationErrorWithData = exports.successResponse = void 0;
+exports.somethingWentWrongMessage = exports.errorMessage = exports.validationErrorWithData = exports.successResponse = void 0;
 const successResponse = (res, msg, data) => __awaiter(void 0, void 0, void 0, function* () {
     var resData = {
         status: true,
@@ -40,5 +40,15 @@ const errorMessage = (res, statusCode, msg) => __awaiter(void 0, void 0, void 0,
     });
 });
 exports.errorMessage = errorMessage;
+// ====================================================================================================
+// ====================================================================================================
+const somethingWentWrongMessage = (res) => __awaiter(void 0, void 0, void 0, function* () {
+    return res.status(400).json({
+        status: false,
+        data: null,
+        message: "Something went wrong"
+    });
+});
+exports.somethingWentWrongMessage = somethingWentWrongMessage;
 // ====================================================================================================
 // ====================================================================================================

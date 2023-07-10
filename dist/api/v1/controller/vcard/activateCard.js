@@ -69,7 +69,7 @@ const activateCard = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         if (!code) {
             return apiResponse.errorMessage(res, 400, "Card number is invalid !");
         }
-        const getCardDetail = `SELECT * FROM card_activation where card_key = '${code}' OR card_number = '${newCardNumber}' limit 1`;
+        const getCardDetail = `SELECT * FROM card_activation where card_key = '${code}' OR card_number = '${code}' OR card_number = '${newCardNumber}' limit 1`;
         const [cardData] = yield db_1.default.query(getCardDetail);
         if (cardData.length === 0) {
             return apiResponse.errorMessage(res, 400, "Code is invalid, Contact support!");

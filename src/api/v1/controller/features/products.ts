@@ -20,10 +20,10 @@ export const addProduct =async (req:Request, res:Response) => {
         }
 
         const createdAt = utility.dateWithFormat();
-        const {title, description, price, image} = req.body;
+        const {title, description, price, image, currencyCode} = req.body;
 
-        const sql = `INSERT INTO services(user_id, title, images, overview, price, status, created_at) VALUES(?, ?, ?, ?, ?, ?, ?)`;
-        const VALUES = [userId, title, image, description, price, 1, createdAt];
+        const sql = `INSERT INTO services(user_id, title, images, overview, price, currency_code, status, created_at) VALUES(?, ?, ?, ?, ?, ?, ?, ?)`;
+        const VALUES = [userId, title, image, description, price, currencyCode, 1, createdAt];
         const [rows]:any = await pool.query(sql, VALUES);
 
         if (rows.affectedRows > 0) {
@@ -65,7 +65,7 @@ export const getProducts =async (req:Request, res:Response) => {
         const getPageQuery = `SELECT id, title, overview as description, images, price, status FROM services WHERE user_id = ${userId}`;
         const [result]:any= await pool.query(getPageQuery);
 
-        const sql = `SELECT id, title, overview as description, images, price, status FROM services WHERE user_id = ${userId} ORDER BY created_at DESC LIMIT ${page_size} OFFSET ${offset}`;
+        const sql = `SELECT id, title, overview as description, currency_code, images, price, status FROM services WHERE user_id = ${userId} ORDER BY created_at DESC LIMIT ${page_size} OFFSET ${offset}`;
         const [rows]:any = await pool.query(sql);
 
         let totalPages:any = result.length/page_size;
@@ -121,10 +121,10 @@ export const updateProduct =async (req:Request, res:Response) => {
         }
 
         const productId = req.query.productId;
-        const {title, description, price, image} = req.body;
+        const {title, description, price, image, currencyCode} = req.body;
 
-        const sql = `UPDATE services SET title = ?, overview = ?, price = ?, images = ? WHERE user_id = ? AND id = ?`;
-        const VALUES = [title, description, price, image, userId, productId];
+        const sql = `UPDATE services SET title = ?, overview = ?, price = ?, currency_code = ?, images = ? WHERE user_id = ? AND id = ?`;
+        const VALUES = [title, description, price, currencyCode, image, userId, productId];
         const [rows]:any = await pool.query(sql, VALUES);
 
         if (rows.affectedRows > 0) {

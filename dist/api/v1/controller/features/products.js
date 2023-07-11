@@ -55,9 +55,9 @@ const addProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             return apiResponse.errorMessage(res, 401, "User Id is required!");
         }
         const createdAt = utility.dateWithFormat();
-        const { title, description, price, image } = req.body;
-        const sql = `INSERT INTO services(user_id, title, images, overview, price, status, created_at) VALUES(?, ?, ?, ?, ?, ?, ?)`;
-        const VALUES = [userId, title, image, description, price, 1, createdAt];
+        const { title, description, price, image, currencyCode } = req.body;
+        const sql = `INSERT INTO services(user_id, title, images, overview, price, currency_code, status, created_at) VALUES(?, ?, ?, ?, ?, ?, ?, ?)`;
+        const VALUES = [userId, title, image, description, price, currencyCode, 1, createdAt];
         const [rows] = yield db_1.default.query(sql, VALUES);
         if (rows.affectedRows > 0) {
             return apiResponse.successResponse(res, "Product Added Successfully", null);
@@ -97,7 +97,7 @@ const getProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         const offset = (page - 1) * page_size;
         const getPageQuery = `SELECT id, title, overview as description, images, price, status FROM services WHERE user_id = ${userId}`;
         const [result] = yield db_1.default.query(getPageQuery);
-        const sql = `SELECT id, title, overview as description, images, price, status FROM services WHERE user_id = ${userId} ORDER BY created_at DESC LIMIT ${page_size} OFFSET ${offset}`;
+        const sql = `SELECT id, title, overview as description, currency_code, images, price, status FROM services WHERE user_id = ${userId} ORDER BY created_at DESC LIMIT ${page_size} OFFSET ${offset}`;
         const [rows] = yield db_1.default.query(sql);
         let totalPages = result.length / page_size;
         let totalPage = Math.ceil(totalPages);
@@ -151,9 +151,9 @@ const updateProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* 
             return apiResponse.errorMessage(res, 401, "User Id is required!");
         }
         const productId = req.query.productId;
-        const { title, description, price, image } = req.body;
-        const sql = `UPDATE services SET title = ?, overview = ?, price = ?, images = ? WHERE user_id = ? AND id = ?`;
-        const VALUES = [title, description, price, image, userId, productId];
+        const { title, description, price, image, currencyCode } = req.body;
+        const sql = `UPDATE services SET title = ?, overview = ?, price = ?, currency_code = ?, images = ? WHERE user_id = ? AND id = ?`;
+        const VALUES = [title, description, price, currencyCode, image, userId, productId];
         const [rows] = yield db_1.default.query(sql, VALUES);
         if (rows.affectedRows > 0) {
             return apiResponse.successResponse(res, "Product Updated Successfully", null);

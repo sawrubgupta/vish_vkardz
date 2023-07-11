@@ -635,6 +635,7 @@ export const userProductsValidation = async (req:Request, res:Response, next:Nex
         description: Joi.string().min(1).max(80).trim().required(),
         price: Joi.string().required(),
         image: Joi.string().required(),
+        currencyCode: Joi.string().allow('').allow(null),
     });
 
     const value = schema.validate(req.body);

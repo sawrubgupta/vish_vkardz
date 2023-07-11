@@ -587,6 +587,7 @@ const userProductsValidation = (req, res, next) => __awaiter(void 0, void 0, voi
         description: joi_1.default.string().min(1).max(80).trim().required(),
         price: joi_1.default.string().required(),
         image: joi_1.default.string().required(),
+        currencyCode: joi_1.default.string().allow('').allow(null),
     });
     const value = schema.validate(req.body);
     if (value.error) {

@@ -41,6 +41,7 @@ profileRouter.patch("/updateImage", authorization_controller_1.tempAuthenticatin
 profileRouter.patch("/updateVcardinfo", authorization_controller_1.authenticatingToken, validation.updateVcardinfoValidation, profileController.updateVcardinfo);
 profileRouter.post("/setProfilePin", authorization_controller_1.tempAuthenticatingToken, validation.setProfilePinValidation, setPinController.setPin); //use in business type
 profileRouter.delete("/removeProfilePin", authorization_controller_1.tempAuthenticatingToken, setPinController.removePin); //use in business type
+profileRouter.post("/validatePin", validation.validatePinValidation, setPinController.validatePin); //use in business type
 profileRouter.get("/getLayots", themeController.getLayout); //use in business type
 profileRouter.patch("/updateVcardLayout", authorization_controller_1.tempAuthenticatingToken, themeController.updateVcardLayout); //use in business type
 profileRouter.post('/addPrimaryProfile', authorization_controller_1.authenticatingToken, validation.primaryProfileValidation, primaryProfileController.setPrimaryProfile);

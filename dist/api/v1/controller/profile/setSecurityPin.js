@@ -35,7 +35,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.removePin = exports.setPin = void 0;
+exports.validatePin = exports.removePin = exports.setPin = void 0;
 const db_1 = __importDefault(require("../../../../db"));
 const apiResponse = __importStar(require("../../helper/apiResponse"));
 const development_1 = __importDefault(require("../../config/development"));
@@ -102,5 +102,30 @@ const removePin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.removePin = removePin;
+// ====================================================================================================
+// ====================================================================================================
+const validatePin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { username, pin } = req.body;
+        const sql = `SELECT * FROM users WHERE username = '${username}' LIMIT 1`;
+        const [rows] = yield db_1.default.query(sql);
+        if (rows.length === 0)
+            return apiResponse.errorMessage(res, 400, "Invalid username");
+        if (rows[0].is_password_enable === 0) {
+            return apiResponse.successResponse(res, "Profile Pin is disabled", null);
+        }
+        if (pin == rows[0].set_password) {
+            return apiResponse.successResponse(res, "Profile pin verified", null);
+        }
+        else {
+            return apiResponse.errorMessage(res, 400, "Wrong profile pin");
+        }
+    }
+    catch (error) {
+        console.log(error);
+        return apiResponse.errorMessage(res, 400, "Something went wrong");
+    }
+});
+exports.validatePin = validatePin;
 // ====================================================================================================
 // ====================================================================================================

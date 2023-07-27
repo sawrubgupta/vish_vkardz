@@ -20,6 +20,29 @@ name api's
 database changes:
 
 ------------------------------new changes--------------------------------
+27-07-2023
+CREATE TABLE `exchange_contacts` (
+ `id` INT(11) NOT NULL AUTO_INCREMENT ,
+ `user_id` INT(11) NOT NULL ,
+ `name` VARCHAR(55) NOT NULL ,
+ `email` VARCHAR(200) NOT NULL ,
+ `phone` VARCHAR(55) NOT NULL ,
+ `message` TEXT NULL DEFAULT NULL ,
+ `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ,
+ PRIMARY KEY (`id`)
+) ENGINE = InnoDB;
+
+CREATE TABLE `leads` (
+ `id` INT(11) NOT NULL AUTO_INCREMENT ,
+ `user_id` INT(11) NOT NULL ,
+ `name` VARCHAR(55) NOT NULL ,
+ `email` VARCHAR(200) NOT NULL ,
+ `phone` VARCHAR(55) NOT NULL ,
+ `message` TEXT NULL DEFAULT NULL ,
+ `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ,
+ PRIMARY KEY (`id`)
+) ENGINE = InnoDB;
+
 11-07-2023
 ALTER TABLE services add COLUMN currency_code varchar(55) DEFAULT null AFTER price;
 

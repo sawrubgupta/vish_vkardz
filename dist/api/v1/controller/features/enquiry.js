@@ -35,7 +35,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.replyEnquiry = exports.deleteEnquiry = exports.enquiryList = void 0;
+exports.submitEnquiry = exports.replyEnquiry = exports.deleteEnquiry = exports.enquiryList = void 0;
 const db_1 = __importDefault(require("../../../../db"));
 const apiResponse = __importStar(require("../../helper/apiResponse"));
 const utility = __importStar(require("../../helper/utility"));
@@ -171,5 +171,32 @@ const replyEnquiry = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     }
 });
 exports.replyEnquiry = replyEnquiry;
+// ====================================================================================================
+// ====================================================================================================
+const submitEnquiry = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { username, name, email, phone, message } = req.body;
+        const createdAt = utility.dateWithFormat();
+        const userSql = `SELECT id FROM users WHERE username = '${username}' LIMIT 1`;
+        const [userRows] = yield db_1.default.query(userSql);
+        if (userRows.length === 0)
+            return apiResponse.errorMessage(res, 400, "Invalid username");
+        const userId = userRows[0].id;
+        const sql = `INSERT INTO user_contacts(user_id, name, email, phone_num, msg, created_at) VALUES(?, ?, ?, ?, ?, ?)`;
+        const VALUES = [userId, name, email, phone, message, createdAt];
+        const [rows] = yield db_1.default.query(sql, VALUES);
+        if (rows.affectedRows > 0) {
+            return apiResponse.successResponse(res, "Success", null);
+        }
+        else {
+            return apiResponse.errorMessage(res, 400, "Failed!, try again");
+        }
+    }
+    catch (error) {
+        console.log(error);
+        return apiResponse.somethingWentWrongMessage(res);
+    }
+});
+exports.submitEnquiry = submitEnquiry;
 // ====================================================================================================
 // ====================================================================================================

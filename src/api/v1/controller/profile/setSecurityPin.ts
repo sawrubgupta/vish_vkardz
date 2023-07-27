@@ -69,3 +69,29 @@ export const removePin =async (req:Request, res:Response) => {
 
 // ====================================================================================================
 // ====================================================================================================
+
+export const validatePin =async (req:Request, res:Response) => {
+    try {
+        const { username, pin } = req.body;
+
+        const sql = `SELECT * FROM users WHERE username = '${username}' LIMIT 1`;
+        const [rows]:any = await pool.query(sql);
+        if (rows.length === 0) return apiResponse.errorMessage(res, 400, "Invalid username");
+
+        if (rows[0].is_password_enable === 0) {
+            return apiResponse.successResponse(res, "Profile Pin is disabled", null);
+        }
+        if (pin == rows[0].set_password) {
+            return apiResponse.successResponse(res, "Profile pin verified", null);
+        } else {
+            return apiResponse.errorMessage(res, 400, "Wrong profile pin");
+        }
+
+    } catch (error) {
+        console.log(error);
+        return apiResponse.errorMessage(res, 400, "Something went wrong");
+    }
+}
+
+// ====================================================================================================
+// ====================================================================================================

@@ -854,3 +854,88 @@ export const contactUsValidation =async (req:Request, res:Response, next:NextFun
 
 // ====================================================================================================
 // ====================================================================================================
+
+export const enquiryValidation =async (req:Request, res:Response, next:NextFunction) => {
+
+    const schema = Joi.object({
+        username: Joi.string().required(),
+        name: Joi.string().required(),
+        email: Joi.string().email().required(),
+        phone: Joi.required(),
+        message: Joi.string().allow(null, ""),
+    })
+
+    const value = schema.validate(req.body);
+
+    if (value.error) {
+        const errMsg = await validationCheck(value);
+        return await apiResponse.errorMessage(res,400, errMsg);
+    }
+    next();
+}
+
+// ====================================================================================================
+// ====================================================================================================
+
+export const exchangeContactValidation =async (req:Request, res:Response, next:NextFunction) => {
+
+    const schema = Joi.object({
+        username: Joi.string().required(),
+        name: Joi.string().required(),
+        email: Joi.string().email().required(),
+        phone: Joi.required(),
+        message: Joi.string().allow(null, ""),
+    })
+
+    const value = schema.validate(req.body);
+
+    if (value.error) {
+        const errMsg = await validationCheck(value);
+        return await apiResponse.errorMessage(res,400, errMsg);
+    }
+    next();
+}
+
+// ====================================================================================================
+// ====================================================================================================
+
+export const captureLeadtValidation =async (req:Request, res:Response, next:NextFunction) => {
+
+    const schema = Joi.object({
+        username: Joi.string().required(),
+        name: Joi.string().required(),
+        email: Joi.string().email().required(),
+        phone: Joi.required(),
+        message: Joi.string().allow(null, ""),
+    })
+
+    const value = schema.validate(req.body);
+
+    if (value.error) {
+        const errMsg = await validationCheck(value);
+        return await apiResponse.errorMessage(res,400, errMsg);
+    }
+    next();
+}
+
+// ====================================================================================================
+// ====================================================================================================
+
+export const validatePinValidation =async (req:Request, res:Response, next:NextFunction) => {
+
+    const schema = Joi.object({
+        username: Joi.string().required(),
+        pin: Joi.string().required(),
+    })
+
+    const value = schema.validate(req.body);
+
+    if (value.error) {
+        const errMsg = await validationCheck(value);
+        return await apiResponse.errorMessage(res,400, errMsg);
+    }
+    next();
+}
+
+// ====================================================================================================
+// ====================================================================================================

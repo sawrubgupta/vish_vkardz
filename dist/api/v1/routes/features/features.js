@@ -31,6 +31,7 @@ const gallaryController = __importStar(require("../../controller/features/gallar
 const appointmentController = __importStar(require("../../controller/features/appointment"));
 const enquiryController = __importStar(require("../../controller/features/enquiry"));
 const businessHourController = __importStar(require("../../controller/features/businessHour"));
+const contactController = __importStar(require("../../controller/features/contacts"));
 const authorization_controller_1 = require("../../middleware/authorization.controller");
 const validation = __importStar(require("../../middleware/validation"));
 const featureRouter = (0, express_1.Router)();
@@ -54,4 +55,7 @@ featureRouter.post("/manageAppointment", authorization_controller_1.tempAuthenti
 featureRouter.get("/enquiryList", authorization_controller_1.tempAuthenticatingToken, enquiryController.enquiryList); //use in business type
 featureRouter.delete("/deleteEnquiry", authorization_controller_1.tempAuthenticatingToken, enquiryController.deleteEnquiry); //use in business type
 featureRouter.post("/replyEnquiry", authorization_controller_1.tempAuthenticatingToken, enquiryController.replyEnquiry); //use in business type
+featureRouter.post("/enquiry", validation.enquiryValidation, enquiryController.submitEnquiry); //use in business type
+featureRouter.post("/exchangeContact", validation.exchangeContactValidation, contactController.exchangeContacts); //use in business type
+featureRouter.post("/captureLead", validation.captureLeadtValidation, contactController.captureLead); //use in business type
 exports.default = featureRouter;

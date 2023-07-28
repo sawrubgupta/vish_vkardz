@@ -98,13 +98,14 @@ export const cardPurchase =async (req:Request, res:Response) => {
                 const designation = element.customizeDesignation;
                 const logo = element.customzeLogo;
                 const customizeQty = element.customizeQty;
+                const otherInfo = element.otherInfo;
                 
                 orderListSql = orderListSql + `(${userId}, ${orderId}, ${productId}, ${qty}, '${subTotal}', '${createdAt}'),`;
                 result = orderListSql.substring(0,orderListSql.lastIndexOf(','));
 
                 if (isCustomizable === 1) {
-                    let customizeSql = `INSERT INTO customize_card(user_id, product_id, name, designation, qty, created_at) VALUES(?, ?, ?, ?, ?, ?)`;
-                    const VALUES = [userId, productId, name, designation, customizeQty, createdAt];
+                    let customizeSql = `INSERT INTO customize_card(user_id, product_id, name, designation, qty, other_info, created_at) VALUES(?, ?, ?, ?, ?, ?, ?)`;
+                    const VALUES = [userId, productId, name, designation, customizeQty, otherInfo, createdAt];
                     const [customizeRows]:any = await pool.query(customizeSql, VALUES)
                     const customize_id = customizeRows.insertId;
             

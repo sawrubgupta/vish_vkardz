@@ -20,6 +20,9 @@ name api's
 database changes:
 
 ------------------------------new changes--------------------------------
+28-07-2023
+ALTER TABLE `customize_card` ADD `other_info` VARCHAR(255) NULL DEFAULT NULL AFTER `phone_num`;
+
 27-07-2023
 CREATE TABLE `exchange_contacts` (
  `id` INT(11) NOT NULL AUTO_INCREMENT ,

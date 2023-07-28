@@ -661,8 +661,7 @@ const purchaseValidation = (req, res, next) => __awaiter(void 0, void 0, void 0,
             customizeName: joi_1.default.string().allow(null).allow(''),
             customizeDesignation: joi_1.default.string().allow(null).allow(''),
             customzeLogo: joi_1.default.string().allow(null).allow(''),
-            customizeQty: joi_1.default.number().allow(null).allow(''),
-            otherInfo: joi_1.default.string().allow('').allow(null)
+            customizeQty: joi_1.default.number().allow(null).allow('')
         })
     });
     const value = schema.validate(req.body);

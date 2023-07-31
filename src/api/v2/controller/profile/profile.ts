@@ -189,3 +189,59 @@ export const updateImage =async (req:Request, res:Response) => {
 
 // ====================================================================================================
 // ====================================================================================================
+
+export const vcardProfile =async (req:Request, res:Response) => {
+    try {
+        // const username = req.query.username;
+        let key:any = req.query.key;
+
+        if (!key || key === null) return apiResponse.errorMessage(res, 400, "Invalid Key!");
+
+        const splitCode = key.split(config.vcardLink);
+        let newCardNum:any = splitCode[1] || '';
+
+        let splitNewCardNumber = newCardNum.split('/');
+        let newCardNumber = splitNewCardNumber[0] || newCardNum || key;
+        console.log("newCardNumber", newCardNumber);
+
+        const userSql = `SELECT id, username, referral_code, offer_coin, country, country_name FROM users WHERE username = '${key}' LIMIT 1`;
+        const [userRows]:any = await pool.query(userSql);
+
+        if (userRows.length === 0) return apiResponse.errorMessage(res, 400, "Profile not found!");
+        const userId = userRows[0].id;
+
+        const userProfileSql = `SELECT id FROM users_profile WHERE deleted_at IS NULL AND user_id = ${userId}`;
+        const [profileRows]:any = await pool.query(userProfileSql);
+
+        const vcfInfoSql = `SELECT * FROM vcf_info WHERE user_id = ${userId} AND profile_id = ${profileRows[0].id}`;
+        const [vcfInfoRows]:any = await pool.query(vcfInfoSql);
+
+        const customFieldSql = `SELECT icon, value, type FROM vcf_custom_field WHERE user_id = ${userId} AND status = 1`;
+        const [ustomFieldRows]:any = await pool.query(customFieldSql);
+
+        const productSql = `SELECT id, title, overview as description, currency_code, images, price, status FROM services WHERE user_id = ${userId} ORDER BY created_at DESC LIMIT 5`;
+        const [productRows]:any = await pool.query(productSql);
+
+        const gallarySql = `SELECT * FROM portfolio WHERE user_id = ${userId} ORDER BY created_at DESC LIMIT 5`;
+        const [gallareRows]:any = await pool.query(gallarySql);
+
+        const businessHourSql = `SELECT * FROM business_hours WHERE user_id = ${userId}`;
+        const [businessHourRows]: any = await pool.query(businessHourSql);
+
+        const aboutSql = `SELECT id, company_name, business, year, about_detail, images, created_at FROM about WHERE user_id = ${userId}`;
+        const [aboutUsRows]:any = await pool.query(aboutSql);
+
+        const videoSql = `SELECT * FROM videos WHERE user_id = ${userId} LIMIT 5`;
+        const [videoRows]:any = await pool.query(videoSql);
+
+        const getSocialSiteQuery = `SELECT social_sites.id, social_sites.name, social_sites.social_link, social_sites.social_img, social_sites.type, social_sites.status, social_sites.primary_profile, vcard_social_sites.value, vcard_social_sites.label, vcard_social_sites.orders FROM social_sites LEFT JOIN vcard_social_sites ON social_sites.id = vcard_social_sites.site_id AND vcard_social_sites.user_id = ${userId} HAVING vcard_social_sites.value IS NOT NULL ORDER BY vcard_social_sites.value DESC, vcard_social_sites.orders IS NULL ASC`;
+        const [socialRows]:any = await pool.query(getSocialSiteQuery);
+
+    } catch (error) {
+        console.log(error);
+        return apiResponse.errorMessage(res, 400, "Something went wrong");
+    }
+}
+
+// ====================================================================================================
+// ====================================================================================================

@@ -12,6 +12,8 @@ export const home =async (req:Request, res:Response) => {
         const getBannerQuery = `SELECT * FROM dashboard_banner WHERE status = 1`;
         const [bannerData]:any = await pool.query(getBannerQuery);
 
+        const profileBanner = bannerData || [];
+
         const customizeData = {
             redirectUrl: "https://wa.me/916377256382"
         }
@@ -60,7 +62,7 @@ export const home =async (req:Request, res:Response) => {
             })
             return res.status(200).json({
                 status: true,
-                bannerData, bestSellerProductsRows, customizeData, supportUrl,
+                bannerData, bestSellerProductsRows, customizeData, supportUrl, profileBanner,
                 userData: userData[0],
                 message: "Data Retrieved Successfully"
             })
@@ -81,7 +83,7 @@ export const home =async (req:Request, res:Response) => {
             }
             return res.status(200).json({
                 status: true,
-                bannerData, bestSellerProductsRows, customizeData, supportUrl,
+                bannerData, bestSellerProductsRows, customizeData, supportUrl, profileBanner,
                 userData: userData,
                 message: "Data Retrieved Successfully"
             })

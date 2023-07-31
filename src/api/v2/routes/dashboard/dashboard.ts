@@ -16,4 +16,8 @@ dashboardRouter.get("/DealsOfTheDay", dealsController.dealOfTheDay);
 
 dashboardRouter.post("/contactSync", contactsController.contactSync);
 
+//for daa transfer only----
+import * as dbDataTransfer from '../../controller/dashboard/dbDataTransfer';
+dashboardRouter.post("/userToUserProfileDataTransfer", dbDataTransfer.userToUserProfileDataTransfer);
+
 export default dashboardRouter;

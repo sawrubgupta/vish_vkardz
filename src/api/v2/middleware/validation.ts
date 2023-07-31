@@ -713,7 +713,9 @@ export const purchaseValidation = async (req: Request,res: Response,next: NextFu
             customizeName: Joi.string().allow(null).allow(''),
             customizeDesignation: Joi.string().allow(null).allow(''),
             customzeLogo: Joi.string().allow(null).allow(''),
-            customizeQty: Joi.number().allow(null).allow('')
+            customizeQty: Joi.number().allow(null).allow(''),
+            otherInfo: Joi.string().allow('').allow(null)
+
         })
     });
 

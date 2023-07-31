@@ -20,8 +20,48 @@ name api's
 database changes:
 
 ------------------------------new changes--------------------------------
+31-07-2023
+CREATE TABLE `videos` (
+ `id` INT(11) NOT NULL AUTO_INCREMENT ,
+ `user_id` INT(11) NOT NULL ,
+ `profile_id` INT(11) NULL DEFAULT NULL ,
+ `type` VARCHAR(55) NOT NULL ,
+ `url` VARCHAR(255) NULL DEFAULT NULL ,
+ `thumbnail` VARCHAR(255) NULL DEFAULT NULL ,
+ `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ,
+ PRIMARY KEY (`id`)
+) ENGINE = InnoDB;
+ALTER TABLE `social_sites` ADD `social_type` VARCHAR(55) NOT NULL DEFAULT 'social' AFTER `type`;
+UPDATE social_sites SET social_type = 'contact' WHERE type = 'number';
+UPDATE social_sites SET social_type = 'payment' WHERE name LIKE '%pay%';
+
 28-07-2023
 ALTER TABLE `customize_card` ADD `other_info` VARCHAR(255) NULL DEFAULT NULL AFTER `phone_num`;
+ALTER TABLE `dashboard_banner` ADD `product_id` INT(11) NULL DEFAULT NULL AFTER `category_id`;
+CREATE TABLE `users_profile` (
+  `id` int(11) NOT NULL COMMENT 'profile id',
+  `user_id` int(11) NOT NULL COMMENT 'user''s id',
+  `profile_image` varchar(255) DEFAULT NULL COMMENT 'thumb(profile image)',
+  `cover_photo` varchar(255) DEFAULT NULL COMMENT 'profile cover image',
+  `hit` int(11) NOT NULL DEFAULT 0 COMMENT 'total profile view',
+  `share_link` int(11) NOT NULL DEFAULT 0 COMMENT 'total profile share',
+  `qr_code` varchar(255) DEFAULT NULL COMMENT 'profile card qr code',
+  `language` varchar(255) NOT NULL DEFAULT 'english' COMMENT 'profile language',
+  `vcard_layouts` int(11) NOT NULL DEFAULT 1 COMMENT 'layouts(profile theme)',
+  `vcard_bg_color` varchar(255) NOT NULL DEFAULT 'e43f5a' COMMENT 'profile theme color',
+  `font` varchar(255) DEFAULT NULL COMMENT 'profile font',
+  `is_private` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'profile private',
+  `set_password` int(8) DEFAULT NULL COMMENT 'profile pin',
+  `on_tap_url` varchar(255) DEFAULT NULL COMMENT 'profile url(primary url by default vkardz  url )',
+  `is_default` BOOLEAN NOT NULL DEFAULT 0,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `deleted_at` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+ALTER TABLE `users_profile`
+  ADD PRIMARY KEY (`id`);
+ALTER TABLE `users_profile`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'profile id';
+ALTER TABLE `vcf_custom_field` ADD `profile_id` INT(11) NULL DEFAULT NULL AFTER `user_id`;
 
 27-07-2023
 CREATE TABLE `exchange_contacts` (
@@ -42,6 +82,17 @@ CREATE TABLE `leads` (
  `email` VARCHAR(200) NOT NULL ,
  `phone` VARCHAR(55) NOT NULL ,
  `message` TEXT NULL DEFAULT NULL ,
+ `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ,
+ PRIMARY KEY (`id`)
+) ENGINE = InnoDB;
+
+CREATE TABLE `vcf_info` (
+ `id` INT(11) NOT NULL AUTO_INCREMENT ,
+ `user_id` INT(11) NOT NULL ,
+ `profile_id` INT(11) NOT NULL,
+ `type` VARCHAR(55) NOT NULL ,
+ `value` VARCHAR(200) NOT NULL ,
+ `status` BOOLEAN NOT NULL DEFAULT TRUE ,
  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ,
  PRIMARY KEY (`id`)
 ) ENGINE = InnoDB;

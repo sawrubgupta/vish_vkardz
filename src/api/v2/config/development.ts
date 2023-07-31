@@ -29,7 +29,7 @@ export default {
     propersonalizePlan: 'propersonalize',
 
     vcfNumber: 'number',
-    vcfPhone: 'phone',
+    vcfPhone: 'phone',//not used in custom field
     vcfAddress: 'address',
     vcfWebsite: 'website',
     vcfEmail: 'email',

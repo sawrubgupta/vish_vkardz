@@ -7,7 +7,7 @@ const pool = mysql.createPool({
   user: process.env.USER || "root", //"vkar_staging1", //,//"admin", //"root", //"vkar_vkardz",
   password: process.env.PASSWORD || "",//"GfCudy6C9CGDOd#!", ////"lnbc100n1p" , //"sOMAIqlIqrhzp!@4",
   database: process.env.DATABASE || "vkardz_new", //"vkar_staging1", //"vkar_staging1",//"furball",//"vkardz_new", //"vkar_vkardz"wo
-  connectTimeout: 10000,
+  connectTimeout: 100000,
   
         /**
          * The maximum number of connection requests the pool will queue before returning an error from getConnection. If set to 0, there

@@ -5,7 +5,9 @@ import bcrypt from "bcryptjs";
 import * as utility from "../../helper/utility";
 import { getQr } from "../../helper/qrCode";
 import md5 from "md5";
+import config from "../../config/development";
 
+//not used
 export const register =async (req:Request, res:Response) => {
     try {
         const { name, email, password, username, dial_code, phone, country, fcmToken } = req.body;
@@ -58,6 +60,9 @@ export const register =async (req:Request, res:Response) => {
             const [userData]:any = await pool.query(sql, VALUES);
     
             if (userData.affectedRows > 0) {
+                let userProfileSql = `INSERT INTO users_profile(user_id, profile_image, cover_photo, qr_code, language, vcard_layouts, vcard_bg_color, set_password, on_tap_url, is_default, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+                const VALUES = [userData.insertId, ]
+
                 const getUserName = `SELECT * FROM users WHERE id = ${userData.insertId} LIMIT 1`;
                 const [userRows]:any = await pool.query(getUserName)
                         
@@ -205,6 +210,18 @@ console.log("data", data);
         const [userData]:any = await pool.query(sql, VALUES);
 
         if (userData.affectedRows > 0) {
+            const userId = userData.insertId;
+
+            let userProfileSql = `INSERT INTO users_profile(user_id, qr_code, is_default, created_at) VALUES (?, ?, ?, ?)`;
+            const profileVALUES = [userData.insertId, qrData.data, 1, justDate];
+            const [profileRows]:any = await pool.query(userProfileSql, profileVALUES);
+            const profileId = profileRows.insertId;
+
+            const { name, type, socialId, email, password, username, dial_code, phone, country, countryName, fcmToken, deviceId, deviceType } = req.body;
+
+            const vcfInfoSql = `INSERT INTO vcf_info(user_id, profile_id, type, value, status, created_at) VALUES(?, ?, ?, ?, ?, ?), (?, ?, ?, ?, ?, ?)`;
+            const vcfVALUES = [userId, profileId, config.vcfNumber, phone, 1, justDate, userId, profileId, config.vcfNumber, phone, 1, justDate]
+
             const getUserName = `SELECT * FROM users WHERE id = ${userData.insertId} LIMIT 1`;
             const [userRows]:any = await pool.query(getUserName)
 

@@ -34,6 +34,16 @@ export default {
     vcfWebsite: 'website',
     vcfEmail: 'email',
     vcfCompany: 'company',
+    vcfGender: 'gender',
+    vcfDesignation: 'designation',
+    vcfDepartment: 'department',
+    vcfNotes: 'notes',
+    vcfDob: 'dob',
+    vcfName: 'name',
+
+    socialType: 'social',
+    contactType: 'contact',
+    paymentType: 'payment',
 
     referrerType: 'referrer',
     refereeType: 'referee',

@@ -8,6 +8,7 @@ import * as appointmentController from '../../controller/features/appointment';
 import * as enquiryController from '../../controller/features/enquiry';
 import * as businessHourController from '../../controller/features/businessHour';
 import * as contactController from '../../controller/features/contacts';
+import * as videosController from '../../controller/features/videos';
 
 import {authenticatingToken, tempAuthenticatingToken} from '../../middleware/authorization.controller';
 import * as validation from '../../middleware/validation';
@@ -44,5 +45,9 @@ featureRouter.post("/enquiry", validation.enquiryValidation, enquiryController.s
 
 featureRouter.post("/exchangeContact", validation.exchangeContactValidation, contactController.exchangeContacts);//use in business type
 featureRouter.post("/captureLead", validation.captureLeadtValidation, contactController.captureLead);//use in business type
+
+featureRouter.post("/video", tempAuthenticatingToken, validation.videosValidation, videosController.addVideos);
+featureRouter.get("/videos", tempAuthenticatingToken, videosController.getVideos);
+featureRouter.delete("/deleteVideo", tempAuthenticatingToken, validation.deleteVideosValidation, videosController.deleteVideos);
 
 export default featureRouter;

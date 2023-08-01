@@ -212,15 +212,15 @@ console.log("data", data);
         if (userData.affectedRows > 0) {
             const userId = userData.insertId;
 
-            let userProfileSql = `INSERT INTO users_profile(user_id, qr_code, is_default, created_at) VALUES (?, ?, ?, ?)`;
-            const profileVALUES = [userData.insertId, qrData.data, 1, justDate];
+            let userProfileSql = `INSERT INTO users_profile(user_id, qr_code, on_tap_url, is_default, created_at) VALUES (?, ?, ?, ?, ?)`;
+            const profileVALUES = [userData.insertId, qrData.data, primaryProfileLink, 1, justDate];
             const [profileRows]:any = await pool.query(userProfileSql, profileVALUES);
             const profileId = profileRows.insertId;
 
-            const { name, type, socialId, email, password, username, dial_code, phone, country, countryName, fcmToken, deviceId, deviceType } = req.body;
-
-            const vcfInfoSql = `INSERT INTO vcf_info(user_id, profile_id, type, value, status, created_at) VALUES(?, ?, ?, ?, ?, ?), (?, ?, ?, ?, ?, ?)`;
-            const vcfVALUES = [userId, profileId, config.vcfNumber, phone, 1, justDate, userId, profileId, config.vcfNumber, phone, 1, justDate]
+            const vcfPhone = dial_code + ' ' + phone;
+            const vcfInfoSql = `INSERT INTO vcf_info(user_id, profile_id, type, value, status, created_at) VALUES(?, ?, ?, ?, ?, ?), (?, ?, ?, ?, ?, ?), (?, ?, ?, ?, ?, ?)`;
+            const vcfVALUES = [userId, profileId, config.vcfNumber, vcfPhone, 1, justDate, userId, profileId, config.vcfEmail, email, 1, justDate, userId, profileId, config.vcfName, name, 1, justDate];
+            const [rows]:any = await pool.query(vcfInfoSql, vcfVALUES);
 
             const getUserName = `SELECT * FROM users WHERE id = ${userData.insertId} LIMIT 1`;
             const [userRows]:any = await pool.query(getUserName)

@@ -45,6 +45,7 @@ const home = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const userId = res.locals.jwt.userId;
         const getBannerQuery = `SELECT * FROM dashboard_banner WHERE status = 1`;
         const [bannerData] = yield db_1.default.query(getBannerQuery);
+        const profileBanner = bannerData || [];
         const customizeData = {
             redirectUrl: "https://wa.me/916377256382"
         };
@@ -88,7 +89,7 @@ const home = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             });
             return res.status(200).json({
                 status: true,
-                bannerData, bestSellerProductsRows, customizeData, supportUrl,
+                bannerData, bestSellerProductsRows, customizeData, supportUrl, profileBanner,
                 userData: userData[0],
                 message: "Data Retrieved Successfully"
             });
@@ -107,7 +108,7 @@ const home = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             };
             return res.status(200).json({
                 status: true,
-                bannerData, bestSellerProductsRows, customizeData, supportUrl,
+                bannerData, bestSellerProductsRows, customizeData, supportUrl, profileBanner,
                 userData: userData,
                 message: "Data Retrieved Successfully"
             });

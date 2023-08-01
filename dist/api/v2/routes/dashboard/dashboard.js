@@ -35,4 +35,7 @@ dashboardRouter.get("/bestSellerProducts", authorization_controller_1.tempAuthen
 dashboardRouter.get("/mixingData", mixingDataController.mixingData);
 dashboardRouter.get("/DealsOfTheDay", dealsController.dealOfTheDay);
 dashboardRouter.post("/contactSync", contactsController.contactSync);
+//for daa transfer only----
+const dbDataTransfer = __importStar(require("../../controller/dashboard/dbDataTransfer"));
+dashboardRouter.post("/userToUserProfileDataTransfer", dbDataTransfer.userToUserProfileDataTransfer);
 exports.default = dashboardRouter;

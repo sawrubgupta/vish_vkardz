@@ -35,7 +35,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.validatePinValidation = exports.captureLeadtValidation = exports.exchangeContactValidation = exports.enquiryValidation = exports.contactUsValidation = exports.updatePackageValidation = exports.primaryProfileValidation = exports.productRatingValidation = exports.businessHourValidation = exports.setProfilePinValidation = exports.purchaseValidation = exports.userProductsValidation = exports.aboutUsValidation = exports.redeemCouponCodeValidation = exports.updateDdeliveryAddressValidation = exports.deliveryAddressValidation = exports.customizeCardValidation = exports.cartValidation = exports.addVcfValidation = exports.switchAccountValidation = exports.editSocialLinksValidation = exports.updateVcardinfoValidation = exports.updateProfileValidation = exports.settingValidation = exports.changePasswordValidation = exports.socialLoginValidation = exports.loginValidation = exports.socialRegistrationValidation = exports.registrationValidation = void 0;
+exports.deleteVideosValidation = exports.videosValidation = exports.validatePinValidation = exports.captureLeadtValidation = exports.exchangeContactValidation = exports.enquiryValidation = exports.contactUsValidation = exports.updatePackageValidation = exports.primaryProfileValidation = exports.productRatingValidation = exports.businessHourValidation = exports.setProfilePinValidation = exports.purchaseValidation = exports.userProductsValidation = exports.aboutUsValidation = exports.redeemCouponCodeValidation = exports.updateDdeliveryAddressValidation = exports.deliveryAddressValidation = exports.customizeCardValidation = exports.cartValidation = exports.addVcfValidation = exports.switchAccountValidation = exports.editSocialLinksValidation = exports.updateVcardinfoValidation = exports.updateProfileValidation = exports.settingValidation = exports.changePasswordValidation = exports.socialLoginValidation = exports.loginValidation = exports.socialRegistrationValidation = exports.registrationValidation = void 0;
 const apiResponse = __importStar(require("../helper/apiResponse"));
 const joi_1 = __importDefault(require("joi"));
 function validationCheck(value) {
@@ -841,5 +841,35 @@ const validatePinValidation = (req, res, next) => __awaiter(void 0, void 0, void
     next();
 });
 exports.validatePinValidation = validatePinValidation;
+// ====================================================================================================
+// ====================================================================================================
+const videosValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const schema = joi_1.default.object({
+        videoType: joi_1.default.string().required(),
+        url: joi_1.default.string().required(),
+        thumbnail: joi_1.default.string().allow("", null)
+    });
+    const value = schema.validate(req.body);
+    if (value.error) {
+        const errMsg = yield validationCheck(value);
+        return yield apiResponse.errorMessage(res, 400, errMsg);
+    }
+    next();
+});
+exports.videosValidation = videosValidation;
+// ====================================================================================================
+// ====================================================================================================
+const deleteVideosValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const schema = joi_1.default.object({
+        videoId: joi_1.default.number().required(),
+    });
+    const value = schema.validate(req.body);
+    if (value.error) {
+        const errMsg = yield validationCheck(value);
+        return yield apiResponse.errorMessage(res, 400, errMsg);
+    }
+    next();
+});
+exports.deleteVideosValidation = deleteVideosValidation;
 // ====================================================================================================
 // ====================================================================================================

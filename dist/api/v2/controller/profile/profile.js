@@ -31,11 +31,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __asyncValues = (this && this.__asyncValues) || function (o) {
+    if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
+    var m = o[Symbol.asyncIterator], i;
+    return m ? m.call(o) : (o = typeof __values === "function" ? __values(o) : o[Symbol.iterator](), i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function () { return this; }, i);
+    function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }
+    function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateImage = exports.updateVcardinfo = exports.updateProfile = exports.getProfile = void 0;
+exports.vcardProfile = exports.updateImage = exports.updateVcardinfo = exports.updateProfile = exports.getProfile = void 0;
 const db_1 = __importDefault(require("../../../../db"));
 const apiResponse = __importStar(require("../../helper/apiResponse"));
 const development_1 = __importDefault(require("../../config/development"));
@@ -207,5 +214,179 @@ const updateImage = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     }
 });
 exports.updateImage = updateImage;
+// ====================================================================================================
+// ====================================================================================================
+const vcardProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, e_1, _b, _c, _d, e_2, _e, _f;
+    try {
+        // const username = req.query.username;
+        let key = req.query.key;
+        if (!key || key === null)
+            return apiResponse.errorMessage(res, 400, "User Profile not exist!!");
+        const splitCode = key.split(development_1.default.vcardLink);
+        let newCardNum = splitCode[1] || '';
+        let splitNewCardNumber = newCardNum.split('/');
+        let newCardNumber = splitNewCardNumber[0] || newCardNum || key;
+        console.log("newCardNumber", newCardNumber);
+        const userSql = `SELECT users.id, users.username, users.referral_code, users.offer_coin, users.country, users.country_name, business_admin.image, business_admin.company FROM users LEFT JOIN business_admin ON business_admin.id = users.admin_id WHERE users.deleted_at IS NULL AND (users.username = '${key}' OR users.username = '${newCardNumber}' OR users.card_number = '${key}' OR users.card_number = '${newCardNumber}' OR users.card_number_fix = '${key}' OR users.card_number_fix = '${newCardNumber}') LIMIT 1`;
+        const [userRows] = yield db_1.default.query(userSql);
+        if (userRows.length === 0)
+            return apiResponse.errorMessage(res, 400, "Profile not found!");
+        const userId = userRows[0].id;
+        const userProfileSql = `SELECT * FROM users_profile WHERE deleted_at IS NULL AND user_id = ${userId}`;
+        const [profileRows] = yield db_1.default.query(userProfileSql);
+        const vcfInfoSql = `SELECT * FROM vcf_info WHERE user_id = ${userId} AND profile_id = ${profileRows[0].id}`;
+        const [vcfInfoRows] = yield db_1.default.query(vcfInfoSql);
+        const customFieldSql = `SELECT icon, value, type FROM vcf_custom_field WHERE user_id = ${userId} AND status = 1`;
+        const [customFieldRows] = yield db_1.default.query(customFieldSql);
+        const productSql = `SELECT id, title, overview as description, currency_code, images, price, status FROM services WHERE user_id = ${userId} ORDER BY created_at DESC LIMIT 5`;
+        const [productRows] = yield db_1.default.query(productSql);
+        const gallarySql = `SELECT * FROM portfolio WHERE user_id = ${userId} ORDER BY created_at DESC LIMIT 5`;
+        const [gallareRows] = yield db_1.default.query(gallarySql);
+        const businessHourSql = `SELECT * FROM business_hours WHERE user_id = ${userId}`;
+        const [businessHourRows] = yield db_1.default.query(businessHourSql);
+        const aboutSql = `SELECT id, company_name, business, year, about_detail, images, created_at FROM about WHERE user_id = ${userId}`;
+        const [aboutUsRows] = yield db_1.default.query(aboutSql);
+        const videoSql = `SELECT * FROM videos WHERE user_id = ${userId} LIMIT 5`;
+        const [videoRows] = yield db_1.default.query(videoSql);
+        const getSocialSiteQuery = `SELECT social_sites.id, social_sites.name, social_sites.social_link, social_sites.social_img, social_sites.type, social_sites.status, social_sites.social_type, social_sites.primary_profile, vcard_social_sites.value, vcard_social_sites.label, vcard_social_sites.orders FROM social_sites LEFT JOIN vcard_social_sites ON social_sites.id = vcard_social_sites.site_id AND vcard_social_sites.user_id = ${userId} HAVING vcard_social_sites.value IS NOT NULL ORDER BY vcard_social_sites.value DESC, vcard_social_sites.orders IS NULL ASC`;
+        const [socialRows] = yield db_1.default.query(getSocialSiteQuery);
+        // const gender:any = (vcfInfoRows.find((x: { type: string; }) => x.type === config.vcfGender))?.value??null;
+        // const designation:any = (vcfInfoRows.find((x: { type: string; }) => x.type === config.vcfDesignation))?.value??null;
+        // const department:any = (vcfInfoRows.find((x: { type: string; }) => x.type === config.vcfDepartment))?.value??"";
+        // const notes:any = (vcfInfoRows.find((x: { type: string; }) => x.type === config.vcfNotes))?.value??"";
+        // const dob:any = (vcfInfoRows.find((x: { type: string; }) => x.type === config.vcfDesignation))?.value??"";
+        // const number:any = (vcfInfoRows.find((x: { type: string; }) => x.type === config.vcfNumber))?.value??"";
+        // console.log(number, "number");
+        let gender = null;
+        let designation = null;
+        let department = null;
+        let notes = null;
+        let dob = null;
+        let phone = [];
+        let email = [];
+        let address = [];
+        let company = [];
+        let website = [];
+        try {
+            for (var _g = true, vcfInfoRows_1 = __asyncValues(vcfInfoRows), vcfInfoRows_1_1; vcfInfoRows_1_1 = yield vcfInfoRows_1.next(), _a = vcfInfoRows_1_1.done, !_a;) {
+                _c = vcfInfoRows_1_1.value;
+                _g = false;
+                try {
+                    const ele = _c;
+                    if (ele.type === development_1.default.vcfGender)
+                        gender = ele.value;
+                    if (ele.type === development_1.default.vcfDesignation)
+                        designation = ele.value;
+                    if (ele.type === development_1.default.vcfDepartment)
+                        department = ele.value;
+                    if (ele.type === development_1.default.vcfNotes)
+                        notes = ele.value;
+                    if (ele.type === development_1.default.vcfDob)
+                        dob = ele.value;
+                    if (ele.type === development_1.default.vcfNumber)
+                        phone.push({ number: ele.value });
+                    if (ele.type === development_1.default.vcfEmail)
+                        email.push(ele.value);
+                    if (ele.type === development_1.default.vcfAddress)
+                        address.push(ele.value);
+                    if (ele.type === development_1.default.vcfCompany)
+                        company.push(ele.value);
+                    if (ele.type === development_1.default.vcfWebsite)
+                        website.push(ele.value);
+                }
+                finally {
+                    _g = true;
+                }
+            }
+        }
+        catch (e_1_1) { e_1 = { error: e_1_1 }; }
+        finally {
+            try {
+                if (!_g && !_a && (_b = vcfInfoRows_1.return)) yield _b.call(vcfInfoRows_1);
+            }
+            finally { if (e_1) throw e_1.error; }
+        }
+        let socialLink = [];
+        let socialContacts = [];
+        let socialBusiness = [];
+        let socialPayment = [];
+        try {
+            for (var _h = true, socialRows_1 = __asyncValues(socialRows), socialRows_1_1; socialRows_1_1 = yield socialRows_1.next(), _d = socialRows_1_1.done, !_d;) {
+                _f = socialRows_1_1.value;
+                _h = false;
+                try {
+                    const socialEle = _f;
+                    if (socialEle.social_type === development_1.default.socialType)
+                        socialLink.push(socialEle);
+                    if (socialEle.social_type === development_1.default.contactType)
+                        socialContacts.push(socialEle);
+                    if (socialEle.social_type === development_1.default.businessType)
+                        socialBusiness.push(socialEle);
+                    if (socialEle.social_type === development_1.default.paymentType)
+                        socialPayment.push(socialEle);
+                }
+                finally {
+                    _h = true;
+                }
+            }
+        }
+        catch (e_2_1) { e_2 = { error: e_2_1 }; }
+        finally {
+            try {
+                if (!_h && !_d && (_e = socialRows_1.return)) yield _e.call(socialRows_1);
+            }
+            finally { if (e_2) throw e_2.error; }
+        }
+        const profile_data = {
+            referral_code: userRows[0].referral_code,
+            admin: {
+                company_logo: userRows[0].image,
+                company_branding: userRows[0].company,
+                company_name: userRows[0].company
+            },
+            country: {
+                country_code: userRows[0].country,
+                country_name: userRows[0].country_name
+            },
+            gender: gender,
+            designation: designation,
+            department: department,
+            notes: notes,
+            dob: dob,
+            number: phone,
+            email: email,
+            address: address,
+            company_name: company,
+            website: website,
+            socials: {
+                social_link: socialLink,
+                contact_info: socialContacts,
+                business_link: socialBusiness,
+                payments: socialPayment
+            },
+            custom: customFieldRows,
+            other_info: {
+                profile_image: profileRows[0].profile_image,
+                cover_photo: profileRows[0].cover_photo
+            },
+            share: {
+                profile_link: profileRows[0].on_tap_url,
+                qr_code: profileRows[0].qr_code
+            },
+            products: productRows,
+            gallery: gallareRows,
+            business_hours: businessHourRows,
+            about_us: aboutUsRows,
+            videos: videoRows
+        };
+        return apiResponse.successResponse(res, "Data Retrieved Successfully", profile_data);
+    }
+    catch (error) {
+        console.log(error);
+        return apiResponse.errorMessage(res, 400, "Something went wrong");
+    }
+});
+exports.vcardProfile = vcardProfile;
 // ====================================================================================================
 // ====================================================================================================

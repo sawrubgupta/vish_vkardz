@@ -18,6 +18,7 @@ profileRouter.get("/getProfile", tempAuthenticatingToken, profileController.getP
 profileRouter.patch("/updateProfile", tempAuthenticatingToken, validation.updateProfileValidation, profileController.updateProfile); //use in business type
 profileRouter.patch("/updateImage", tempAuthenticatingToken, profileController.updateImage); //use in business type
 profileRouter.patch("/updateVcardinfo", authenticatingToken, validation.updateVcardinfoValidation, profileController.updateVcardinfo);
+profileRouter.get("/userProfile", profileController.vcardProfile); //use in business type
 
 profileRouter.post("/setProfilePin", tempAuthenticatingToken, validation.setProfilePinValidation, setPinController.setPin); //use in business type
 profileRouter.delete("/removeProfilePin", tempAuthenticatingToken, setPinController.removePin); //use in business type

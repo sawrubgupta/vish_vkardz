@@ -195,7 +195,7 @@ export const vcardProfile =async (req:Request, res:Response) => {
         // const username = req.query.username;
         let key:any = req.query.key;
 
-        if (!key || key === null) return apiResponse.errorMessage(res, 400, "Invalid Key!");
+        if (!key || key === null) return apiResponse.errorMessage(res, 400, "User Profile not exist!!");
 
         const splitCode = key.split(config.vcardLink);
         let newCardNum:any = splitCode[1] || '';
@@ -204,20 +204,20 @@ export const vcardProfile =async (req:Request, res:Response) => {
         let newCardNumber = splitNewCardNumber[0] || newCardNum || key;
         console.log("newCardNumber", newCardNumber);
 
-        const userSql = `SELECT id, username, referral_code, offer_coin, country, country_name FROM users WHERE username = '${key}' LIMIT 1`;
+        const userSql = `SELECT users.id, users.username, users.referral_code, users.offer_coin, users.country, users.country_name, business_admin.image, business_admin.company FROM users LEFT JOIN business_admin ON business_admin.id = users.admin_id WHERE users.deleted_at IS NULL AND (users.username = '${key}' OR users.username = '${newCardNumber}' OR users.card_number = '${key}' OR users.card_number = '${newCardNumber}' OR users.card_number_fix = '${key}' OR users.card_number_fix = '${newCardNumber}') LIMIT 1`;
         const [userRows]:any = await pool.query(userSql);
 
         if (userRows.length === 0) return apiResponse.errorMessage(res, 400, "Profile not found!");
         const userId = userRows[0].id;
 
-        const userProfileSql = `SELECT id FROM users_profile WHERE deleted_at IS NULL AND user_id = ${userId}`;
+        const userProfileSql = `SELECT * FROM users_profile WHERE deleted_at IS NULL AND user_id = ${userId}`;
         const [profileRows]:any = await pool.query(userProfileSql);
 
         const vcfInfoSql = `SELECT * FROM vcf_info WHERE user_id = ${userId} AND profile_id = ${profileRows[0].id}`;
         const [vcfInfoRows]:any = await pool.query(vcfInfoSql);
 
         const customFieldSql = `SELECT icon, value, type FROM vcf_custom_field WHERE user_id = ${userId} AND status = 1`;
-        const [ustomFieldRows]:any = await pool.query(customFieldSql);
+        const [customFieldRows]:any = await pool.query(customFieldSql);
 
         const productSql = `SELECT id, title, overview as description, currency_code, images, price, status FROM services WHERE user_id = ${userId} ORDER BY created_at DESC LIMIT 5`;
         const [productRows]:any = await pool.query(productSql);
@@ -234,8 +234,98 @@ export const vcardProfile =async (req:Request, res:Response) => {
         const videoSql = `SELECT * FROM videos WHERE user_id = ${userId} LIMIT 5`;
         const [videoRows]:any = await pool.query(videoSql);
 
-        const getSocialSiteQuery = `SELECT social_sites.id, social_sites.name, social_sites.social_link, social_sites.social_img, social_sites.type, social_sites.status, social_sites.primary_profile, vcard_social_sites.value, vcard_social_sites.label, vcard_social_sites.orders FROM social_sites LEFT JOIN vcard_social_sites ON social_sites.id = vcard_social_sites.site_id AND vcard_social_sites.user_id = ${userId} HAVING vcard_social_sites.value IS NOT NULL ORDER BY vcard_social_sites.value DESC, vcard_social_sites.orders IS NULL ASC`;
+        const getSocialSiteQuery = `SELECT social_sites.id, social_sites.name, social_sites.social_link, social_sites.social_img, social_sites.type, social_sites.status, social_sites.social_type, social_sites.primary_profile, vcard_social_sites.value, vcard_social_sites.label, vcard_social_sites.orders FROM social_sites LEFT JOIN vcard_social_sites ON social_sites.id = vcard_social_sites.site_id AND vcard_social_sites.user_id = ${userId} HAVING vcard_social_sites.value IS NOT NULL ORDER BY vcard_social_sites.value DESC, vcard_social_sites.orders IS NULL ASC`;
         const [socialRows]:any = await pool.query(getSocialSiteQuery);
+
+        // const gender:any = (vcfInfoRows.find((x: { type: string; }) => x.type === config.vcfGender))?.value??null;
+        // const designation:any = (vcfInfoRows.find((x: { type: string; }) => x.type === config.vcfDesignation))?.value??null;
+        // const department:any = (vcfInfoRows.find((x: { type: string; }) => x.type === config.vcfDepartment))?.value??"";
+        // const notes:any = (vcfInfoRows.find((x: { type: string; }) => x.type === config.vcfNotes))?.value??"";
+        // const dob:any = (vcfInfoRows.find((x: { type: string; }) => x.type === config.vcfDesignation))?.value??"";
+        // const number:any = (vcfInfoRows.find((x: { type: string; }) => x.type === config.vcfNumber))?.value??"";
+        // console.log(number, "number");
+        
+        let gender = null;
+        let designation = null;
+        let department = null;
+        let notes = null;
+        let dob = null;
+        let phone = [];
+        let email = [];
+        let address = [];
+        let company = [];
+        let website = [];
+        
+        for await (const ele of vcfInfoRows) {
+            if (ele.type === config.vcfGender) gender = ele.value;
+            if (ele.type === config.vcfDesignation) designation = ele.value;
+            if (ele.type === config.vcfDepartment) department = ele.value; 
+            if (ele.type === config.vcfNotes) notes = ele.value;
+            if (ele.type === config.vcfDob) dob = ele.value;
+            if (ele.type === config.vcfNumber) phone.push({number: ele.value});
+            if (ele.type === config.vcfEmail) email.push(ele.value);
+            if (ele.type === config.vcfAddress) address.push(ele.value);
+            if (ele.type === config.vcfCompany) company.push(ele.value);
+            if (ele.type === config.vcfWebsite) website.push(ele.value);
+        }
+
+        let socialLink = [];
+        let socialContacts = [];
+        let socialBusiness = [];
+        let socialPayment = [];
+        for await (const socialEle of socialRows) {
+            if (socialEle.social_type === config.socialType) socialLink.push(socialEle);
+            if (socialEle.social_type === config.contactType) socialContacts.push(socialEle);
+            if (socialEle.social_type === config.businessType) socialBusiness.push(socialEle);
+            if (socialEle.social_type === config.paymentType) socialPayment.push(socialEle);
+        }
+        
+        const profile_data= {
+            referral_code: userRows[0].referral_code,
+            admin: {
+                company_logo: userRows[0].image,
+                company_branding: userRows[0].company,
+                company_name: userRows[0].company
+            },
+
+            country: {
+                country_code: userRows[0].country,
+                country_name: userRows[0].country_name
+            },
+            gender: gender,
+            designation: designation,
+            department: department,
+            notes: notes,
+            dob: dob,
+            number: phone,
+            email: email,
+            address: address,
+            company_name: company,
+            website: website,
+            socials: {
+                social_link: socialLink,
+                contact_info: socialContacts,
+                business_link: socialBusiness,
+                payments: socialPayment
+            },
+            custom: customFieldRows,
+            other_info: {
+                profile_image: profileRows[0].profile_image,
+                cover_photo: profileRows[0].cover_photo
+            },
+            share: {
+                profile_link: profileRows[0].on_tap_url,
+                qr_code: profileRows[0].qr_code
+            },
+            products: productRows,
+            gallery: gallareRows,
+            business_hours: businessHourRows,
+            about_us:aboutUsRows,
+            videos: videoRows
+
+        }
+
+        return apiResponse.successResponse(res, "Data Retrieved Successfully", profile_data);
 
     } catch (error) {
         console.log(error);

@@ -941,3 +941,43 @@ export const validatePinValidation =async (req:Request, res:Response, next:NextF
 
 // ====================================================================================================
 // ====================================================================================================
+
+export const videosValidation =async (req:Request, res:Response, next:NextFunction) => {
+
+    const schema = Joi.object({
+        profileId: Joi.number().required(), 
+        videoType: Joi.string().required(), 
+        url: Joi.string().required(), 
+        thumbnail: Joi.string().allow("", null)
+    })
+
+    const value = schema.validate(req.body);
+
+    if (value.error) {
+        const errMsg = await validationCheck(value);
+        return await apiResponse.errorMessage(res,400, errMsg);
+    }
+    next();
+}
+
+// ====================================================================================================
+// ====================================================================================================
+
+export const deleteVideosValidation =async (req:Request, res:Response, next:NextFunction) => {
+
+    const schema = Joi.object({
+        profileId: Joi.number().required(), 
+        videoId: Joi.number().required(), 
+    })
+
+    const value = schema.validate(req.body);
+
+    if (value.error) {
+        const errMsg = await validationCheck(value);
+        return await apiResponse.errorMessage(res,400, errMsg);
+    }
+    next();
+}
+
+// ====================================================================================================
+// ====================================================================================================

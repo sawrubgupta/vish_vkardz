@@ -41,6 +41,8 @@ const db_1 = __importDefault(require("../../../../db"));
 const utility = __importStar(require("../../helper/utility"));
 const qrCode_1 = require("../../helper/qrCode");
 const md5_1 = __importDefault(require("md5"));
+const development_1 = __importDefault(require("../../config/development"));
+//not used
 const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { name, email, password, username, dial_code, phone, country, fcmToken } = req.body;
@@ -86,6 +88,8 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             const VALUES = [name, name, email, email, hash, username, dial_code, qrData.data, phone, dial_code, phone, country, referralCode, 0, 1, 0, 1, 1, 1, 0, justDate, justDate, justDate, endDate, fcmToken, packageFound[0].id];
             const [userData] = yield db_1.default.query(sql, VALUES);
             if (userData.affectedRows > 0) {
+                let userProfileSql = `INSERT INTO users_profile(user_id, profile_image, cover_photo, qr_code, language, vcard_layouts, vcard_bg_color, set_password, on_tap_url, is_default, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+                const VALUES = [userData.insertId,];
                 const getUserName = `SELECT * FROM users WHERE id = ${userData.insertId} LIMIT 1`;
                 const [userRows] = yield db_1.default.query(getUserName);
                 if (userRows[0].card_number !== null && userRows[0].card_number !== undefined && userRows[0].card_number !== '') {
@@ -232,6 +236,15 @@ const socialRegister = (req, res) => __awaiter(void 0, void 0, void 0, function*
         const VALUES = [name, name, email, email, hash, username, dial_code, qrData.data, phone, 'USD', dial_code, phone, country, countryName, referralCode, 100, 1, 0, 1, 1, 1, 0, justDate, justDate, justDate, endDate, 16, 'vcard', fcmToken, deviceId, deviceType, facebookId, googleId, appleId];
         const [userData] = yield db_1.default.query(sql, VALUES);
         if (userData.affectedRows > 0) {
+            const userId = userData.insertId;
+            let userProfileSql = `INSERT INTO users_profile(user_id, qr_code, on_tap_url, is_default, created_at) VALUES (?, ?, ?, ?, ?)`;
+            const profileVALUES = [userData.insertId, qrData.data, primaryProfileLink, 1, justDate];
+            const [profileRows] = yield db_1.default.query(userProfileSql, profileVALUES);
+            const profileId = profileRows.insertId;
+            const vcfPhone = dial_code + ' ' + phone;
+            const vcfInfoSql = `INSERT INTO vcf_info(user_id, profile_id, type, value, status, created_at) VALUES(?, ?, ?, ?, ?, ?), (?, ?, ?, ?, ?, ?), (?, ?, ?, ?, ?, ?)`;
+            const vcfVALUES = [userId, profileId, development_1.default.vcfNumber, vcfPhone, 1, justDate, userId, profileId, development_1.default.vcfEmail, email, 1, justDate, userId, profileId, development_1.default.vcfName, name, 1, justDate];
+            const [rows] = yield db_1.default.query(vcfInfoSql, vcfVALUES);
             const getUserName = `SELECT * FROM users WHERE id = ${userData.insertId} LIMIT 1`;
             const [userRows] = yield db_1.default.query(getUserName);
             if (userRows[0].card_number !== null && userRows[0].card_number !== undefined && userRows[0].card_number !== '') {

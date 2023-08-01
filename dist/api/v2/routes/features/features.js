@@ -32,6 +32,7 @@ const appointmentController = __importStar(require("../../controller/features/ap
 const enquiryController = __importStar(require("../../controller/features/enquiry"));
 const businessHourController = __importStar(require("../../controller/features/businessHour"));
 const contactController = __importStar(require("../../controller/features/contacts"));
+const videosController = __importStar(require("../../controller/features/videos"));
 const authorization_controller_1 = require("../../middleware/authorization.controller");
 const validation = __importStar(require("../../middleware/validation"));
 const featureRouter = (0, express_1.Router)();
@@ -58,4 +59,7 @@ featureRouter.post("/replyEnquiry", authorization_controller_1.tempAuthenticatin
 featureRouter.post("/enquiry", validation.enquiryValidation, enquiryController.submitEnquiry); //use in business type
 featureRouter.post("/exchangeContact", validation.exchangeContactValidation, contactController.exchangeContacts); //use in business type
 featureRouter.post("/captureLead", validation.captureLeadtValidation, contactController.captureLead); //use in business type
+featureRouter.post("/video", authorization_controller_1.tempAuthenticatingToken, validation.videosValidation, videosController.addVideos);
+featureRouter.get("/videos", authorization_controller_1.tempAuthenticatingToken, videosController.getVideos);
+featureRouter.delete("/deleteVideo", authorization_controller_1.tempAuthenticatingToken, validation.deleteVideosValidation, videosController.deleteVideos);
 exports.default = featureRouter;

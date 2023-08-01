@@ -39,6 +39,7 @@ profileRouter.get("/getProfile", authorization_controller_1.tempAuthenticatingTo
 profileRouter.patch("/updateProfile", authorization_controller_1.tempAuthenticatingToken, validation.updateProfileValidation, profileController.updateProfile); //use in business type
 profileRouter.patch("/updateImage", authorization_controller_1.tempAuthenticatingToken, profileController.updateImage); //use in business type
 profileRouter.patch("/updateVcardinfo", authorization_controller_1.authenticatingToken, validation.updateVcardinfoValidation, profileController.updateVcardinfo);
+profileRouter.get("/userProfile", profileController.vcardProfile); //use in business type
 profileRouter.post("/setProfilePin", authorization_controller_1.tempAuthenticatingToken, validation.setProfilePinValidation, setPinController.setPin); //use in business type
 profileRouter.delete("/removeProfilePin", authorization_controller_1.tempAuthenticatingToken, setPinController.removePin); //use in business type
 profileRouter.post("/validatePin", validation.validatePinValidation, setPinController.validatePin); //use in business type

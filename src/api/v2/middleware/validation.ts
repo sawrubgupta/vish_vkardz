@@ -615,6 +615,7 @@ export const aboutUsValidation = async (req:Request, res:Response, next:NextFunc
         business: Joi.string().allow("").allow(null),
         aboutUsDetail: Joi.string().allow("").allow(null),
         image: Joi.string().trim().allow(''),
+        document: Joi.string().allow('').allow(null),
     });
 
     const value = schema.validate(req.body);

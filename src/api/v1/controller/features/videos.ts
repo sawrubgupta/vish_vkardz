@@ -42,7 +42,7 @@ export const getVideos =async (req:Request, res:Response) => {
     try {
         let userId
         const type = req.query.type; //type = business, user, null
-        if (type && type === config.businessType) {
+        if (type && (type === config.businessType  || type === config.websiteType)) {
             userId = req.query.userId;
         } else {
             userId = res.locals.jwt.userId;

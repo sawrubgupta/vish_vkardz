@@ -25,8 +25,8 @@ export const addUpdateAboutUs =async (req:Request, res:Response) => {
         const [aboutUsRows]:any = await pool.query(getAboutUs);
 
         if (aboutUsRows.length > 0) {
-            const updateQuery = `UPDATE about SET company_name = ?, year = ?, business = ?, about_detail = ?, images = ? WHERE user_id = ?`;
-            const VALUES = [companyName, year, business, aboutUsDetail, image, userId];
+            const updateQuery = `UPDATE about SET company_name = ?, year = ?, business = ?, about_detail = ?, images = ?, document = ? WHERE user_id = ?`;
+            const VALUES = [companyName, year, business, aboutUsDetail, image, document, userId];
             const [updatedRows]:any = await pool.query(updateQuery, VALUES);
 
             if (updatedRows.affectedRows > 0) {
@@ -35,8 +35,8 @@ export const addUpdateAboutUs =async (req:Request, res:Response) => {
                 return apiResponse.errorMessage(res, 400, "Failed to update, try again");
             }
         } else {
-            const insertedQuery = `INSERT INTO about(user_id, company_name, business, year, about_detail, images, created_at) VALUES (?, ?, ?, ?, ?, ? ,?)`;
-            const insertVALUES = [userId, companyName, business, year, aboutUsDetail, image, createdAt];
+            const insertedQuery = `INSERT INTO about(user_id, company_name, business, year, about_detail, images, document, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+            const insertVALUES = [userId, companyName, business, year, aboutUsDetail, image, document, createdAt];
             const [insertedRows]:any = await pool.query(insertedQuery, insertVALUES);
 
             if (insertedRows.affectedRows > 0) {
@@ -68,7 +68,7 @@ export const getAboutUs =async (req:Request, res:Response) => {
             return apiResponse.errorMessage(res, 401, "User Id is required!");
         }
 
-        const sql = `SELECT id, company_name, business, year, about_detail, images, created_at FROM about WHERE user_id = ${userId}`;
+        const sql = `SELECT id, company_name, business, year, about_detail, images, created_at, document FROM about WHERE user_id = ${userId}`;
         const [rows]:any = await pool.query(sql);
 
         const getFeatureStatus = `SELECT status FROM users_features WHERE user_id = ${userId} AND feature_id = 3`;

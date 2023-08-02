@@ -57,7 +57,7 @@ export const businessHourList = async (req: Request, res: Response) => {
         // const userId = res.locals.jwt.userId;
         let userId:any; 
         const type = req.query.type; //type = business, user, null
-        if (type && type === config.businessType) {
+        if (type && (type === config.businessType  || type === config.websiteType)) {
             userId = req.query.userId;
         } else {
             userId = res.locals.jwt.userId;

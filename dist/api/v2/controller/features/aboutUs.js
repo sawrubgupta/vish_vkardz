@@ -59,8 +59,8 @@ const addUpdateAboutUs = (req, res) => __awaiter(void 0, void 0, void 0, functio
         const getAboutUs = `SELECT id FROM about WHERE user_id = ${userId}`;
         const [aboutUsRows] = yield db_1.default.query(getAboutUs);
         if (aboutUsRows.length > 0) {
-            const updateQuery = `UPDATE about SET company_name = ?, year = ?, business = ?, about_detail = ?, images = ? WHERE user_id = ?`;
-            const VALUES = [companyName, year, business, aboutUsDetail, image, userId];
+            const updateQuery = `UPDATE about SET company_name = ?, year = ?, business = ?, about_detail = ?, images = ?, document = ? WHERE user_id = ?`;
+            const VALUES = [companyName, year, business, aboutUsDetail, image, document, userId];
             const [updatedRows] = yield db_1.default.query(updateQuery, VALUES);
             if (updatedRows.affectedRows > 0) {
                 return apiResponse.successResponse(res, "Updated Successfully", null);
@@ -70,8 +70,8 @@ const addUpdateAboutUs = (req, res) => __awaiter(void 0, void 0, void 0, functio
             }
         }
         else {
-            const insertedQuery = `INSERT INTO about(user_id, company_name, business, year, about_detail, images, created_at) VALUES (?, ?, ?, ?, ?, ? ,?)`;
-            const insertVALUES = [userId, companyName, business, year, aboutUsDetail, image, createdAt];
+            const insertedQuery = `INSERT INTO about(user_id, company_name, business, year, about_detail, images, document, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+            const insertVALUES = [userId, companyName, business, year, aboutUsDetail, image, document, createdAt];
             const [insertedRows] = yield db_1.default.query(insertedQuery, insertVALUES);
             if (insertedRows.affectedRows > 0) {
                 return apiResponse.successResponse(res, "Inserted Successfully", null);
@@ -103,7 +103,7 @@ const getAboutUs = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         if (!userId || userId === "" || userId === undefined) {
             return apiResponse.errorMessage(res, 401, "User Id is required!");
         }
-        const sql = `SELECT id, company_name, business, year, about_detail, images, created_at FROM about WHERE user_id = ${userId}`;
+        const sql = `SELECT id, company_name, business, year, about_detail, images, created_at, document FROM about WHERE user_id = ${userId}`;
         const [rows] = yield db_1.default.query(sql);
         const getFeatureStatus = `SELECT status FROM users_features WHERE user_id = ${userId} AND feature_id = 3`;
         const [featureStatusRRows] = yield db_1.default.query(getFeatureStatus);

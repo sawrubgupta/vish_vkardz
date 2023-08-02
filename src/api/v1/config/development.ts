@@ -22,6 +22,7 @@ export default {
         secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
     },
 
+    websiteType: 'web',
     allUsers: 'all',
     activateUsers: 'activateUsers',
     deactivateUsers: 'deactivateUsers',

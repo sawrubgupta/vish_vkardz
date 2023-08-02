@@ -570,6 +570,7 @@ const aboutUsValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, 
         business: joi_1.default.string().allow("").allow(null),
         aboutUsDetail: joi_1.default.string().allow("").allow(null),
         image: joi_1.default.string().trim().allow(''),
+        document: joi_1.default.string().allow('').allow(null),
     });
     const value = schema.validate(req.body);
     if (value.error) {

@@ -177,11 +177,21 @@ const submitEnquiry = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     try {
         const { username, name, email, phone, message } = req.body;
         const createdAt = utility.dateWithFormat();
-        const userSql = `SELECT id FROM users WHERE username = '${username}' LIMIT 1`;
-        const [userRows] = yield db_1.default.query(userSql);
-        if (userRows.length === 0)
-            return apiResponse.errorMessage(res, 400, "Invalid username");
-        const userId = userRows[0].id;
+        let userId;
+        const type = req.query.type; //type = business, user, null
+        if (type && (type === development_1.default.businessType || type === development_1.default.websiteType)) {
+            userId = req.query.userId;
+        }
+        else {
+            userId = res.locals.jwt.userId;
+        }
+        if (!userId || userId === "" || userId === undefined) {
+            return apiResponse.errorMessage(res, 401, "User Id is required!");
+        }
+        // const userSql = `SELECT id FROM users WHERE username = '${username}' LIMIT 1`;
+        // const [userRows]:any = await pool.query(userSql);
+        // if (userRows.length === 0) return apiResponse.errorMessage(res, 400, "Invalid username");
+        // userId = userRows[0].id;
         const sql = `INSERT INTO user_contacts(user_id, name, email, phone_num, msg, created_at) VALUES(?, ?, ?, ?, ?, ?)`;
         const VALUES = [userId, name, email, phone, message, createdAt];
         const [rows] = yield db_1.default.query(sql, VALUES);

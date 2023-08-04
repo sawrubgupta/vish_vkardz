@@ -5,7 +5,11 @@ import * as apiResponse from '../../helper/apiResponse';
 
 export const addProfile =async (req:Request, res:Response) => {
     try {
-        
+        const userId = res.locals.jwt.userId;
+
+        const {} = req.body;
+
+        const sql = ``
     } catch (error) {
         console.log(error);
         return apiResponse.somethingWentWrongMessage(res);

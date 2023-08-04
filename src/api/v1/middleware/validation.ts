@@ -860,7 +860,7 @@ export const contactUsValidation =async (req:Request, res:Response, next:NextFun
 export const enquiryValidation =async (req:Request, res:Response, next:NextFunction) => {
 
     const schema = Joi.object({
-        username: Joi.string().required(),
+        username: Joi.string().allow(null, ""),
         name: Joi.string().required(),
         email: Joi.string().email().required(),
         phone: Joi.required(),
@@ -966,6 +966,29 @@ export const deleteVideosValidation =async (req:Request, res:Response, next:Next
 
     const schema = Joi.object({
         videoId: Joi.number().required(), 
+    })
+
+    const value = schema.validate(req.body);
+
+    if (value.error) {
+        const errMsg = await validationCheck(value);
+        return await apiResponse.errorMessage(res,400, errMsg);
+    }
+    next();
+}
+
+// ====================================================================================================
+// ====================================================================================================
+
+export const bookAppointmentValidation =async (req:Request, res:Response, next:NextFunction) => {
+
+    const schema = Joi.object({
+        type: Joi.string().allow("", null),
+        userId: Joi.number().allow("", null),
+        name: Joi.string().required(),
+         email: Joi.string().email().required(),
+         date: Joi.string().required(),
+         time: Joi.string().required()
     })
 
     const value = schema.validate(req.body);

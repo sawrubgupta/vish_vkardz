@@ -45,7 +45,7 @@ const addUpdateAboutUs = (req, res) => __awaiter(void 0, void 0, void 0, functio
         // const userId:string = res.locals.jwt.userId;
         let userId;
         const type = req.query.type; //type = business, user, null
-        if (type && type === development_1.default.businessType) {
+        if (type && (type === development_1.default.businessType || type === development_1.default.websiteType || type === development_1.default.vcfWebsite)) {
             userId = req.query.userId;
         }
         else {
@@ -94,7 +94,7 @@ const getAboutUs = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         // const userId:string = res.locals.jwt.userId;
         let userId;
         const type = req.query.type; //type = business, user, null
-        if (type && type === development_1.default.businessType) {
+        if (type && (type === development_1.default.businessType || type === development_1.default.websiteType || type === development_1.default.vcfWebsite)) {
             userId = req.query.userId;
         }
         else {
@@ -134,7 +134,7 @@ const deleteAboutUs = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         // const userId:string = res.locals.jwt.userId;
         let userId;
         const type = req.query.type; //type = business, user, null
-        if (type && type === development_1.default.businessType) {
+        if (type && (type === development_1.default.businessType || type === development_1.default.websiteType || type === development_1.default.vcfWebsite)) {
             userId = req.query.userId;
         }
         else {

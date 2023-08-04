@@ -4,10 +4,11 @@ import * as profileController from '../../controller/profile/profile';
 import * as setPinController from '../../controller/profile/setSecurityPin';
 import * as themeController from '../../controller/profile/theme';
 import * as primaryProfileController from '../../controller/profile/primaryProfile';
-import * as switchAccountController from '../../controller/profile/privateAccount';
+import * as privateAccountController from '../../controller/profile/privateAccount';
 import * as searchController from '../../controller/profile/searchUser';
 import * as vcfController from '../../controller/profile/customField';
 import * as vcardProfileController from '../../controller/profile/vcardProfile';
+import * as customUserInfoController from '../../controller/profile/customField';
 
 import {authenticatingToken, tempAuthenticatingToken} from '../../middleware/authorization.controller';
 import * as validation from '../../middleware/validation';
@@ -30,7 +31,9 @@ profileRouter.patch("/updateVcardLayout", tempAuthenticatingToken, themeControll
 profileRouter.post('/addPrimaryProfile', authenticatingToken, validation.primaryProfileValidation, primaryProfileController.setPrimaryProfile);
 profileRouter.get('/getPrimrySites', authenticatingToken, primaryProfileController.getPrimarySite);
 
-profileRouter.post('/switchAccount', authenticatingToken, validation.switchAccountValidation, switchAccountController.switchToPublic);
+profileRouter.post('/switchAccount', authenticatingToken, validation.switchAccountValidation, privateAccountController.switchToPublic);
+profileRouter.post('/privateUserProfile', authenticatingToken, validation.privateUserProfileValidation, privateAccountController.privateProfile);
+
 profileRouter.get('/searchUser', searchController.search);
 
 profileRouter.post('/addUpdateVcf', tempAuthenticatingToken, validation.addVcfValidation, vcfController.addCustomField);
@@ -39,5 +42,9 @@ profileRouter.get('/getVcf', tempAuthenticatingToken, vcfController.getVcf);
 
 profileRouter.get('/checkProfilePin', vcardProfileController.checkPinEnable);
 profileRouter.get('/vcardProfile', vcardProfileController.vcardProfile);
+
+profileRouter.post('/addCustomInfo', authenticatingToken, validation.customUserInfoValidation, customUserInfoController.addUserInfo);
+profileRouter.get('/getUserField', authenticatingToken, customUserInfoController.getUserCustomField);
+profileRouter.delete('/deleteUserCf', authenticatingToken, customUserInfoController.deleteUsercf);
 
 export default profileRouter;

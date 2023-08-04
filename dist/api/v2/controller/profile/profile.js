@@ -263,6 +263,7 @@ const vcardProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         let department = null;
         let notes = null;
         let dob = null;
+        let name = null;
         let phone = [];
         let email = [];
         let address = [];
@@ -284,6 +285,8 @@ const vcardProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* (
                         notes = ele.value;
                     if (ele.type === development_1.default.vcfDob)
                         dob = ele.value;
+                    if (ele.type === development_1.default.vcfName)
+                        name = ele.value;
                     if (ele.type === development_1.default.vcfNumber)
                         phone.push({ number: ele.value });
                     if (ele.type === development_1.default.vcfEmail)
@@ -339,6 +342,7 @@ const vcardProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             finally { if (e_2) throw e_2.error; }
         }
         const profile_data = {
+            userId: userRows[0].id,
             referral_code: userRows[0].referral_code,
             admin: {
                 company_logo: userRows[0].image,
@@ -349,6 +353,7 @@ const vcardProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* (
                 country_code: userRows[0].country,
                 country_name: userRows[0].country_name
             },
+            name: name,
             gender: gender,
             designation: designation,
             department: department,
@@ -359,6 +364,10 @@ const vcardProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             address: address,
             company_name: company,
             website: website,
+            theme: {
+                vcard_layouts: profileRows[0].vcard_layouts,
+                vcard_bg_color: profileRows[0].vcard_bg_color,
+            },
             socials: {
                 social_link: socialLink,
                 contact_info: socialContacts,

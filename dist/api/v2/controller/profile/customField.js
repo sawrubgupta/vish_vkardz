@@ -42,10 +42,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getVcf = exports.deleteVcf = exports.addCustomField = void 0;
+exports.getUserCustomField = exports.deleteUsercf = exports.addUserInfo = exports.getVcf = exports.deleteVcf = exports.addCustomField = void 0;
 const db_1 = __importDefault(require("../../../../db"));
 const apiResponse = __importStar(require("../../helper/apiResponse"));
 const development_1 = __importDefault(require("../../config/development"));
+const utility = __importStar(require("../../helper/utility"));
 const addCustomField = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, e_1, _b, _c;
     try {
@@ -163,3 +164,93 @@ const getVcf = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.getVcf = getVcf;
+// ====================================================================================================
+// ====================================================================================================
+const addUserInfo = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        let userId;
+        const { profileId, vcfType, vcfValue } = req.body;
+        const type = req.body.type; //type = business, user, null
+        if (type && (type === development_1.default.businessType || type === development_1.default.websiteType || type === development_1.default.vcfWebsite)) {
+            userId = req.body.userId;
+        }
+        else {
+            userId = res.locals.jwt.userId;
+        }
+        if (!userId || userId === "" || userId === undefined) {
+            return apiResponse.errorMessage(res, 401, "Please login !");
+        }
+        const createdAt = utility.dateWithFormat();
+        const vcfInfoSql = `INSERT INTO vcf_info(user_id, profile_id, type, value, status, created_at) VALUES(?, ?, ?, ?, ?, ?)`;
+        const vcfVALUES = [userId, profileId, vcfType, vcfValue, 1, createdAt];
+        const [vcfInfoRows] = yield db_1.default.query(vcfInfoSql, vcfVALUES);
+        if (vcfInfoRows.affectedRows > 0) {
+            return apiResponse.successResponse(res, "Success", null);
+        }
+        else {
+            return apiResponse.errorMessage(res, 400, "Failed!, try again");
+        }
+    }
+    catch (error) {
+        console.log(error);
+        return apiResponse.somethingWentWrongMessage(res);
+    }
+});
+exports.addUserInfo = addUserInfo;
+// ====================================================================================================
+// ====================================================================================================
+const deleteUsercf = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        let userId;
+        const type = req.body.type; //type = business, user, null
+        if (type && type === development_1.default.businessType) {
+            userId = req.body.userId;
+        }
+        else {
+            userId = res.locals.jwt.userId;
+        }
+        if (!userId || userId === "" || userId === undefined) {
+            return apiResponse.errorMessage(res, 401, "Please login !");
+        }
+        const fieldId = req.body.fieldId;
+        if (!fieldId || fieldId === null || fieldId === '') {
+            return apiResponse.errorMessage(res, 400, "Id is required!");
+        }
+        const sql = `DELETE FROM vcf_info WHERE id = ${fieldId} AND user_id = ${userId}`;
+        const [rows] = yield db_1.default.query(sql);
+        return apiResponse.successResponse(res, "Extra Field Deleted Sucessfully", null);
+    }
+    catch (error) {
+        console.log(error);
+        return apiResponse.errorMessage(res, 400, "Something Went Wrong");
+    }
+});
+exports.deleteUsercf = deleteUsercf;
+// ====================================================================================================
+// ====================================================================================================
+const getUserCustomField = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        let userId;
+        const type = req.query.type; //type = business, user, null
+        const profileId = req.query.profileId;
+        if (type && type === development_1.default.businessType) {
+            userId = req.query.userId;
+        }
+        else {
+            userId = res.locals.jwt.userId;
+        }
+        if (!userId || userId === "" || userId === undefined) {
+            return apiResponse.errorMessage(res, 401, "Please login !");
+        }
+        const sql = `SELECT * FROM vcf_info WHERE user_id = ${userId} AND profile_id = ${profileId}`;
+        const [rows] = yield db_1.default.query(sql);
+        return apiResponse.successResponse(res, "Data Retrieved Successfully", rows);
+    }
+    catch (error) {
+        console.log(error);
+        return apiResponse.errorMessage(res, 400, "Something went wrong");
+    }
+});
+exports.getUserCustomField = getUserCustomField;
+// ====================================================================================================
+// ====================================================================================================

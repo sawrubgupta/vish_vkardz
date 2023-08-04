@@ -53,6 +53,7 @@ featureRouter.delete("/deletePortfolio", authorization_controller_1.tempAuthenti
 featureRouter.get("/getAppointments", authorization_controller_1.tempAuthenticatingToken, appointmentController.appointmentList); //use in business type
 featureRouter.delete("/deleteAppointment", authorization_controller_1.tempAuthenticatingToken, appointmentController.deleteAppointment); //use in business type
 featureRouter.post("/manageAppointment", authorization_controller_1.tempAuthenticatingToken, appointmentController.manageAppointment); //use in business type
+featureRouter.post("/bookAppointment", authorization_controller_1.tempAuthenticatingToken, validation.bookAppointmentValidation, appointmentController.bookAppointment);
 featureRouter.get("/enquiryList", authorization_controller_1.tempAuthenticatingToken, enquiryController.enquiryList); //use in business type
 featureRouter.delete("/deleteEnquiry", authorization_controller_1.tempAuthenticatingToken, enquiryController.deleteEnquiry); //use in business type
 featureRouter.post("/replyEnquiry", authorization_controller_1.tempAuthenticatingToken, enquiryController.replyEnquiry); //use in business type

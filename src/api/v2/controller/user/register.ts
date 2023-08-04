@@ -220,7 +220,7 @@ console.log("data", data);
             const vcfPhone = dial_code + ' ' + phone;
             const vcfInfoSql = `INSERT INTO vcf_info(user_id, profile_id, type, value, status, created_at) VALUES(?, ?, ?, ?, ?, ?), (?, ?, ?, ?, ?, ?), (?, ?, ?, ?, ?, ?)`;
             const vcfVALUES = [userId, profileId, config.vcfNumber, vcfPhone, 1, justDate, userId, profileId, config.vcfEmail, email, 1, justDate, userId, profileId, config.vcfName, name, 1, justDate];
-            const [rows]:any = await pool.query(vcfInfoSql, vcfVALUES);
+            const [vcfInfoRows]:any = await pool.query(vcfInfoSql, vcfVALUES);
 
             const getUserName = `SELECT * FROM users WHERE id = ${userData.insertId} LIMIT 1`;
             const [userRows]:any = await pool.query(getUserName)

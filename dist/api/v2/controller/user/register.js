@@ -244,7 +244,7 @@ const socialRegister = (req, res) => __awaiter(void 0, void 0, void 0, function*
             const vcfPhone = dial_code + ' ' + phone;
             const vcfInfoSql = `INSERT INTO vcf_info(user_id, profile_id, type, value, status, created_at) VALUES(?, ?, ?, ?, ?, ?), (?, ?, ?, ?, ?, ?), (?, ?, ?, ?, ?, ?)`;
             const vcfVALUES = [userId, profileId, development_1.default.vcfNumber, vcfPhone, 1, justDate, userId, profileId, development_1.default.vcfEmail, email, 1, justDate, userId, profileId, development_1.default.vcfName, name, 1, justDate];
-            const [rows] = yield db_1.default.query(vcfInfoSql, vcfVALUES);
+            const [vcfInfoRows] = yield db_1.default.query(vcfInfoSql, vcfVALUES);
             const getUserName = `SELECT * FROM users WHERE id = ${userData.insertId} LIMIT 1`;
             const [userRows] = yield db_1.default.query(getUserName);
             if (userRows[0].card_number !== null && userRows[0].card_number !== undefined && userRows[0].card_number !== '') {

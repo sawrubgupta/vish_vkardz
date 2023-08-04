@@ -35,7 +35,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.manageAppointment = exports.deleteAppointment = exports.appointmentList = void 0;
+exports.bookAppointment = exports.manageAppointment = exports.deleteAppointment = exports.appointmentList = void 0;
 const db_1 = __importDefault(require("../../../../db"));
 const apiResponse = __importStar(require("../../helper/apiResponse"));
 const utility = __importStar(require("../../helper/utility"));
@@ -165,5 +165,38 @@ const manageAppointment = (req, res) => __awaiter(void 0, void 0, void 0, functi
     }
 });
 exports.manageAppointment = manageAppointment;
+// ====================================================================================================
+// ====================================================================================================
+const bookAppointment = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        let userId;
+        const type = req.body.type; //type = business, user, null
+        if (type && (type === development_1.default.businessType || type === development_1.default.websiteType)) {
+            userId = req.body.userId;
+        }
+        else {
+            userId = res.locals.jwt.userId;
+        }
+        if (!userId || userId === "" || userId === undefined) {
+            return apiResponse.errorMessage(res, 401, "User Id is required!");
+        }
+        const createdAt = utility.dateWithFormat();
+        const { name, email, date, time } = req.body;
+        const sql = `INSERT INTO my_appointments(user_id, title, email, ap_date, ap_time, created_at) VALUES(?, ?, ?, ?, ?, ?)`;
+        const VALUES = [userId, name, email, date, time, createdAt];
+        const [rows] = yield db_1.default.query(sql, VALUES);
+        if (rows.affectedRows > 0) {
+            return apiResponse.errorMessage(res, 400, "Appointment Booked Successfully");
+        }
+        else {
+            return apiResponse.errorMessage(res, 400, "Failed!, try again");
+        }
+    }
+    catch (error) {
+        console.log(error);
+        return apiResponse.errorMessage(res, 400, "Something went wrong");
+    }
+});
+exports.bookAppointment = bookAppointment;
 // ====================================================================================================
 // ====================================================================================================

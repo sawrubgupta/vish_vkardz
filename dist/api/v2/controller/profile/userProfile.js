@@ -31,54 +31,20 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.privateProfile = exports.switchToPublic = void 0;
-const db_1 = __importDefault(require("../../../../db"));
+exports.addProfile = void 0;
 const apiResponse = __importStar(require("../../helper/apiResponse"));
-const switchToPublic = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const addProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userId = res.locals.jwt.userId;
-        const isPrivate = req.body.isPrivate;
-        const sql = `UPDATE users SET is_private = ? WHERE id = ?`;
-        const VALUES = [isPrivate, userId];
-        const [rows] = yield db_1.default.query(sql, VALUES);
-        if (rows.affectedRows > 0) {
-            return apiResponse.successResponse(res, "Account Switch Successfully", null);
-        }
-        else {
-            return apiResponse.errorMessage(res, 400, "Failed to Switch Account, Please try again!");
-        }
-    }
-    catch (error) {
-        console.log(error);
-        return apiResponse.errorMessage(res, 400, "Something Went Wrong");
-    }
-});
-exports.switchToPublic = switchToPublic;
-// ====================================================================================================
-// ====================================================================================================
-const privateProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const userId = res.locals.jwt.userId;
-        const { profileId, isPrivate } = req.body;
-        const sql = `UPDATE users_profile SET is_private = ? WHERE user_id = ? AND id = ?`;
-        const VALUES = [isPrivate, userId, profileId];
-        const [rows] = yield db_1.default.query(sql, VALUES);
-        if (rows.affectedRows > 0) {
-            return apiResponse.successResponse(res, "Success", null);
-        }
-        else {
-            return apiResponse.errorMessage(res, 400, "Failed!, try again");
-        }
+        const {} = req.body;
+        const sql = ``;
     }
     catch (error) {
         console.log(error);
         return apiResponse.somethingWentWrongMessage(res);
     }
 });
-exports.privateProfile = privateProfile;
+exports.addProfile = addProfile;
 // ====================================================================================================
 // ====================================================================================================

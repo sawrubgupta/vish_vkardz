@@ -28,10 +28,11 @@ const profileController = __importStar(require("../../controller/profile/profile
 const setPinController = __importStar(require("../../controller/profile/setSecurityPin"));
 const themeController = __importStar(require("../../controller/profile/theme"));
 const primaryProfileController = __importStar(require("../../controller/profile/primaryProfile"));
-const switchAccountController = __importStar(require("../../controller/profile/privateAccount"));
+const privateAccountController = __importStar(require("../../controller/profile/privateAccount"));
 const searchController = __importStar(require("../../controller/profile/searchUser"));
 const vcfController = __importStar(require("../../controller/profile/customField"));
 const vcardProfileController = __importStar(require("../../controller/profile/vcardProfile"));
+const customUserInfoController = __importStar(require("../../controller/profile/customField"));
 const authorization_controller_1 = require("../../middleware/authorization.controller");
 const validation = __importStar(require("../../middleware/validation"));
 const profileRouter = (0, express_1.Router)();
@@ -47,11 +48,15 @@ profileRouter.get("/getLayots", themeController.getLayout); //use in business ty
 profileRouter.patch("/updateVcardLayout", authorization_controller_1.tempAuthenticatingToken, themeController.updateVcardLayout); //use in business type
 profileRouter.post('/addPrimaryProfile', authorization_controller_1.authenticatingToken, validation.primaryProfileValidation, primaryProfileController.setPrimaryProfile);
 profileRouter.get('/getPrimrySites', authorization_controller_1.authenticatingToken, primaryProfileController.getPrimarySite);
-profileRouter.post('/switchAccount', authorization_controller_1.authenticatingToken, validation.switchAccountValidation, switchAccountController.switchToPublic);
+profileRouter.post('/switchAccount', authorization_controller_1.authenticatingToken, validation.switchAccountValidation, privateAccountController.switchToPublic);
+profileRouter.post('/privateUserProfile', authorization_controller_1.authenticatingToken, validation.privateUserProfileValidation, privateAccountController.privateProfile);
 profileRouter.get('/searchUser', searchController.search);
 profileRouter.post('/addUpdateVcf', authorization_controller_1.tempAuthenticatingToken, validation.addVcfValidation, vcfController.addCustomField);
 profileRouter.delete('/deleteVcf', authorization_controller_1.tempAuthenticatingToken, vcfController.deleteVcf);
 profileRouter.get('/getVcf', authorization_controller_1.tempAuthenticatingToken, vcfController.getVcf);
 profileRouter.get('/checkProfilePin', vcardProfileController.checkPinEnable);
 profileRouter.get('/vcardProfile', vcardProfileController.vcardProfile);
+profileRouter.post('/addCustomInfo', authorization_controller_1.authenticatingToken, validation.customUserInfoValidation, customUserInfoController.addUserInfo);
+profileRouter.get('/getUserField', authorization_controller_1.authenticatingToken, customUserInfoController.getUserCustomField);
+profileRouter.delete('/deleteUserCf', authorization_controller_1.authenticatingToken, customUserInfoController.deleteUsercf);
 exports.default = profileRouter;

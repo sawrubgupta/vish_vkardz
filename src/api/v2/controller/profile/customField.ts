@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import pool from '../../../../db';
 import * as apiResponse from '../../helper/apiResponse';
 import config from '../../config/development';
+import * as utility from "../../helper/utility";
 
 export const addCustomField =async (req:Request, res:Response) => {
     try {
@@ -104,3 +105,95 @@ export const getVcf =async (req:Request, res:Response) => {
         return apiResponse.errorMessage(res, 400, "Something went wrong");
     }
 }
+
+// ====================================================================================================
+// ====================================================================================================
+
+export const addUserInfo = async (req:Request, res:Response) => {
+    try {
+        let userId:any; 
+        const { profileId, vcfType, vcfValue } = req.body;
+        const type = req.body.type; //type = business, user, null
+        if (type && (type === config.businessType  || type === config.websiteType || type === config.vcfWebsite)) {
+            userId = req.body.userId;
+        } else {
+            userId = res.locals.jwt.userId;
+        }
+        if (!userId || userId === "" || userId === undefined) {
+            return apiResponse.errorMessage(res, 401, "Please login !")
+        }
+        const createdAt = utility.dateWithFormat();
+
+        const vcfInfoSql = `INSERT INTO vcf_info(user_id, profile_id, type, value, status, created_at) VALUES(?, ?, ?, ?, ?, ?)`;
+        const vcfVALUES = [userId, profileId, vcfType, vcfValue, 1, createdAt];
+        const [vcfInfoRows]:any = await pool.query(vcfInfoSql, vcfVALUES);
+
+        if (vcfInfoRows.affectedRows > 0) {
+            return apiResponse.successResponse(res, "Success", null);
+        } else {
+            return apiResponse.errorMessage(res, 400, "Failed!, try again");
+        }
+    } catch (error) {
+        console.log(error);
+        return apiResponse.somethingWentWrongMessage(res);
+    }
+}
+
+// ====================================================================================================
+// ====================================================================================================
+
+export const deleteUsercf =async (req:Request, res:Response) => {
+    try {
+        let userId:any; 
+        const type = req.body.type; //type = business, user, null
+        if (type && type === config.businessType) {
+            userId = req.body.userId;
+        } else {
+            userId = res.locals.jwt.userId;
+        }
+        if (!userId || userId === "" || userId === undefined) {
+            return apiResponse.errorMessage(res, 401, "Please login !")
+        }
+        const fieldId = req.body.fieldId;
+        if (!fieldId || fieldId === null || fieldId === '') {
+            return apiResponse.errorMessage(res, 400, "Id is required!");
+        }
+        const sql = `DELETE FROM vcf_info WHERE id = ${fieldId} AND user_id = ${userId}`;
+        const [rows]:any = await pool.query(sql);
+
+        return apiResponse.successResponse(res, "Extra Field Deleted Sucessfully", null);
+    } catch (error) {
+        console.log(error);
+        return apiResponse.errorMessage(res, 400, "Something Went Wrong");
+    }
+}
+
+// ====================================================================================================
+// ====================================================================================================
+
+export const getUserCustomField =async (req:Request, res:Response) => {
+    try {
+        let userId:any; 
+        const type = req.query.type; //type = business, user, null
+        const profileId = req.query.profileId;
+        if (type && type === config.businessType) {
+            userId = req.query.userId;
+        } else {
+            userId = res.locals.jwt.userId;
+        }
+        if (!userId || userId === "" || userId === undefined) {
+            return apiResponse.errorMessage(res, 401, "Please login !")
+        }
+
+        const sql = `SELECT * FROM vcf_info WHERE user_id = ${userId} AND profile_id = ${profileId}`;
+        const [rows]:any = await pool.query(sql);
+
+        return apiResponse.successResponse(res, "Data Retrieved Successfully", rows);
+    } catch (error) {
+        console.log(error);
+        return apiResponse.errorMessage(res, 400, "Something went wrong");
+    }
+}
+
+// ====================================================================================================
+// ====================================================================================================

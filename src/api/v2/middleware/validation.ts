@@ -982,3 +982,67 @@ export const deleteVideosValidation =async (req:Request, res:Response, next:Next
 
 // ====================================================================================================
 // ====================================================================================================
+
+export const customUserInfoValidation =async (req:Request, res:Response, next:NextFunction) => {
+
+    const schema = Joi.object({
+        type: Joi.string().allow("", null),
+        userId: Joi.allow(null, ''),
+        profileId: Joi.number().required(), 
+        vcfType: Joi.string().required(), 
+        vcfValue: Joi.string().required(),
+    })
+
+    const value = schema.validate(req.body);
+
+    if (value.error) {
+        const errMsg = await validationCheck(value);
+        return await apiResponse.errorMessage(res,400, errMsg);
+    }
+    next();
+}
+
+// ====================================================================================================
+// ====================================================================================================
+
+export const bookAppointmentValidation =async (req:Request, res:Response, next:NextFunction) => {
+
+    const schema = Joi.object({
+        type: Joi.string().allow("", null),
+        userId: Joi.number().allow("", null),
+        name: Joi.string().required(),
+         email: Joi.string().email().required(),
+         date: Joi.string().required(),
+         time: Joi.string().required()
+    })
+
+    const value = schema.validate(req.body);
+
+    if (value.error) {
+        const errMsg = await validationCheck(value);
+        return await apiResponse.errorMessage(res,400, errMsg);
+    }
+    next();
+}
+
+// ====================================================================================================
+// ====================================================================================================
+
+export const privateUserProfileValidation =async (req:Request, res:Response, next:NextFunction) => {
+
+    const schema = Joi.object({
+        profileId: Joi.number().required(), 
+        isPrivate: Joi.boolean().allow(0, 1).required()
+    })
+
+    const value = schema.validate(req.body);
+
+    if (value.error) {
+        const errMsg = await validationCheck(value);
+        return await apiResponse.errorMessage(res,400, errMsg);
+    }
+    next();
+}
+
+// ====================================================================================================
+// ====================================================================================================

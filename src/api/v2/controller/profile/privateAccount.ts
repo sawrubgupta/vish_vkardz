@@ -24,3 +24,26 @@ export const switchToPublic =async (req:Request, res:Response) => {
 
 // ====================================================================================================
 // ====================================================================================================
+
+export const privateProfile = async (req:Request, res:Response) => {
+    try {
+        const userId = res.locals.jwt.userId;
+        const { profileId, isPrivate } = req.body;
+
+        const sql = `UPDATE users_profile SET is_private = ? WHERE user_id = ? AND id = ?`;
+        const VALUES = [isPrivate, userId, profileId];
+        const [rows]:any = await pool.query(sql, VALUES);
+
+        if (rows.affectedRows > 0) {
+            return apiResponse.successResponse(res, "Success", null);
+        } else {
+            return apiResponse.errorMessage(res, 400, "Failed!, try again");
+        }
+    } catch (error) {
+        console.log(error);
+        return apiResponse.somethingWentWrongMessage(res);
+    }
+}
+
+// ====================================================================================================
+// ====================================================================================================

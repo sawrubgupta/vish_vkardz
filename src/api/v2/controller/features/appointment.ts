@@ -140,3 +140,37 @@ export const manageAppointment =async (req:Request, res:Response) => {
 
 // ====================================================================================================
 // ====================================================================================================
+
+export const bookAppointment =async (req:Request, res:Response) => {
+    try {
+        let userId:any; 
+        const type = req.body.type; //type = business, user, null
+        if (type && (type === config.businessType  || type === config.websiteType)) {
+            userId = req.body.userId;
+        } else {
+            userId = res.locals.jwt.userId;
+        }
+        if (!userId || userId === "" || userId === undefined) {
+            return apiResponse.errorMessage(res, 401, "User Id is required!");
+        }
+        const createdAt = utility.dateWithFormat();
+        const { name, email, date, time } = req.body;
+
+        const sql = `INSERT INTO my_appointments(user_id, title, email, ap_date, ap_time, created_at) VALUES(?, ?, ?, ?, ?, ?)`;
+        const VALUES = [userId, name, email, date, time, createdAt];
+        const [rows]:any = await pool.query(sql, VALUES);
+
+        if (rows.affectedRows > 0) {
+            return apiResponse.errorMessage(res, 400, "Appointment Booked Successfully");
+        } else {
+            return apiResponse.errorMessage(res, 400, "Failed!, try again");
+        }
+
+    } catch (error) {
+        console.log(error);
+        return apiResponse.errorMessage(res, 400, "Something went wrong");
+    }
+}
+
+// ====================================================================================================
+// ====================================================================================================

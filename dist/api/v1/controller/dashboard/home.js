@@ -55,6 +55,8 @@ const home = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         if (userId) {
             const getCardQuery = `SELECT products.product_id, products.name, products.sub_cat, products.slug, products.description, products.price, products.mrp_price, products.discount_percent, products.product_image, products.image_back, products.image_other, products.material, products.bg_color, products.print, products.dimention, products.weight, products.thickness, products.alt_title, product_price.usd_selling_price, product_price.usd_mrp_price, product_price.aed_selling_price, product_price.aed_mrp_price, product_price.inr_selling_price, product_price.inr_mrp_price, product_price.qar_selling_price, product_price.qar_mrp_price, COUNT(product_rating.id) AS totalRating, AVG(COALESCE(product_rating.rating, 0)) AS averageRating FROM products LEFT JOIN product_price ON products.product_id = product_price.product_id LEFT JOIN product_rating ON products.product_id = product_rating.product_id WHERE products.sub_cat = 'best-seller' AND products.status = 1 GROUP BY product_rating.product_id LIMIT 5`;
             const [bestSellerProductsRows] = yield db_1.default.query(getCardQuery);
+            const recommendedProductSql = `SELECT products.product_id, products.name, products.sub_cat, products.slug, products.description, products.price, products.mrp_price, products.discount_percent, products.product_image, products.image_back, products.image_other, products.material, products.bg_color, products.print, products.dimention, products.weight, products.thickness, products.alt_title, product_price.usd_selling_price, product_price.usd_mrp_price, product_price.aed_selling_price, product_price.aed_mrp_price, product_price.inr_selling_price, product_price.inr_mrp_price, product_price.qar_selling_price, product_price.qar_mrp_price, COUNT(product_rating.id) AS totalRating, AVG(COALESCE(product_rating.rating, 0)) AS averageRating FROM products LEFT JOIN product_price ON products.product_id = product_price.product_id LEFT JOIN product_rating ON products.product_id = product_rating.product_id WHERE products.is_rrecommended = 1 AND products.status = 1 GROUP BY product_rating.product_id LIMIT 5`;
+            const [recommendedProductRows] = yield db_1.default.query(recommendedProductSql);
             const checkWishlist = `SELECT product_id FROM wishlist WHERE user_id = ${userId}`;
             const [wishlistRows] = yield db_1.default.query(checkWishlist);
             const cartQuery = `SELECT product_id FROM cart_details WHERE user_id = ${userId}`;
@@ -87,9 +89,35 @@ const home = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                     }
                 }
             });
+            recommendedProductRows.forEach((element, index) => {
+                if (wishlistRows.length === 0) {
+                    recommendedProductRows[index].isAddedToWishlist = false;
+                }
+                for (const i of wishlistRows) {
+                    if (i.product_id === element.product_id) {
+                        recommendedProductRows[index].isAddedToWishlist = true;
+                        break;
+                    }
+                    else {
+                        recommendedProductRows[index].isAddedToWishlist = false;
+                    }
+                }
+                if (cartRows.length === 0) {
+                    recommendedProductRows[index].isAddedToCart = false;
+                }
+                for (const cartData of cartRows) {
+                    if (cartData.product_id === element.product_id) {
+                        recommendedProductRows[index].isAddedToCart = true;
+                        break;
+                    }
+                    else {
+                        recommendedProductRows[index].isAddedToCart = false;
+                    }
+                }
+            });
             return res.status(200).json({
                 status: true,
-                bannerData, bestSellerProductsRows, customizeData, supportUrl, profileBanner,
+                bannerData, bestSellerProductsRows, recommendedProductRows, customizeData, supportUrl, profileBanner,
                 userData: userData[0],
                 message: "Data Retrieved Successfully"
             });
@@ -101,6 +129,12 @@ const home = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 bestSellerProductsRows[index].isAddedToWishlist = false;
                 bestSellerProductsRows[index].isAddedToCart = false;
             });
+            const recommendedProductSql = `SELECT products.product_id, products.name, products.sub_cat, products.slug, products.description, products.price, products.mrp_price, products.discount_percent, products.product_image, products.image_back, products.image_other, products.material, products.bg_color, products.print, products.dimention, products.weight, products.thickness, products.alt_title, product_price.usd_selling_price, product_price.usd_mrp_price, product_price.aed_selling_price, product_price.aed_mrp_price, product_price.inr_selling_price, product_price.inr_mrp_price, product_price.qar_selling_price, product_price.qar_mrp_price, COUNT(product_rating.id) AS totalRating, AVG(COALESCE(product_rating.rating, 0)) AS averageRating FROM products LEFT JOIN product_price ON products.product_id = product_price.product_id LEFT JOIN product_rating ON products.product_id = product_rating.product_id WHERE products.is_rrecommended = 1 AND products.status = 1 GROUP BY product_rating.product_id LIMIT 5`;
+            const [recommendedProductRows] = yield db_1.default.query(recommendedProductSql);
+            recommendedProductRows.forEach((element, index) => {
+                recommendedProductRows[index].isAddedToWishlist = false;
+                recommendedProductRows[index].isAddedToCart = false;
+            });
             const userData = {
                 name: "",
                 username: "",
@@ -108,7 +142,7 @@ const home = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             };
             return res.status(200).json({
                 status: true,
-                bannerData, bestSellerProductsRows, customizeData, supportUrl, profileBanner,
+                bannerData, bestSellerProductsRows, recommendedProductRows, customizeData, supportUrl, profileBanner,
                 userData: userData,
                 message: "Data Retrieved Successfully"
             });

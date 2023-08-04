@@ -20,6 +20,9 @@ name api's
 database changes:
 
 ------------------------------new changes--------------------------------
+04-08-2023
+ALTER TABLE `products` ADD `is_rrecommended` BOOLEAN NOT NULL DEFAULT FALSE AFTER `is_todays_deal`;
+
 31-07-2023
 CREATE TABLE `videos` (
  `id` INT(11) NOT NULL AUTO_INCREMENT ,

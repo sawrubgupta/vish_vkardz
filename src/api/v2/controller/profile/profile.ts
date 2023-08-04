@@ -250,6 +250,7 @@ export const vcardProfile =async (req:Request, res:Response) => {
         let department = null;
         let notes = null;
         let dob = null;
+        let name = null;
         let phone = [];
         let email = [];
         let address = [];
@@ -262,6 +263,7 @@ export const vcardProfile =async (req:Request, res:Response) => {
             if (ele.type === config.vcfDepartment) department = ele.value; 
             if (ele.type === config.vcfNotes) notes = ele.value;
             if (ele.type === config.vcfDob) dob = ele.value;
+            if (ele.type === config.vcfName) name = ele.value;
             if (ele.type === config.vcfNumber) phone.push({number: ele.value});
             if (ele.type === config.vcfEmail) email.push(ele.value);
             if (ele.type === config.vcfAddress) address.push(ele.value);
@@ -281,6 +283,7 @@ export const vcardProfile =async (req:Request, res:Response) => {
         }
         
         const profile_data= {
+            userId: userRows[0].id,
             referral_code: userRows[0].referral_code,
             admin: {
                 company_logo: userRows[0].image,
@@ -292,6 +295,7 @@ export const vcardProfile =async (req:Request, res:Response) => {
                 country_code: userRows[0].country,
                 country_name: userRows[0].country_name
             },
+            name: name,
             gender: gender,
             designation: designation,
             department: department,
@@ -302,7 +306,11 @@ export const vcardProfile =async (req:Request, res:Response) => {
             address: address,
             company_name: company,
             website: website,
-            socials: {
+            theme:{
+                vcard_layouts: profileRows[0].vcard_layouts,
+                vcard_bg_color: profileRows[0].vcard_bg_color,    
+            },
+           socials: {
                 social_link: socialLink,
                 contact_info: socialContacts,
                 business_link: socialBusiness,

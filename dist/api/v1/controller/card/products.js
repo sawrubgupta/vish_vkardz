@@ -43,6 +43,14 @@ const getCategories = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     try {
         const sql = `SELECT * FROM product_type WHERE status = 1`;
         const [rows] = yield db_1.default.query(sql);
+        const extraCategory = {
+            id: 20,
+            name: "Super Hero Card",
+            pro_cat_slug: "super-hero",
+            image: "https://cdn.pixabay.com/photo/2020/05/25/17/21/link-5219567_960_720.jpg",
+            status: 1
+        };
+        rows.push(extraCategory);
         if (rows.length > 0) {
             return apiResponse.successResponse(res, "Category get successfully", rows);
         }
@@ -62,10 +70,17 @@ const getProductByCategoryId = (req, res) => __awaiter(void 0, void 0, void 0, f
     try {
         const categoryId = req.query.categoryId;
         const userId = res.locals.jwt.userId;
-        console.log(userId);
-        if (!categoryId) {
-            return apiResponse.errorMessage(res, 400, "Please Add Category Id");
+        const slug = req.query.slug;
+        let query;
+        if (categoryId) {
+            query = `products.type = ${categoryId}`;
         }
+        else {
+            query = `products.sub_cat = '${slug}'`;
+        }
+        // if (!categoryId) {
+        //     return apiResponse.errorMessage(res, 400, "Please Add Category Id");
+        // }
         let keyword = req.query.keyword;
         var getPage = req.query.page;
         var page = parseInt(getPage);
@@ -75,9 +90,9 @@ const getProductByCategoryId = (req, res) => __awaiter(void 0, void 0, void 0, f
         var page_size = development_1.default.pageSize;
         const offset = (page - 1) * page_size;
         if (userId) {
-            const getPageQuery = `SELECT products.product_id, AVG(COALESCE(product_rating.rating, 0)) AS averageRating FROM products LEFT JOIN product_price ON products.product_id = product_price.product_id LEFT JOIN product_rating ON products.product_id = product_rating.product_id WHERE products.type = ${categoryId} AND products.status = 1 AND products.name LIKE '%${keyword}%' GROUP BY products.product_id`;
+            const getPageQuery = `SELECT products.product_id, AVG(COALESCE(product_rating.rating, 0)) AS averageRating FROM products LEFT JOIN product_price ON products.product_id = product_price.product_id LEFT JOIN product_rating ON products.product_id = product_rating.product_id WHERE ${query} AND products.status = 1 AND products.name LIKE '%${keyword}%' GROUP BY products.product_id`;
             const [result] = yield db_1.default.query(getPageQuery);
-            const sql = `SELECT products.product_id, products.name, products.sub_cat, products.slug, products.description, products.price, products.mrp_price, products.discount_percent, products.product_image, products.image_back, products.image_other, products.material, products.bg_color, products.print, products.dimention, products.weight, products.thickness, products.alt_title, product_price.usd_selling_price, product_price.usd_mrp_price, product_price.aed_selling_price, product_price.aed_mrp_price, product_price.inr_selling_price, product_price.inr_mrp_price, product_price.qar_selling_price, product_price.qar_mrp_price, COUNT(product_rating.id) AS totalRating, AVG(COALESCE(product_rating.rating, 0)) AS averageRating FROM products LEFT JOIN product_price ON products.product_id = product_price.product_id LEFT JOIN product_rating ON products.product_id = product_rating.product_id WHERE products.type = ${categoryId} AND products.status = 1 AND products.name LIKE '%${keyword}%' GROUP BY products.product_id ORDER BY products.created_at desc limit ${page_size} offset ${offset}`;
+            const sql = `SELECT products.product_id, products.name, products.sub_cat, products.slug, products.description, products.price, products.mrp_price, products.discount_percent, products.product_image, products.image_back, products.image_other, products.material, products.bg_color, products.print, products.dimention, products.weight, products.thickness, products.alt_title, product_price.usd_selling_price, product_price.usd_mrp_price, product_price.aed_selling_price, product_price.aed_mrp_price, product_price.inr_selling_price, product_price.inr_mrp_price, product_price.qar_selling_price, product_price.qar_mrp_price, COUNT(product_rating.id) AS totalRating, AVG(COALESCE(product_rating.rating, 0)) AS averageRating FROM products LEFT JOIN product_price ON products.product_id = product_price.product_id LEFT JOIN product_rating ON products.product_id = product_rating.product_id WHERE ${query} AND products.status = 1 AND products.name LIKE '%${keyword}%' GROUP BY products.product_id ORDER BY products.created_at desc limit ${page_size} offset ${offset}`;
             const [rows] = yield db_1.default.query(sql);
             const checkWishlist = `SELECT product_id FROM wishlist WHERE user_id = ${userId}`;
             const [wishlistRows] = yield db_1.default.query(checkWishlist);

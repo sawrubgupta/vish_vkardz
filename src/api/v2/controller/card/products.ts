@@ -9,6 +9,15 @@ export const getCategories = async (req: Request, res: Response) => {
         const sql = `SELECT * FROM product_type WHERE status = 1`;
         const [rows]: any = await pool.query(sql);
 
+        const extraCategory = {
+            id: 19,
+            name: "Other NFC Product",
+            pro_cat_slug: "other-product",
+            image: "https://cdn.pixabay.com/photo/2020/05/25/17/21/link-5219567_960_720.jpg",
+            status: 1
+        }
+        rows.push(extraCategory);
+        
         if (rows.length > 0) {
             return apiResponse.successResponse(res, "Category get successfully", rows)
         } else {

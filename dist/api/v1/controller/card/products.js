@@ -47,7 +47,7 @@ const getCategories = (req, res) => __awaiter(void 0, void 0, void 0, function* 
             id: 20,
             name: "Super Hero Card",
             pro_cat_slug: "super-hero",
-            image: "https://cdn.pixabay.com/photo/2020/05/25/17/21/link-5219567_960_720.jpg",
+            image: "uploads/site_images/superhero-cover.png",
             status: 1
         };
         rows.push(extraCategory);
@@ -72,7 +72,7 @@ const getProductByCategoryId = (req, res) => __awaiter(void 0, void 0, void 0, f
         const userId = res.locals.jwt.userId;
         const slug = req.query.slug;
         let query;
-        if (categoryId) {
+        if (categoryId && categoryId != null && categoryId != undefined) {
             query = `products.type = ${categoryId}`;
         }
         else {

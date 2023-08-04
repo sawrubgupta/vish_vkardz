@@ -35,7 +35,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.bestSellerProducts = exports.home = void 0;
+exports.recommendedProducts = exports.bestSellerProducts = exports.home = void 0;
 const db_1 = __importDefault(require("../../../../db"));
 const apiResponse = __importStar(require("../../helper/apiResponse"));
 const development_1 = __importDefault(require("../../config/development"));
@@ -227,3 +227,76 @@ const bestSellerProducts = (req, res) => __awaiter(void 0, void 0, void 0, funct
     }
 });
 exports.bestSellerProducts = bestSellerProducts;
+// ====================================================================================================
+// ====================================================================================================
+const recommendedProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const userId = res.locals.jwt.userId;
+        var getPage = req.query.page;
+        var page = parseInt(getPage);
+        if (page === null || page <= 1 || !page) {
+            page = 1;
+        }
+        var page_size = development_1.default.pageSize;
+        const offset = (page - 1) * page_size;
+        if (userId) {
+            const getCardQuery = `SELECT products.product_id, products.name, products.sub_cat, products.slug, products.description, products.price, products.mrp_price, products.discount_percent, products.product_image, products.image_back, products.image_other, products.material, products.bg_color, products.print, products.dimention, products.weight, products.thickness, products.alt_title, product_price.usd_selling_price, product_price.usd_mrp_price, product_price.aed_selling_price, product_price.aed_mrp_price, product_price.inr_selling_price, product_price.inr_mrp_price, product_price.qar_selling_price, product_price.qar_mrp_price, COUNT(product_rating.id) AS totalRating, AVG(COALESCE(product_rating.rating, 0)) AS averageRating FROM products LEFT JOIN product_price ON products.product_id = product_price.product_id LEFT JOIN product_rating ON products.product_id = product_rating.product_id WHERE products.is_rrecommended = 1 AND products.status = 1 GROUP BY product_rating.product_id ORDER BY products.created_at desc limit ${page_size} offset ${offset}`;
+            const [recommendedProductRows] = yield db_1.default.query(getCardQuery);
+            const checkWishlist = `SELECT product_id FROM wishlist WHERE user_id = ${userId}`;
+            const [wishlistRows] = yield db_1.default.query(checkWishlist);
+            const cartQuery = `SELECT product_id FROM cart_details WHERE user_id = ${userId}`;
+            const [cartRows] = yield db_1.default.query(cartQuery);
+            recommendedProductRows.forEach((element, index) => {
+                if (wishlistRows.length === 0) {
+                    recommendedProductRows[index].isAddedToWishlist = false;
+                }
+                for (const i of wishlistRows) {
+                    if (i.product_id === element.product_id) {
+                        recommendedProductRows[index].isAddedToWishlist = true;
+                        break;
+                    }
+                    else {
+                        recommendedProductRows[index].isAddedToWishlist = false;
+                    }
+                }
+                if (cartRows.length === 0) {
+                    recommendedProductRows[index].isAddedToCart = false;
+                }
+                for (const cartData of cartRows) {
+                    if (cartData.product_id === element.product_id) {
+                        recommendedProductRows[index].isAddedToCart = true;
+                        break;
+                    }
+                    else {
+                        recommendedProductRows[index].isAddedToCart = false;
+                    }
+                }
+            });
+            return res.status(200).json({
+                status: true,
+                recommendedProductRows,
+                message: "Data Retrieved Successfully"
+            });
+        }
+        else {
+            const getCardQuery = `SELECT products.product_id, products.name, products.sub_cat, products.slug, products.description, products.price, products.mrp_price, products.discount_percent, products.product_image, products.image_back, products.image_other, products.material, products.bg_color, products.print, products.dimention, products.weight, products.thickness, products.alt_title, product_price.usd_selling_price, product_price.usd_mrp_price, product_price.aed_selling_price, product_price.aed_mrp_price, product_price.inr_selling_price, product_price.inr_mrp_price, product_price.qar_selling_price, product_price.qar_mrp_price, COUNT(product_rating.id) AS totalRating, AVG(COALESCE(product_rating.rating, 0)) AS averageRating FROM products LEFT JOIN product_price ON products.product_id = product_price.product_id LEFT JOIN product_rating ON products.product_id = product_rating.product_id WHERE products.is_rrecommended = 1 AND products.status = 1 GROUP BY product_rating.product_id LIMIT 5`;
+            const [recommendedProductRows] = yield db_1.default.query(getCardQuery);
+            recommendedProductRows.forEach((element, index) => {
+                recommendedProductRows[index].isAddedToWishlist = false;
+                recommendedProductRows[index].isAddedToCart = false;
+            });
+            return res.status(200).json({
+                status: true,
+                recommendedProductRows,
+                message: "Data Retrieved Successfully"
+            });
+        }
+    }
+    catch (error) {
+        console.log(error);
+        return apiResponse.errorMessage(res, 400, "Something Went Wrong");
+    }
+});
+exports.recommendedProducts = recommendedProducts;
+// ====================================================================================================
+// ====================================================================================================

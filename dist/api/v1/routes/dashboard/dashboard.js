@@ -34,5 +34,6 @@ dashboardRouter.get("/home", authorization_controller_1.tempAuthenticatingToken,
 dashboardRouter.get("/bestSellerProducts", authorization_controller_1.tempAuthenticatingToken, homeController.bestSellerProducts);
 dashboardRouter.get("/mixingData", mixingDataController.mixingData);
 dashboardRouter.get("/DealsOfTheDay", dealsController.dealOfTheDay);
+dashboardRouter.get("/recommendedProducts", authorization_controller_1.tempAuthenticatingToken, homeController.recommendedProducts);
 dashboardRouter.post("/contactSync", contactsController.contactSync);
 exports.default = dashboardRouter;

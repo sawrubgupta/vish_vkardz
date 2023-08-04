@@ -216,6 +216,7 @@ const updateImage = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
 exports.updateImage = updateImage;
 // ====================================================================================================
 // ====================================================================================================
+//updated prfile with new json
 const vcardProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, e_1, _b, _c, _d, e_2, _e, _f;
     try {

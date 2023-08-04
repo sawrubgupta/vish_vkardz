@@ -13,6 +13,8 @@ dashboardRouter.get("/home", tempAuthenticatingToken, homeController.home);
 dashboardRouter.get("/bestSellerProducts", tempAuthenticatingToken, homeController.bestSellerProducts);
 dashboardRouter.get("/mixingData", mixingDataController.mixingData);
 dashboardRouter.get("/DealsOfTheDay", dealsController.dealOfTheDay);
+dashboardRouter.get("/recommendedProducts", tempAuthenticatingToken, homeController.recommendedProducts);
+
 
 dashboardRouter.post("/contactSync", contactsController.contactSync);
 

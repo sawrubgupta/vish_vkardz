@@ -190,6 +190,8 @@ export const updateImage =async (req:Request, res:Response) => {
 // ====================================================================================================
 // ====================================================================================================
 
+
+//updated prfile with new json
 export const vcardProfile =async (req:Request, res:Response) => {
     try {
         // const username = req.query.username;

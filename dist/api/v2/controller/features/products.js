@@ -45,7 +45,7 @@ const addProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         // const userId:string = res.locals.jwt.userId;
         let userId;
         const type = req.query.type; //type = business, user, null
-        if (type && type === development_1.default.businessType) {
+        if (type && (type === development_1.default.businessType || type === development_1.default.websiteType || type === development_1.default.vcfWebsite)) {
             userId = req.query.userId;
         }
         else {
@@ -79,7 +79,7 @@ const getProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         // const userId:string = res.locals.jwt.userId;
         let userId;
         const type = req.query.type; //type = business, user, null
-        if (type && type === development_1.default.businessType) {
+        if (type && (type === development_1.default.businessType || type === development_1.default.websiteType || type === development_1.default.vcfWebsite)) {
             userId = req.query.userId;
         }
         else {
@@ -88,6 +88,9 @@ const getProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         if (!userId || userId === "" || userId === undefined) {
             return apiResponse.errorMessage(res, 401, "User Id is required!");
         }
+        const userSql = `SELECT phone FROM users WHERE id = ${userId} LIMIT 1`;
+        const [userRows] = yield db_1.default.query(userSql);
+        const userPhone = userRows[0].phone;
         var getPage = req.query.page;
         var page = parseInt(getPage);
         if (page === null || page <= 1 || !page) {
@@ -108,6 +111,7 @@ const getProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             return res.status(200).json({
                 status: true,
                 data: rows,
+                userPhone,
                 featureStatus: featureStatus[0].status,
                 totalPage: totalPage,
                 currentPage: page,
@@ -120,6 +124,7 @@ const getProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             return res.status(200).json({
                 status: true,
                 data: null,
+                userPhone,
                 featureStatus: featureStatus[0].status,
                 totalPage: totalPage,
                 currentPage: page,
@@ -141,7 +146,7 @@ const updateProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         // const userId:string = res.locals.jwt.userId;
         let userId;
         const type = req.query.type; //type = business, user, null
-        if (type && type === development_1.default.businessType) {
+        if (type && (type === development_1.default.businessType || type === development_1.default.websiteType || type === development_1.default.vcfWebsite)) {
             userId = req.query.userId;
         }
         else {
@@ -175,7 +180,7 @@ const deleteProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         // const userId:string = res.locals.jwt.userId;
         let userId;
         const type = req.query.type; //type = business, user, null
-        if (type && type === development_1.default.businessType) {
+        if (type && (type === development_1.default.businessType || type === development_1.default.websiteType || type === development_1.default.vcfWebsite)) {
             userId = req.query.userId;
         }
         else {

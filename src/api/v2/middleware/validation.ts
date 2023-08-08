@@ -5,33 +5,33 @@ import Joi from "joi";
 async function validationCheck(value: any) {
     let msg = value.error.details[0].message;
     console.log(msg);
-    
+
     msg = msg.replace(/"/g, "");
     msg = msg.replace('_', " ");
     msg = msg.replace('.', " ");
-    
+
     const errorMessage = "Validation error : " + msg;
     return errorMessage;
 }
 
 export const registrationValidation = async (req: Request, res: Response, next: NextFunction) => {
     const schema = Joi.object({
-        name: Joi.string().trim().min(3).max(70).trim().required(),       
+        name: Joi.string().trim().min(3).max(70).trim().required(),
         email: Joi.string().email().max(80).required(),
         password: Joi.string().min(3).max(30).required(),
         username: Joi.string().trim().min(2).max(50).required(),
         country: Joi.number().integer(),
         phone: Joi.string().trim().min(8).max(20).trim().required(),
-        country_name : Joi.string().trim().allow(''),
+        country_name: Joi.string().trim().allow(''),
         dial_code: Joi.string().required(),
-        fcmToken:Joi.string().trim().required(),
+        fcmToken: Joi.string().trim().required(),
     });
 
     const value = schema.validate(req.body);
 
     if (value.error) {
         const errMsg = await validationCheck(value);
-        return await apiResponse.errorMessage(res,400, errMsg);
+        return await apiResponse.errorMessage(res, 400, errMsg);
     }
     next();
 };
@@ -41,7 +41,7 @@ export const registrationValidation = async (req: Request, res: Response, next: 
 
 export const socialRegistrationValidation = async (req: Request, res: Response, next: NextFunction) => {
     const schema = Joi.object({
-        name: Joi.string().trim().min(3).max(70).trim().required(),  
+        name: Joi.string().trim().min(3).max(70).trim().required(),
         type: Joi.string().trim().required(),
         socialId: Joi.string().trim().allow(null).allow(''),
         email: Joi.string().email().max(80).required(),
@@ -49,10 +49,10 @@ export const socialRegistrationValidation = async (req: Request, res: Response, 
         username: Joi.string().trim().min(2).max(50).required(),
         country: Joi.number().integer().required(),
         phone: Joi.string().trim().min(8).max(20).trim().required(),
-        countryName : Joi.string().trim().allow(''),
+        countryName: Joi.string().trim().allow(''),
         dial_code: Joi.string().required(),
-        fcmToken:Joi.string().trim().required(),
-        deviceId:Joi.allow('').allow(null),
+        fcmToken: Joi.string().trim().required(),
+        deviceId: Joi.allow('').allow(null),
         deviceType: Joi.string().allow('').allow(null),
     });
 
@@ -60,7 +60,7 @@ export const socialRegistrationValidation = async (req: Request, res: Response, 
 
     if (value.error) {
         const errMsg = await validationCheck(value);
-        return await apiResponse.errorMessage(res,400, errMsg);
+        return await apiResponse.errorMessage(res, 400, errMsg);
     }
     next();
 };
@@ -68,57 +68,57 @@ export const socialRegistrationValidation = async (req: Request, res: Response, 
 // ====================================================================================================
 // ====================================================================================================
 
-export const loginValidation = async (req: Request,res: Response,next: NextFunction) => {
+export const loginValidation = async (req: Request, res: Response, next: NextFunction) => {
     const schema = Joi.object({
-      password: Joi.string().min(3).max(30).required(),
-      email: Joi.string().email().required(),
-      fcmToken:Joi.string().trim().required(),
+        password: Joi.string().min(3).max(30).required(),
+        email: Joi.string().email().required(),
+        fcmToken: Joi.string().trim().required(),
     });
-  
+
     const value = schema.validate(req.body);
-  
+
     if (value.error) {
-      const errMsg = await validationCheck(value);
-      return await apiResponse.errorMessage(res,400, errMsg);
+        const errMsg = await validationCheck(value);
+        return await apiResponse.errorMessage(res, 400, errMsg);
     }
     next();
-  };
+};
 
 // ====================================================================================================
 // ====================================================================================================
 
-export const socialLoginValidation = async (req: Request,res: Response,next: NextFunction) => {
+export const socialLoginValidation = async (req: Request, res: Response, next: NextFunction) => {
     const schema = Joi.object({
-      password: Joi.string().min(3).max(30).allow('').allow(null),
-      email: Joi.string().required().allow('').allow(null),
-      fcmToken:Joi.string().trim().required(),
-      type: Joi.string().trim().required(),
-      socialId: Joi.string().trim().allow(null).allow(''),
+        password: Joi.string().min(3).max(30).allow('').allow(null),
+        email: Joi.string().required().allow('').allow(null),
+        fcmToken: Joi.string().trim().required(),
+        type: Joi.string().trim().required(),
+        socialId: Joi.string().trim().allow(null).allow(''),
     });
-  
+
     const value = schema.validate(req.body);
-  
+
     if (value.error) {
-      const errMsg = await validationCheck(value);
-      return await apiResponse.errorMessage(res,400, errMsg);
+        const errMsg = await validationCheck(value);
+        return await apiResponse.errorMessage(res, 400, errMsg);
     }
     next();
-  };
+};
 
 // ====================================================================================================
 // ====================================================================================================
 
 export const changePasswordValidation = async (req: Request, res: Response, next: NextFunction) => {
-    const schema = Joi.object({ 
+    const schema = Joi.object({
         oldPassword: Joi.string().min(3).max(30).required(),
         newPassword: Joi.string().min(3).max(30).required(),
     });
 
     const value = schema.validate(req.body);
 
-    if (value.error) { 
-    const errMsg = await validationCheck(value);
-    return await apiResponse.errorMessage(res,400, errMsg);
+    if (value.error) {
+        const errMsg = await validationCheck(value);
+        return await apiResponse.errorMessage(res, 400, errMsg);
     }
     next();
 };
@@ -127,7 +127,7 @@ export const changePasswordValidation = async (req: Request, res: Response, next
 // ====================================================================================================
 
 export const settingValidation = async (req: Request, res: Response, next: NextFunction) => {
-    const schema = Joi.object({ 
+    const schema = Joi.object({
         pushNotificationEnable: Joi.boolean(),
         emailNotificationEnable: Joi.boolean(),
         currencyCode: Joi.string().min(1).max(4).allow(''),
@@ -138,7 +138,7 @@ export const settingValidation = async (req: Request, res: Response, next: NextF
 
     if (value.error) {
         const errMsg = await validationCheck(value);
-        return await apiResponse.errorMessage(res,400, errMsg);
+        return await apiResponse.errorMessage(res, 400, errMsg);
     }
     next();
 };
@@ -146,15 +146,15 @@ export const settingValidation = async (req: Request, res: Response, next: NextF
 // ====================================================================================================
 // ====================================================================================================
 
-export const updateProfileValidation =async (req:Request, res:Response, next:NextFunction) => {
-    
+export const updateProfileValidation = async (req: Request, res: Response, next: NextFunction) => {
+
     const schema = Joi.object({
         name: Joi.string().trim().min(3).max(80).trim().required(),
         designation: Joi.string().min(3).max(80).allow(''),
-        companyName : Joi.string().trim().min(3).max(80).allow(''),
+        companyName: Joi.string().trim().min(3).max(80).allow(''),
         dialCode: Joi.string().required(),
         phone: Joi.string().trim().min(8).max(20).trim().required(),
-        email: Joi.string().email( ).max(60).required(),
+        email: Joi.string().email().max(60).required(),
         website: Joi.string().trim().max(80).min(5).allow(''),
         address: Joi.string().normalize().max(200).required(),
     });
@@ -163,7 +163,7 @@ export const updateProfileValidation =async (req:Request, res:Response, next:Nex
 
     if (value.error) {
         const errMsg = await validationCheck(value);
-        return await apiResponse.errorMessage(res,400, errMsg);
+        return await apiResponse.errorMessage(res, 400, errMsg);
     }
     next();
 };
@@ -171,13 +171,13 @@ export const updateProfileValidation =async (req:Request, res:Response, next:Nex
 // ====================================================================================================
 // ====================================================================================================
 
-export const updateVcardinfoValidation =async (req:Request, res:Response, next:NextFunction) => {
-    
+export const updateVcardinfoValidation = async (req: Request, res: Response, next: NextFunction) => {
+
     const schema = Joi.object({
         name: Joi.string().min(3).max(80).required(),
         dialCode: Joi.string().required(),
         phone: Joi.string().trim().min(8).max(20).trim().required(),
-        email: Joi.string().email( ).trim().max(60).required(),
+        email: Joi.string().email().trim().max(60).required(),
         country: Joi.number().allow(''),
         countryName: Joi.string().allow('').allow(null),
         gender: Joi.string().max(200).allow(''),
@@ -187,7 +187,7 @@ export const updateVcardinfoValidation =async (req:Request, res:Response, next:N
 
     if (value.error) {
         const errMsg = await validationCheck(value);
-        return await apiResponse.errorMessage(res,400, errMsg);
+        return await apiResponse.errorMessage(res, 400, errMsg);
     }
     next();
 };
@@ -195,8 +195,8 @@ export const updateVcardinfoValidation =async (req:Request, res:Response, next:N
 // ====================================================================================================
 // ====================================================================================================
 
-export const editSocialLinksValidation =async (req:Request, res:Response, next:NextFunction) => {
-    
+export const editSocialLinksValidation = async (req: Request, res: Response, next: NextFunction) => {
+
     const schema = Joi.object({
         siteId: Joi.number().integer().required(),
         siteValue: Joi.string().max(100).allow(''),
@@ -208,7 +208,7 @@ export const editSocialLinksValidation =async (req:Request, res:Response, next:N
 
     if (value.error) {
         const errMsg = await validationCheck(value);
-        return await apiResponse.errorMessage(res,400, errMsg);
+        return await apiResponse.errorMessage(res, 400, errMsg);
     }
     next();
 }
@@ -216,8 +216,8 @@ export const editSocialLinksValidation =async (req:Request, res:Response, next:N
 // ====================================================================================================
 // ====================================================================================================
 
-export const switchAccountValidation =async (req:Request, res:Response, next:NextFunction) => {
-    
+export const switchAccountValidation = async (req: Request, res: Response, next: NextFunction) => {
+
     const schema = Joi.object({
         isPrivate: Joi.boolean().allow(0, 1).required(),
     })
@@ -226,7 +226,7 @@ export const switchAccountValidation =async (req:Request, res:Response, next:Nex
 
     if (value.error) {
         const errMsg = await validationCheck(value);
-        return await apiResponse.errorMessage(res,400, errMsg);
+        return await apiResponse.errorMessage(res, 400, errMsg);
     }
     next();
 }
@@ -234,8 +234,8 @@ export const switchAccountValidation =async (req:Request, res:Response, next:Nex
 // ====================================================================================================
 // ====================================================================================================
 
-export const addVcfValidation =async (req:Request, res:Response, next:NextFunction) => {
-    
+export const addVcfValidation = async (req: Request, res: Response, next: NextFunction) => {
+
     const schema = Joi.object({
         type: Joi.string().allow('').allow(null),
         userId: Joi.number().allow('').allow(null),
@@ -246,14 +246,14 @@ export const addVcfValidation =async (req:Request, res:Response, next:NextFuncti
                 vcfValue: Joi.string().required(),
                 status: Joi.boolean().allow(0, 1),
             })
-            )
-        })
+        )
+    })
 
     const value = schema.validate(req.body);
 
     if (value.error) {
         const errMsg = await validationCheck(value);
-        return await apiResponse.errorMessage(res,400, errMsg);
+        return await apiResponse.errorMessage(res, 400, errMsg);
     }
     next();
 }
@@ -329,7 +329,7 @@ export const affiliateRegValidation = async (
 
 
 
-    
+
 /*
     // qucick setup 
     export const quickSetupValidation = async (req: Request,res: Response,next: NextFunction) => {
@@ -429,7 +429,7 @@ export const activateCardValidation =async (req:Request, res:Response, next:Next
 // ====================================================================================================
 // ====================================================================================================
 
-    
+
 /*
     export const userFeedbackValidation =async (req:Request, res:Response, next:NextFunction) => {
             const schema = Joi.object({
@@ -494,17 +494,17 @@ export const wishlistValidation = async(req: Request, res: Response, next: NextF
 // ====================================================================================================
 // ====================================================================================================
 
-export const cartValidation = async (req: Request,res: Response,next: NextFunction) => {
+export const cartValidation = async (req: Request, res: Response, next: NextFunction) => {
     const schema = Joi.object({
         productId: Joi.number().required(),
         qty: Joi.number().required(),
     });
 
     const value = schema.validate(req.body);
-  
+
     if (value.error) {
         const errMsg = await validationCheck(value);
-        return await apiResponse.errorMessage(res,400, errMsg);
+        return await apiResponse.errorMessage(res, 400, errMsg);
     }
     next();
 };
@@ -512,7 +512,7 @@ export const cartValidation = async (req: Request,res: Response,next: NextFuncti
 // ====================================================================================================
 // ====================================================================================================
 
-export const customizeCardValidation = async (req: Request,res: Response,next: NextFunction) => {
+export const customizeCardValidation = async (req: Request, res: Response, next: NextFunction) => {
     const schema = Joi.object({
         productId: Joi.number().required(),
         name: Joi.string().trim().max(70).trim().required(),
@@ -522,10 +522,10 @@ export const customizeCardValidation = async (req: Request,res: Response,next: N
     });
 
     const value = schema.validate(req.body);
-  
+
     if (value.error) {
         const errMsg = await validationCheck(value);
-        return await apiResponse.errorMessage(res,400, errMsg);
+        return await apiResponse.errorMessage(res, 400, errMsg);
     }
     next();
 };
@@ -533,9 +533,9 @@ export const customizeCardValidation = async (req: Request,res: Response,next: N
 // ====================================================================================================
 // ====================================================================================================
 
-export const deliveryAddressValidation = async (req: Request,res: Response, next:NextFunction) => {
+export const deliveryAddressValidation = async (req: Request, res: Response, next: NextFunction) => {
     const schema = Joi.object({
-        currencyCode : Joi.string().allow(null).allow(''),
+        currencyCode: Joi.string().allow(null).allow(''),
         name: Joi.string().trim().max(70).trim().required(),
         addressType: Joi.string().required(),
         email: Joi.string().email().trim().allow('').allow(null),
@@ -550,10 +550,10 @@ export const deliveryAddressValidation = async (req: Request,res: Response, next
     });
 
     const value = schema.validate(req.body);
-  
+
     if (value.error) {
         const errMsg = await validationCheck(value);
-        return await apiResponse.errorMessage(res,400, errMsg);
+        return await apiResponse.errorMessage(res, 400, errMsg);
     }
     next();
 };
@@ -561,9 +561,9 @@ export const deliveryAddressValidation = async (req: Request,res: Response, next
 // ====================================================================================================
 // ====================================================================================================
 
-export const updateDdeliveryAddressValidation = async (req: Request,res: Response, next:NextFunction) => {
+export const updateDdeliveryAddressValidation = async (req: Request, res: Response, next: NextFunction) => {
     const schema = Joi.object({
-        currencyCode : Joi.string().allow(null).allow(''),
+        currencyCode: Joi.string().allow(null).allow(''),
         addressId: Joi.number().integer().required(),
         name: Joi.string().trim().max(70).trim().required(),
         addressType: Joi.string().required(),
@@ -579,10 +579,10 @@ export const updateDdeliveryAddressValidation = async (req: Request,res: Respons
     });
 
     const value = schema.validate(req.body);
-  
+
     if (value.error) {
         const errMsg = await validationCheck(value);
-        return await apiResponse.errorMessage(res,400, errMsg);
+        return await apiResponse.errorMessage(res, 400, errMsg);
     }
     next();
 };
@@ -590,17 +590,17 @@ export const updateDdeliveryAddressValidation = async (req: Request,res: Respons
 // ====================================================================================================
 // ====================================================================================================
 
-export const redeemCouponCodeValidation = async (req: Request,res: Response,next: NextFunction) => {
+export const redeemCouponCodeValidation = async (req: Request, res: Response, next: NextFunction) => {
     const schema = Joi.object({
         couponCode: Joi.string().trim().required(),
         totalDiscount: Joi.number().required(),
     });
 
     const value = schema.validate(req.body);
-  
+
     if (value.error) {
         const errMsg = await validationCheck(value);
-        return await apiResponse.errorMessage(res,400, errMsg);
+        return await apiResponse.errorMessage(res, 400, errMsg);
     }
     next();
 };
@@ -608,8 +608,11 @@ export const redeemCouponCodeValidation = async (req: Request,res: Response,next
 // ====================================================================================================
 // ====================================================================================================
 
-export const aboutUsValidation = async (req:Request, res:Response, next:NextFunction) => {
+export const aboutUsValidation = async (req: Request, res: Response, next: NextFunction) => {
     const schema = Joi.object({
+        type: Joi.string().allow("").allow(null),
+        userId: Joi.allow("").allow(null),
+        profileId: Joi.number().required(),
         companyName: Joi.string().trim().required(),
         year: Joi.string().required(),
         business: Joi.string().allow("").allow(null),
@@ -619,10 +622,10 @@ export const aboutUsValidation = async (req:Request, res:Response, next:NextFunc
     });
 
     const value = schema.validate(req.body);
-  
+
     if (value.error) {
         const errMsg = await validationCheck(value);
-        return await apiResponse.errorMessage(res,400, errMsg);
+        return await apiResponse.errorMessage(res, 400, errMsg);
     }
     next();
 };
@@ -630,7 +633,7 @@ export const aboutUsValidation = async (req:Request, res:Response, next:NextFunc
 // ====================================================================================================
 // ====================================================================================================
 
-export const userProductsValidation = async (req:Request, res:Response, next:NextFunction) =>{
+export const userProductsValidation = async (req: Request, res: Response, next: NextFunction) => {
     const schema = Joi.object({
         title: Joi.string().max(50).required(),
         description: Joi.string().min(1).max(80).trim().required(),
@@ -651,22 +654,22 @@ export const userProductsValidation = async (req:Request, res:Response, next:Nex
 // ====================================================================================================
 // ====================================================================================================
 
-export const purchaseValidation = async (req: Request,res: Response,next: NextFunction) => {
-    
+export const purchaseValidation = async (req: Request, res: Response, next: NextFunction) => {
+
     const schema = Joi.object({
         orderType: Joi.string().min(3).max(10).required(),
         coinReedem: Joi.boolean().required().allow(0, 1),
-        reedemCoins:{
+        reedemCoins: {
             coins: Joi.number().min(200).allow(null).allow('').optional(),
         },
         isGiftEnable: Joi.boolean().required().allow(0, 1),
-        giftMessage:Joi.string().required().max(200).allow(null).allow(''),
-        deliveryDetails:{
+        giftMessage: Joi.string().required().max(200).allow(null).allow(''),
+        deliveryDetails: {
             name: Joi.string().trim().min(3).max(80).required(),
             phoneNumber: Joi.string().trim().min(8).max(20).required(),
             secondaryPhoneNumber: Joi.string().trim().min(8).max(20).allow(''),
-            email : Joi.string().email().max(80).required(),
-            country : Joi.string().trim().required(),
+            email: Joi.string().email().max(80).required(),
+            country: Joi.string().trim().required(),
             locality: Joi.string().normalize().max(50).required(),
             address: Joi.string().normalize().max(200).required(),
             pincode: Joi.number().min(999).max(9999999).required(),
@@ -689,9 +692,9 @@ export const purchaseValidation = async (req: Request,res: Response,next: NextFu
                 website: Joi.string().trim().max(80).min(5).allow(''),
             }
         },*/
-        paymentInfo:{
+        paymentInfo: {
             username: Joi.string().trim().max(50).allow(''),
-            email: Joi.string().email( ).max(80).allow(''),
+            email: Joi.string().email().max(80).allow(''),
             deliveryCharge: Joi.number(),
             // packageId: Joi.number().integer().required(),
             // codCharge: Joi.number(),
@@ -706,25 +709,25 @@ export const purchaseValidation = async (req: Request,res: Response,next: NextFu
             gstAmount: Joi.number().allow(null),
         },
         orderlist: Joi.array()
-        .items({
-            product_id: Joi.number(),
-            qty: Joi.number(),
-            sub_total: Joi.string(),
-            isCustomizable: Joi.number().integer().required(),
-            customizeName: Joi.string().allow(null).allow(''),
-            customizeDesignation: Joi.string().allow(null).allow(''),
-            customzeLogo: Joi.string().allow(null).allow(''),
-            customizeQty: Joi.number().allow(null).allow(''),
-            otherInfo: Joi.string().allow('').allow(null)
+            .items({
+                product_id: Joi.number(),
+                qty: Joi.number(),
+                sub_total: Joi.string(),
+                isCustomizable: Joi.number().integer().required(),
+                customizeName: Joi.string().allow(null).allow(''),
+                customizeDesignation: Joi.string().allow(null).allow(''),
+                customzeLogo: Joi.string().allow(null).allow(''),
+                customizeQty: Joi.number().allow(null).allow(''),
+                otherInfo: Joi.string().allow('').allow(null)
 
-        })
+            })
     });
 
     const value = schema.validate(req.body);
 
     if (value.error) {
         const errMsg = await validationCheck(value);
-        return await apiResponse.errorMessage(res,400, errMsg);
+        return await apiResponse.errorMessage(res, 400, errMsg);
     }
     next();
 };
@@ -732,10 +735,10 @@ export const purchaseValidation = async (req: Request,res: Response,next: NextFu
 // ====================================================================================================
 // ====================================================================================================
 
-export const setProfilePinValidation = async (req:Request, res:Response, next:NextFunction) =>{
+export const setProfilePinValidation = async (req: Request, res: Response, next: NextFunction) => {
 
     const schema = Joi.object({
-        isPasswordEnable: Joi.boolean().allow(0, 1).required(),
+        profileId: Joi.number().required(),
         securityPin: Joi.number().integer().min(1).required(),
     });
 
@@ -751,7 +754,7 @@ export const setProfilePinValidation = async (req:Request, res:Response, next:Ne
 // ====================================================================================================
 // ====================================================================================================
 
-export const businessHourValidation = async(req: Request, res: Response, next: NextFunction) => {
+export const businessHourValidation = async (req: Request, res: Response, next: NextFunction) => {
 
     const schema = Joi.object({
         businessHours: Joi.array().max(7).items(
@@ -761,14 +764,14 @@ export const businessHourValidation = async(req: Request, res: Response, next: N
                 endTime: Joi.string().required(),
                 status: Joi.number().required(),
             })
-            )
-        })
+        )
+    })
 
     const value = schema.validate(req.body);
-    
+
     if (value.error) {
         const errMsg = await validationCheck(value);
-        return await apiResponse.errorMessage(res,400, errMsg);
+        return await apiResponse.errorMessage(res, 400, errMsg);
     }
     next();
 }
@@ -777,7 +780,7 @@ export const businessHourValidation = async(req: Request, res: Response, next: N
 // ====================================================================================================
 
 
-export const productRatingValidation = async(req: Request, res: Response, next: NextFunction) => {
+export const productRatingValidation = async (req: Request, res: Response, next: NextFunction) => {
 
     const schema = Joi.object({
         productId: Joi.number().required(),
@@ -786,10 +789,10 @@ export const productRatingValidation = async(req: Request, res: Response, next: 
     })
 
     const value = schema.validate(req.body);
-    
+
     if (value.error) {
         const errMsg = await validationCheck(value);
-        return await apiResponse.errorMessage(res,400, errMsg);
+        return await apiResponse.errorMessage(res, 400, errMsg);
     }
     next();
 }
@@ -797,17 +800,17 @@ export const productRatingValidation = async(req: Request, res: Response, next: 
 // ====================================================================================================
 // ====================================================================================================
 
-export const primaryProfileValidation = async(req: Request, res: Response, next: NextFunction) => {
+export const primaryProfileValidation = async (req: Request, res: Response, next: NextFunction) => {
 
     const schema = Joi.object({
         primaryProfileSlug: Joi.string().required(),
     })
 
     const value = schema.validate(req.body);
-    
+
     if (value.error) {
         const errMsg = await validationCheck(value);
-        return await apiResponse.errorMessage(res,400, errMsg);
+        return await apiResponse.errorMessage(res, 400, errMsg);
     }
     next();
 }
@@ -815,8 +818,8 @@ export const primaryProfileValidation = async(req: Request, res: Response, next:
 // ====================================================================================================
 // ====================================================================================================
 
-export const updatePackageValidation =async (req:Request, res:Response, next:NextFunction) => {
-    
+export const updatePackageValidation = async (req: Request, res: Response, next: NextFunction) => {
+
     const schema = Joi.object({
         txnId: Joi.string().required(),
         priceCurrencyCode: Joi.string().required(),
@@ -829,7 +832,7 @@ export const updatePackageValidation =async (req:Request, res:Response, next:Nex
 
     if (value.error) {
         const errMsg = await validationCheck(value);
-        return await apiResponse.errorMessage(res,400, errMsg);
+        return await apiResponse.errorMessage(res, 400, errMsg);
     }
     next();
 }
@@ -837,8 +840,8 @@ export const updatePackageValidation =async (req:Request, res:Response, next:Nex
 // ====================================================================================================
 // ====================================================================================================
 
-export const contactUsValidation =async (req:Request, res:Response, next:NextFunction) => {
-    
+export const contactUsValidation = async (req: Request, res: Response, next: NextFunction) => {
+
     const schema = Joi.object({
         name: Joi.string().required(),
         email: Joi.string().email().required(),
@@ -850,7 +853,7 @@ export const contactUsValidation =async (req:Request, res:Response, next:NextFun
 
     if (value.error) {
         const errMsg = await validationCheck(value);
-        return await apiResponse.errorMessage(res,400, errMsg);
+        return await apiResponse.errorMessage(res, 400, errMsg);
     }
     next();
 }
@@ -858,7 +861,30 @@ export const contactUsValidation =async (req:Request, res:Response, next:NextFun
 // ====================================================================================================
 // ====================================================================================================
 
-export const enquiryValidation =async (req:Request, res:Response, next:NextFunction) => {
+export const enquiryValidation = async (req: Request, res: Response, next: NextFunction) => {
+
+    const schema = Joi.object({
+        username: Joi.string().required(),
+        profileId: Joi.number().required(),
+        name: Joi.string().required(),
+        email: Joi.string().email().required(),
+        phone: Joi.required(),
+        message: Joi.string().allow(null, ""),
+    })
+
+    const value = schema.validate(req.body);
+
+    if (value.error) {
+        const errMsg = await validationCheck(value);
+        return await apiResponse.errorMessage(res, 400, errMsg);
+    }
+    next();
+}
+
+// ====================================================================================================
+// ====================================================================================================
+
+export const exchangeContactValidation = async (req: Request, res: Response, next: NextFunction) => {
 
     const schema = Joi.object({
         username: Joi.string().required(),
@@ -872,7 +898,7 @@ export const enquiryValidation =async (req:Request, res:Response, next:NextFunct
 
     if (value.error) {
         const errMsg = await validationCheck(value);
-        return await apiResponse.errorMessage(res,400, errMsg);
+        return await apiResponse.errorMessage(res, 400, errMsg);
     }
     next();
 }
@@ -880,7 +906,7 @@ export const enquiryValidation =async (req:Request, res:Response, next:NextFunct
 // ====================================================================================================
 // ====================================================================================================
 
-export const exchangeContactValidation =async (req:Request, res:Response, next:NextFunction) => {
+export const captureLeadtValidation = async (req: Request, res: Response, next: NextFunction) => {
 
     const schema = Joi.object({
         username: Joi.string().required(),
@@ -894,7 +920,7 @@ export const exchangeContactValidation =async (req:Request, res:Response, next:N
 
     if (value.error) {
         const errMsg = await validationCheck(value);
-        return await apiResponse.errorMessage(res,400, errMsg);
+        return await apiResponse.errorMessage(res, 400, errMsg);
     }
     next();
 }
@@ -902,29 +928,7 @@ export const exchangeContactValidation =async (req:Request, res:Response, next:N
 // ====================================================================================================
 // ====================================================================================================
 
-export const captureLeadtValidation =async (req:Request, res:Response, next:NextFunction) => {
-
-    const schema = Joi.object({
-        username: Joi.string().required(),
-        name: Joi.string().required(),
-        email: Joi.string().email().required(),
-        phone: Joi.required(),
-        message: Joi.string().allow(null, ""),
-    })
-
-    const value = schema.validate(req.body);
-
-    if (value.error) {
-        const errMsg = await validationCheck(value);
-        return await apiResponse.errorMessage(res,400, errMsg);
-    }
-    next();
-}
-
-// ====================================================================================================
-// ====================================================================================================
-
-export const validatePinValidation =async (req:Request, res:Response, next:NextFunction) => {
+export const validatePinValidation = async (req: Request, res: Response, next: NextFunction) => {
 
     const schema = Joi.object({
         username: Joi.string().required(),
@@ -935,7 +939,7 @@ export const validatePinValidation =async (req:Request, res:Response, next:NextF
 
     if (value.error) {
         const errMsg = await validationCheck(value);
-        return await apiResponse.errorMessage(res,400, errMsg);
+        return await apiResponse.errorMessage(res, 400, errMsg);
     }
     next();
 }
@@ -943,12 +947,12 @@ export const validatePinValidation =async (req:Request, res:Response, next:NextF
 // ====================================================================================================
 // ====================================================================================================
 
-export const videosValidation =async (req:Request, res:Response, next:NextFunction) => {
+export const videosValidation = async (req: Request, res: Response, next: NextFunction) => {
 
     const schema = Joi.object({
-        profileId: Joi.number().required(), 
-        videoType: Joi.string().required(), 
-        url: Joi.string().required(), 
+        profileId: Joi.number().required(),
+        videoType: Joi.string().required(),
+        url: Joi.string().required(),
         thumbnail: Joi.string().allow("", null)
     })
 
@@ -956,7 +960,7 @@ export const videosValidation =async (req:Request, res:Response, next:NextFuncti
 
     if (value.error) {
         const errMsg = await validationCheck(value);
-        return await apiResponse.errorMessage(res,400, errMsg);
+        return await apiResponse.errorMessage(res, 400, errMsg);
     }
     next();
 }
@@ -964,18 +968,18 @@ export const videosValidation =async (req:Request, res:Response, next:NextFuncti
 // ====================================================================================================
 // ====================================================================================================
 
-export const deleteVideosValidation =async (req:Request, res:Response, next:NextFunction) => {
+export const deleteVideosValidation = async (req: Request, res: Response, next: NextFunction) => {
 
     const schema = Joi.object({
-        profileId: Joi.number().required(), 
-        videoId: Joi.number().required(), 
+        profileId: Joi.number().required(),
+        videoId: Joi.number().required(),
     })
 
     const value = schema.validate(req.body);
 
     if (value.error) {
         const errMsg = await validationCheck(value);
-        return await apiResponse.errorMessage(res,400, errMsg);
+        return await apiResponse.errorMessage(res, 400, errMsg);
     }
     next();
 }
@@ -983,13 +987,13 @@ export const deleteVideosValidation =async (req:Request, res:Response, next:Next
 // ====================================================================================================
 // ====================================================================================================
 
-export const customUserInfoValidation =async (req:Request, res:Response, next:NextFunction) => {
+export const customUserInfoValidation = async (req: Request, res: Response, next: NextFunction) => {
 
     const schema = Joi.object({
         type: Joi.string().allow("", null),
         userId: Joi.allow(null, ''),
-        profileId: Joi.number().required(), 
-        vcfType: Joi.string().required(), 
+        profileId: Joi.number().required(),
+        vcfType: Joi.string().required(),
         vcfValue: Joi.string().required(),
     })
 
@@ -997,7 +1001,7 @@ export const customUserInfoValidation =async (req:Request, res:Response, next:Ne
 
     if (value.error) {
         const errMsg = await validationCheck(value);
-        return await apiResponse.errorMessage(res,400, errMsg);
+        return await apiResponse.errorMessage(res, 400, errMsg);
     }
     next();
 }
@@ -1005,22 +1009,23 @@ export const customUserInfoValidation =async (req:Request, res:Response, next:Ne
 // ====================================================================================================
 // ====================================================================================================
 
-export const bookAppointmentValidation =async (req:Request, res:Response, next:NextFunction) => {
+export const bookAppointmentValidation = async (req: Request, res: Response, next: NextFunction) => {
 
     const schema = Joi.object({
         type: Joi.string().allow("", null),
         userId: Joi.number().allow("", null),
+        profileId: Joi.number().required(),
         name: Joi.string().required(),
-         email: Joi.string().email().required(),
-         date: Joi.string().required(),
-         time: Joi.string().required()
+        email: Joi.string().email().required(),
+        date: Joi.string().required(),
+        time: Joi.string().required()
     })
 
     const value = schema.validate(req.body);
 
     if (value.error) {
         const errMsg = await validationCheck(value);
-        return await apiResponse.errorMessage(res,400, errMsg);
+        return await apiResponse.errorMessage(res, 400, errMsg);
     }
     next();
 }
@@ -1028,10 +1033,10 @@ export const bookAppointmentValidation =async (req:Request, res:Response, next:N
 // ====================================================================================================
 // ====================================================================================================
 
-export const privateUserProfileValidation =async (req:Request, res:Response, next:NextFunction) => {
+export const privateUserProfileValidation = async (req: Request, res: Response, next: NextFunction) => {
 
     const schema = Joi.object({
-        profileId: Joi.number().required(), 
+        profileId: Joi.number().required(),
         isPrivate: Joi.boolean().allow(0, 1).required()
     })
 
@@ -1039,7 +1044,55 @@ export const privateUserProfileValidation =async (req:Request, res:Response, nex
 
     if (value.error) {
         const errMsg = await validationCheck(value);
-        return await apiResponse.errorMessage(res,400, errMsg);
+        return await apiResponse.errorMessage(res, 400, errMsg);
+    }
+    next();
+}
+
+// ====================================================================================================
+// ====================================================================================================
+
+export const manageAppointmentValidation = async (req: Request, res: Response, next: NextFunction) => {
+    const schema = Joi.object({
+        type: Joi.string().allow("").allow(null),
+        userId: Joi.allow("").allow(null),
+        profileId: Joi.number().allow("").allow(null),
+        appointmentId: Joi.number().required(),
+        status: Joi.string().required()
+    });
+
+    const value = schema.validate(req.body);
+
+    if (value.error) {
+        const errMsg = await validationCheck(value);
+        return await apiResponse.errorMessage(res, 400, errMsg);
+    }
+    next();
+};
+
+// ====================================================================================================
+// ====================================================================================================
+
+export const updateFeaturesValidation = async (req: Request, res: Response, next: NextFunction) => {
+
+    const schema = Joi.object({
+        type: Joi.string().allow('').allow(null),
+        userId: Joi.number().allow('').allow(null),
+        vcfData: Joi.array().items(
+            Joi.object({
+                vcfId: Joi.number().allow('').allow(null),
+                vcfType: Joi.string().required(),
+                vcfValue: Joi.string().required(),
+                status: Joi.boolean().allow(0, 1),
+            })
+        )
+    })
+
+    const value = schema.validate(req.body);
+
+    if (value.error) {
+        const errMsg = await validationCheck(value);
+        return await apiResponse.errorMessage(res, 400, errMsg);
     }
     next();
 }

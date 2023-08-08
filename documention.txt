@@ -14,12 +14,59 @@ fields of ussername and mobile num and password should be empty ?  after registr
 
 
 name api's 
-
-
+---------------------------*******----------------------------
+new==>
+-->create api for: users table me se data fetch karke users_profile me insert karege jo uski default profile hogi
+-->users_profile table me se profile id nikal kr vcf_custom_field me add kr dege fir is vcf_custom_field ka data vcf_info table me insert kara dege
+UPDATE vcf_custom_field
+JOIN users_profile ON vcf_custom_field.user_id = users_profile.user_id
+SET vcf_custom_field.profile_id = users_profile.id;
+-->features table me status 1 karna h
+---------------------------*******----------------------------
 
 database changes:
-
 ------------------------------new changes--------------------------------
+08-08-2023
+ALTER TABLE `about` ADD `profile_id` INT(11) NOT NULL AFTER `user_id`;
+(UPDATE about JOIN users_profile ON about.user_id = users_profile.user_id SET about.profile_id = users_profile.id;)
+ALTER TABLE `users_features` ADD `profile_id` INT(11) NOT NULL AFTER `user_id`;
+(UPDATE users_features JOIN users_profile ON users_features.user_id = users_profile.user_id SET users_features.profile_id = users_profile.id;)
+ALTER TABLE `my_appointments` ADD `profile_id` INT(11) NOT NULL AFTER `user_id`;
+(UPDATE my_appointments JOIN users_profile ON my_appointments.user_id = users_profile.user_id SET my_appointments.profile_id = users_profile.id;)
+ALTER TABLE `business_hours` ADD `profile_id` INT(11) NOT NULL AFTER `user_id`;
+(UPDATE business_hours JOIN users_profile ON business_hours.user_id = users_profile.user_id SET business_hours.profile_id = users_profile.id;)
+ALTER TABLE `user_contacts` ADD `profile_id` INT(11) NOT NULL AFTER `user_id`;
+(UPDATE user_contacts JOIN users_profile ON user_contacts.user_id = users_profile.user_id SET user_contacts.profile_id = users_profile.id;)
+ALTER TABLE `portfolio` ADD `profile_id` INT(11) NOT NULL AFTER `user_id`;
+(UPDATE portfolio JOIN users_profile ON portfolio.user_id = users_profile.user_id SET portfolio.profile_id = users_profile.id;)
+
+07-08-2023
+ALTER TABLE `features` ADD `type` VARCHAR(55) NULL DEFAULT NULL AFTER `id`;
+ALTER TABLE `features` ADD `feature_show` INT(11) NOT NULL DEFAULT '1' AFTER `status`;
+
+INSERT INTO `features`(`type`, `features`, `slug`, `status`, `created_at`)
+ VALUES ('other','Videos','video',0,'2023-08-07 23:04:31'),
+ ('social','Contact Url','contact-url',0,'2023-08-07 23:04:31'),
+ ('social','Business Url','business-url',0,'2023-08-07 23:04:31'),
+ ('social','Payment Url','payment-url',0,'2023-08-07 23:04:31'),
+ ('vcf','Name','name',0,'2023-08-07 23:04:31'),
+ ('vcf','Email','email',0,'2023-08-07 23:04:31'),
+ ('vcf','Phone Number','number',0,'2023-08-07 23:04:31'),
+ ('vcf','Website','website',0,'2023-08-07 23:04:31'),
+ ('vcf','Address','address',0,'2023-08-07 23:04:31'),
+ ('vcf','Designation','designation',0,'2023-08-07 23:04:31'),
+ ('vcf','Department','department',0,'2023-08-07 23:04:31'),
+ ('vcf','Company Name','company-name',0,'2023-08-07 23:04:31'),
+ ('vcf','DOB','dob',0,'2023-08-07 23:04:31'),
+ ('vcf','Gender','gender',0,'2023-08-07 23:04:31'),
+ ('vcf','Gender','gender',0,'2023-08-07 23:04:31'),
+ ('vcf','Notes','notes',0,'2023-08-07 23:04:31'),
+ ('vcf','Lead Form','lead-form',0,'2023-08-07 23:04:31'),
+ ('vcf','Exchange Contact', 'exchange-contact',0,'2023-08-07 23:04:31'),
+ ('vcf','Custom Bar', 'custom-bar',0,'2023-08-07 23:04:31')
+ ('vcf','Save Button','save-button',0,'2023-08-07 23:04:31'),
+ ('vcf',' Set Pin','set-pin',0,'2023-08-07 23:04:31');
+ 
 04-08-2023
 ALTER TABLE `products` ADD `is_rrecommended` BOOLEAN NOT NULL DEFAULT FALSE AFTER `is_todays_deal`;
 
@@ -44,10 +91,14 @@ ALTER TABLE `dashboard_banner` ADD `product_id` INT(11) NULL DEFAULT NULL AFTER 
 CREATE TABLE `users_profile` (
   `id` int(11) NOT NULL COMMENT 'profile id',
   `user_id` int(11) NOT NULL COMMENT 'user''s id',
+  `card_number` VARCHAR(55) NULL DEFAULT NULL COMMENT 'add these olumn to multiple card link table(user_card)',
+  `card_number_fix` VARCHAR(55) NULL DEFAULT NULL COMMENT 'add these olumn to multiple card link table(user_card)',
   `profile_image` varchar(255) DEFAULT NULL COMMENT 'thumb(profile image)',
   `cover_photo` varchar(255) DEFAULT NULL COMMENT 'profile cover image',
   `hit` int(11) NOT NULL DEFAULT 0 COMMENT 'total profile view',
   `share_link` int(11) NOT NULL DEFAULT 0 COMMENT 'total profile share',
+  `account_type` INT(11) NOT NULL,
+  `package_name` VARCHAR(55) NULL DEFAULT NULL`,
   `qr_code` varchar(255) DEFAULT NULL COMMENT 'profile card qr code',
   `language` varchar(255) NOT NULL DEFAULT 'english' COMMENT 'profile language',
   `vcard_layouts` int(11) NOT NULL DEFAULT 1 COMMENT 'layouts(profile theme)',
@@ -56,7 +107,10 @@ CREATE TABLE `users_profile` (
   `is_private` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'profile private',
   `set_password` int(8) DEFAULT NULL COMMENT 'profile pin',
   `on_tap_url` varchar(255) DEFAULT NULL COMMENT 'profile url(primary url by default vkardz  url )',
+  `is_card_linked` INT(11) NOT NULL DEFAULT '0',
   `is_default` BOOLEAN NOT NULL DEFAULT 0,
+  `is_expired` BOOLEAN NOT NULL DEFAULT 0,
+  `expired_at` DATETIME NULL DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `deleted_at` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

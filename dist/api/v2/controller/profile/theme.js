@@ -72,7 +72,7 @@ const updateVcardLayout = (req, res) => __awaiter(void 0, void 0, void 0, functi
         // const userId:string = res.locals.jwt.userId;
         let userId;
         const type = req.query.type; //type = business, user, null
-        if (type && type === development_1.default.businessType) {
+        if (type && (type === development_1.default.businessType || type === development_1.default.websiteType || type === development_1.default.vcfWebsite)) {
             userId = req.query.userId;
         }
         else {
@@ -90,7 +90,7 @@ const updateVcardLayout = (req, res) => __awaiter(void 0, void 0, void 0, functi
         const VALUES = [styleId, profileColor, userId];
         const [rows] = yield db_1.default.query(sql, VALUES);
         if (rows.affectedRows > 0) {
-            return apiResponse.successResponse(res, "Vcard layout updated successfully !", null);
+            return apiResponse.successResponse(res, "Layout updated successfully", null);
         }
         else {
             return apiResponse.errorMessage(res, 400, "Failed to update layout, try again");

@@ -9,9 +9,9 @@ export const gallary =async (req:Request, res:Response) => {
     try {
         // const userId:string = res.locals.jwt.userId;
         let userId:any; 
-        const type = req.query.type; //type = business, user, null
-        if (type && type === config.businessType) {
-            userId = req.query.userId;
+        const type = req.body.type; //type = business, user, null
+        if (type && (type === config.businessType  || type === config.websiteType || type === config.vcfWebsite)) {
+            userId = req.body.userId;
         } else {
             userId = res.locals.jwt.userId;
         }
@@ -20,13 +20,12 @@ export const gallary =async (req:Request, res:Response) => {
         }
 
         const createdAt = utility.dateWithFormat();
-        const image = req.body.image;
-        if (!image || image === "" || image === undefined) {
-            return apiResponse.errorMessage(res, 400, "Please Upload Image");
-        }
+        const { profileId, image } = req.body;
+        if (!profileId || profileId === null) return apiResponse.errorMessage(res, 400, "Profile id is required");
+        if (!image || image === "" || image === undefined) return apiResponse.errorMessage(res, 400, "Please Upload Image");
 
-        const sql = `INSERT INTO portfolio(user_id, image, thumb, status, created_at) VALUES(?, ?, ?, ?, ?)`;
-        const VALUES = [userId, image, image, 1, createdAt];
+        const sql = `INSERT INTO portfolio(user_id, profile_id, image, thumb, status, created_at) VALUES(?, ?, ?, ?, ?, ?)`;
+        const VALUES = [userId, profileId, image, image, 1, createdAt];
         const [rows]:any = await pool.query(sql, VALUES);
 
         if (rows.affectedRows > 0) {
@@ -48,7 +47,8 @@ export const getPortfolio =async (req:Request, res:Response) => {
         // const userId:string = res.locals.jwt.userId;
         let userId:any; 
         const type = req.query.type; //type = business, user, null
-        if (type && type === config.businessType) {
+        const profileId = req.query.profileId;
+        if (type && (type === config.businessType  || type === config.websiteType || type === config.vcfWebsite)) {
             userId = req.query.userId;
         } else {
             userId = res.locals.jwt.userId;
@@ -65,14 +65,15 @@ export const getPortfolio =async (req:Request, res:Response) => {
         var page_size: any = config.pageSize;       
         const offset = (page - 1 ) * page_size;
 
-        const getPageQuery = `SELECT id, image FROM portfolio WHERE user_id = ${userId}`;
+        const getPageQuery = `SELECT id, image FROM portfolio WHERE user_id = ${userId} AND profile_id = ${profileId}`;
         const [result]:any= await pool.query(getPageQuery);
 
-        const sql = `SELECT id, image FROM portfolio WHERE user_id = ${userId}`;
+        const sql = `SELECT id, image FROM portfolio WHERE user_id = ${userId} AND profile_id = ${profileId} ORDER BY created_at DESC LIMIT ${page_size} OFFSET ${offset}`;
         const [rows]:any = await pool.query(sql);
 
-        const getFeatureStatus = `SELECT status FROM users_features WHERE user_id = ${userId} AND feature_id = 8`;
-        const [featureStatus]:any = await pool.query(getFeatureStatus);
+        const getFeatureStatus = `SELECT status FROM users_features WHERE user_id = ${userId} AND profile_id = ${profileId} AND feature_id = 8`;
+        const [featureRows]:any = await pool.query(getFeatureStatus);
+        const featureStatus = featureRows[0].status || 0;
 
         let totalPages:any = result.length/page_size;
         let totalPage = Math.ceil(totalPages);
@@ -81,7 +82,7 @@ export const getPortfolio =async (req:Request, res:Response) => {
             return res.status(200).json({
                 status: true,
                 data: rows,
-                featureStatus: featureStatus[0].status,
+                featureStatus: featureStatus,
                 totalPage: totalPage,
                 currentPage: page,
                 totalLength: result.length,
@@ -111,9 +112,9 @@ export const deleteImage =async (req:Request, res:Response) => {
     try {
         // const userId:string = res.locals.jwt.userId;
         let userId:any; 
-        const type = req.query.type; //type = business, user, null
-        if (type && type === config.businessType) {
-            userId = req.query.userId;
+        const type = req.body.type; //type = business, user, null
+        if (type && (type === config.businessType  || type === config.websiteType || type === config.vcfWebsite)) {
+            userId = req.body.userId;
         } else {
             userId = res.locals.jwt.userId;
         }

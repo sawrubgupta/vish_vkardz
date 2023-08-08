@@ -44,7 +44,7 @@ const getCategories = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         const sql = `SELECT * FROM product_type WHERE status = 1`;
         const [rows] = yield db_1.default.query(sql);
         const extraCategory = {
-            id: 20,
+            id: 18,
             name: "Super Hero Card",
             pro_cat_slug: "super-hero",
             image: "uploads/site_images/superhero-cover.png",

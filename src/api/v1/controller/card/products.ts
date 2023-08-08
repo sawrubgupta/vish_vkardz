@@ -10,7 +10,7 @@ export const getCategories = async (req: Request, res: Response) => {
         const [rows]: any = await pool.query(sql);
 
         const extraCategory = {
-            id: 20,
+            id: 18,
             name: "Super Hero Card",
             pro_cat_slug: "super-hero",
             image: "uploads/site_images/superhero-cover.png",

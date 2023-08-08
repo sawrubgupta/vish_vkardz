@@ -39,12 +39,13 @@ exports.validatePin = exports.removePin = exports.setPin = void 0;
 const db_1 = __importDefault(require("../../../../db"));
 const apiResponse = __importStar(require("../../helper/apiResponse"));
 const development_1 = __importDefault(require("../../config/development"));
+//according v2
 const setPin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // const userId:string = res.locals.jwt.userId;
         let userId;
         const type = req.query.type; //type = business, user, null
-        if (type && type === development_1.default.businessType) {
+        if (type && (type === development_1.default.businessType || type === development_1.default.websiteType || type === development_1.default.vcfWebsite)) {
             userId = req.query.userId;
         }
         else {
@@ -53,10 +54,9 @@ const setPin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         if (!userId || userId === "" || userId === undefined) {
             return apiResponse.errorMessage(res, 401, "User Id is required!");
         }
-        const isPasswordEnable = req.body.isPasswordEnable;
-        const securityPin = req.body.securityPin;
-        const sql = `UPDATE users SET is_password_enable = ?, set_password = ? WHERE id = ?`;
-        const VALUES = [isPasswordEnable, securityPin, userId];
+        const { securityPin, profileId } = req.body;
+        const sql = `UPDATE users_profile SET set_password = ? WHERE user_id = ? AND id = ?`;
+        const VALUES = [securityPin, userId, profileId];
         const [rows] = yield db_1.default.query(sql, VALUES);
         if (rows.affectedRows > 0) {
             return apiResponse.successResponse(res, "Profile Password Added Successfully", null);
@@ -73,12 +73,13 @@ const setPin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 exports.setPin = setPin;
 // ====================================================================================================
 // ====================================================================================================
+//according v2
 const removePin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // const userId:string = res.locals.jwt.userId;
         let userId;
         const type = req.query.type; //type = business, user, null
-        if (type && type === development_1.default.businessType) {
+        if (type && (type === development_1.default.businessType || type === development_1.default.websiteType || type === development_1.default.vcfWebsite)) {
             userId = req.query.userId;
         }
         else {
@@ -87,7 +88,8 @@ const removePin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         if (!userId || userId === "" || userId === undefined) {
             return apiResponse.errorMessage(res, 401, "User Id is required!");
         }
-        const sql = `UPDATE users SET is_password_enable = 0 WHERE id = ${userId}`;
+        const profileId = req.query.profileId;
+        const sql = `UPDATE users_profile SET set_password = null WHERE user_id = ${userId} AND id = ${profileId}`;
         const [rows] = yield db_1.default.query(sql);
         if (rows.affectedRows > 0) {
             return apiResponse.successResponse(res, "Profile Pin Remove Successfully", null);

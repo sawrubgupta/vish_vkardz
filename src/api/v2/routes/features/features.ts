@@ -17,6 +17,7 @@ const featureRouter = Router();
 
 featureRouter.get("/getUserFeature", tempAuthenticatingToken, featureController.getFeatureByUserId); //use in business type
 featureRouter.patch("/updateFeatures", tempAuthenticatingToken, featureController.updateUserFeaturesStatus); //use in business type
+featureRouter.get("/features", tempAuthenticatingToken, featureController.features); //use in business type
 
 featureRouter.put("/aboutUs", tempAuthenticatingToken, validation.aboutUsValidation, aboutUsCotroller.addUpdateAboutUs); //use in business type
 featureRouter.get("/aboutUs", tempAuthenticatingToken, aboutUsCotroller.getAboutUs);//use in business type
@@ -36,7 +37,7 @@ featureRouter.delete("/deletePortfolio", tempAuthenticatingToken, gallaryControl
 
 featureRouter.get("/getAppointments", tempAuthenticatingToken, appointmentController.appointmentList);//use in business type
 featureRouter.delete("/deleteAppointment", tempAuthenticatingToken, appointmentController.deleteAppointment);//use in business type
-featureRouter.post("/manageAppointment", tempAuthenticatingToken, appointmentController.manageAppointment);//use in business type
+featureRouter.post("/manageAppointment", tempAuthenticatingToken, validation.manageAppointmentValidation, appointmentController.manageAppointment);//use in business type
 featureRouter.post("/bookAppointment", tempAuthenticatingToken, validation.bookAppointmentValidation, appointmentController.bookAppointment);
 
 featureRouter.get("/enquiryList", tempAuthenticatingToken, enquiryController.enquiryList); //use in business type

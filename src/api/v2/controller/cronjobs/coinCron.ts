@@ -29,7 +29,7 @@ export const coinCron = async () => {
                     console.log("Status Change Successfully");
                 } else {
                     console.log("Failed to change status");
-                }    
+                }
             }
         } else {
             console.log("Eempty Rows");

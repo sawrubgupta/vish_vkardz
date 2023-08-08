@@ -19,6 +19,7 @@ dashboardRouter.post("/contactSync", contactsController.contactSync);
 
 //for daa transfer only----
 import * as dbDataTransfer from '../../controller/dashboard/dbDataTransfer';
-dashboardRouter.post("/userToUserProfileDataTransfer", dbDataTransfer.userToUserProfileDataTransfer);
+dashboardRouter.post("/userToUserProfileDataTransfer", authenticatingToken, dbDataTransfer.userToUserProfileDataTransfer);
+dashboardRouter.post("/addUserNewFeature", authenticatingToken, dbDataTransfer.addUserNewFeature);
 
 export default dashboardRouter;

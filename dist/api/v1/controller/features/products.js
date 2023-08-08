@@ -45,7 +45,7 @@ const addProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         // const userId:string = res.locals.jwt.userId;
         let userId;
         const type = req.query.type; //type = business, user, null
-        if (type && type === development_1.default.businessType) {
+        if (type && (type === development_1.default.businessType || type === development_1.default.websiteType || type === development_1.default.vcfWebsite)) {
             userId = req.query.userId;
         }
         else {
@@ -95,6 +95,9 @@ const getProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         }
         var page_size = development_1.default.pageSize;
         const offset = (page - 1) * page_size;
+        const userSql = `SELECT phone FROM users WHERE id = ${userId} LIMIT 1`;
+        const [userRows] = yield db_1.default.query(userSql);
+        const userPhone = userRows[0].phone;
         const getPageQuery = `SELECT id, title, overview as description, images, price, status FROM services WHERE user_id = ${userId}`;
         const [result] = yield db_1.default.query(getPageQuery);
         const sql = `SELECT id, title, overview as description, currency_code, images, price, status FROM services WHERE user_id = ${userId} ORDER BY created_at DESC LIMIT ${page_size} OFFSET ${offset}`;
@@ -109,6 +112,7 @@ const getProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
                 status: true,
                 data: rows,
                 featureStatus: featureStatus[0].status,
+                userPhone,
                 totalPage: totalPage,
                 currentPage: page,
                 totalLength: result.length,
@@ -121,6 +125,7 @@ const getProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
                 status: true,
                 data: null,
                 featureStatus: featureStatus[0].status,
+                userPhone,
                 totalPage: totalPage,
                 currentPage: page,
                 totalLength: result.length,
@@ -141,7 +146,7 @@ const updateProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         // const userId:string = res.locals.jwt.userId;
         let userId;
         const type = req.query.type; //type = business, user, null
-        if (type && (type === development_1.default.businessType || type === development_1.default.websiteType)) {
+        if (type && (type === development_1.default.businessType || type === development_1.default.websiteType || type === development_1.default.vcfWebsite)) {
             userId = req.query.userId;
         }
         else {
@@ -175,7 +180,7 @@ const deleteProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         // const userId:string = res.locals.jwt.userId;
         let userId;
         const type = req.query.type; //type = business, user, null
-        if (type && type === development_1.default.businessType) {
+        if (type && (type === development_1.default.businessType || type === development_1.default.websiteType || type === development_1.default.vcfWebsite)) {
             userId = req.query.userId;
         }
         else {

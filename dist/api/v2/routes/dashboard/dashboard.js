@@ -38,5 +38,6 @@ dashboardRouter.get("/recommendedProducts", authorization_controller_1.tempAuthe
 dashboardRouter.post("/contactSync", contactsController.contactSync);
 //for daa transfer only----
 const dbDataTransfer = __importStar(require("../../controller/dashboard/dbDataTransfer"));
-dashboardRouter.post("/userToUserProfileDataTransfer", dbDataTransfer.userToUserProfileDataTransfer);
+dashboardRouter.post("/userToUserProfileDataTransfer", authorization_controller_1.authenticatingToken, dbDataTransfer.userToUserProfileDataTransfer);
+dashboardRouter.post("/addUserNewFeature", authorization_controller_1.authenticatingToken, dbDataTransfer.addUserNewFeature);
 exports.default = dashboardRouter;

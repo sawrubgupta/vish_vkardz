@@ -239,7 +239,9 @@ console.log("data", data);
 
             let addFeatures:any = `INSERT INTO users_features(feature_id, user_id,status) VALUES`;
             for (const element of featureData) {
-                if (element.id === 1 || element.id === 2 || element.id === 13 || element.id === 14 || element.id === 15) {
+                console.log("element.id", element.id);
+                
+                if (element.id === 1 || element.id === 2 || element.id === 13 || element.id === 14 || element.id === 15 || (element.id >= 18)) {
                     featureStatus = 1
                 } else {
                     featureStatus = 0

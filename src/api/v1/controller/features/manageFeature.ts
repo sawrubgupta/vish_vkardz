@@ -8,7 +8,7 @@ export const getFeatureByUserId =async (req:Request, res:Response) => {
         // const userId:string = res.locals.jwt.userId;
         let userId:any; 
         const type = req.query.type; //type = business, user, null
-        if (type && type === config.businessType) {
+        if (type && (type === config.businessType  || type === config.websiteType || type === config.vcfWebsite)) {
             userId = req.query.userId;
         } else {
             userId = res.locals.jwt.userId;
@@ -47,7 +47,7 @@ export const updateUserFeaturesStatus =async (req:Request, res:Response) => {
         // const userId:string = res.locals.jwt.userId;
         let userId:any; 
         const type = req.query.type; //type = business, user, null
-        if (type && type === config.businessType) {
+        if (type && (type === config.businessType  || type === config.websiteType || type === config.vcfWebsite)) {
             userId = req.query.userId;
         } else {
             userId = res.locals.jwt.userId;
@@ -79,4 +79,25 @@ export const updateUserFeaturesStatus =async (req:Request, res:Response) => {
 }
 
 // =======w============================================================================================
+// ====================================================================================================
+
+export const features =async (req:Request, res:Response) => {
+    try {
+        
+        const sql = `SELECT * FROM features WHERE feature_show = 1`;
+        const [rows]:any = await pool.query(sql);
+
+        return res.status(200).json({
+            status:true,
+            data: rows, 
+            message: "User Features Get Successfully"
+        })
+       
+    } catch (error) {
+        console.log(error);
+        return apiResponse.errorMessage(res, 400, "Something went wrong");
+    }
+}
+
+// ====================================================================================================
 // ====================================================================================================

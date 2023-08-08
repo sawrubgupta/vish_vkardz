@@ -678,7 +678,7 @@ exports.purchaseValidation = purchaseValidation;
 // ====================================================================================================
 const setProfilePinValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const schema = joi_1.default.object({
-        isPasswordEnable: joi_1.default.boolean().allow(0, 1).required(),
+        profileId: joi_1.default.number().required(),
         securityPin: joi_1.default.number().integer().min(1).required(),
     });
     const value = schema.validate(req.body);

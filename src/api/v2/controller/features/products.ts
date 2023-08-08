@@ -10,7 +10,7 @@ export const addProduct =async (req:Request, res:Response) => {
         // const userId:string = res.locals.jwt.userId;
         let userId:any; 
         const type = req.query.type; //type = business, user, null
-        if (type && type === config.businessType) {
+        if (type && (type === config.businessType  || type === config.websiteType || type === config.vcfWebsite)) {
             userId = req.query.userId;
         } else {
             userId = res.locals.jwt.userId;
@@ -45,7 +45,7 @@ export const getProducts =async (req:Request, res:Response) => {
         // const userId:string = res.locals.jwt.userId;
         let userId:any; 
         const type = req.query.type; //type = business, user, null
-        if (type && type === config.businessType) {
+        if (type && (type === config.businessType  || type === config.websiteType || type === config.vcfWebsite)) {
             userId = req.query.userId;
         } else {
             userId = res.locals.jwt.userId;
@@ -53,6 +53,10 @@ export const getProducts =async (req:Request, res:Response) => {
         if (!userId || userId === "" || userId === undefined) {
             return apiResponse.errorMessage(res, 401, "User Id is required!");
         }
+
+        const userSql = `SELECT phone FROM users WHERE id = ${userId} LIMIT 1`;
+        const [userRows]:any = await pool.query(userSql);
+        const userPhone = userRows[0].phone;
 
         var getPage:any = req.query.page;
         var page = parseInt(getPage);
@@ -79,6 +83,7 @@ export const getProducts =async (req:Request, res:Response) => {
             return res.status(200).json({
                 status: true,
                 data: rows,
+                userPhone,
                 featureStatus: featureStatus[0].status,
                 totalPage: totalPage,
                 currentPage: page,
@@ -90,6 +95,7 @@ export const getProducts =async (req:Request, res:Response) => {
             return res.status(200).json({
                 status: true,
                 data: null,
+                userPhone,
                 featureStatus: featureStatus[0].status,
                 totalPage: totalPage,
                 currentPage: page,
@@ -111,7 +117,7 @@ export const updateProduct =async (req:Request, res:Response) => {
         // const userId:string = res.locals.jwt.userId;
         let userId:any; 
         const type = req.query.type; //type = business, user, null
-        if (type && type === config.businessType) {
+        if (type && (type === config.businessType  || type === config.websiteType || type === config.vcfWebsite)) {
             userId = req.query.userId;
         } else {
             userId = res.locals.jwt.userId;
@@ -146,7 +152,7 @@ export const deleteProduct =async (req:Request, res:Response) => {
         // const userId:string = res.locals.jwt.userId;
         let userId:any; 
         const type = req.query.type; //type = business, user, null
-        if (type && type === config.businessType) {
+        if (type && (type === config.businessType  || type === config.websiteType || type === config.vcfWebsite)) {
             userId = req.query.userId;
         } else {
             userId = res.locals.jwt.userId;

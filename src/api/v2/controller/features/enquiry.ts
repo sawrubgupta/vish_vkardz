@@ -9,8 +9,9 @@ export const enquiryList =async (req:Request, res:Response) => {
     try {
         // const userId:string = res.locals.jwt.userId;
         let userId:any; 
-        const type = req.query.type; //type = business, user, null
-        if (type && type === config.businessType) {
+        const type = req.query.type; //type = business, user, 
+        const profileId = req.query.profileId;
+        if (type && (type === config.businessType  || type === config.websiteType || type === config.vcfWebsite)) {
             userId = req.query.userId;
         } else {
             userId = res.locals.jwt.userId;
@@ -27,13 +28,13 @@ export const enquiryList =async (req:Request, res:Response) => {
         var page_size: any = config.pageSize;       
         const offset = (page - 1 ) * page_size;
 
-        const getPageQuery = `SELECT id, name, email, phone_num, msg, created_at FROM user_contacts WHERE user_id = ${userId}`;
+        const getPageQuery = `SELECT id, name, email, phone_num, msg, created_at FROM user_contacts WHERE user_id = ${userId} AND profile_id = ${profileId}`;
         const [result]:any= await pool.query(getPageQuery);
 
-        const sql = `SELECT id, name, email, phone_num, msg, created_at FROM user_contacts WHERE user_id = ${userId} ORDER BY id DESC LIMIT ${page_size} OFFSET ${offset}`;
+        const sql = `SELECT id, name, email, phone_num, msg, created_at FROM user_contacts WHERE user_id = ${userId} AND profile_id = ${profileId} ORDER BY id DESC LIMIT ${page_size} OFFSET ${offset}`;
         const [rows]:any = await pool.query(sql);
 
-        const getFeatureStatus = `SELECT status FROM users_features WHERE user_id = ${userId} AND feature_id = 11`;
+        const getFeatureStatus = `SELECT status FROM users_features WHERE user_id = ${userId} AND profile_id = ${profileId} AND feature_id = 11`;
         let [featureStatus]:any = await pool.query(getFeatureStatus);
 
         if(featureStatus.length === 0) {
@@ -78,17 +79,20 @@ export const deleteEnquiry =async (req:Request, res:Response) => {
     try {
         // const userId:string = res.locals.jwt.userId;
         let userId:any; 
-        const type = req.query.type; //type = business, user, null
+        const type = req.body.type; //type = business, user, null
+        // const profileId = req.body.profileId;
         if (type && type == config.businessType) {
             userId = req.query.userId;
         } else {
             userId = res.locals.jwt.userId;
         }
-        if (!userId || userId === "" || userId === undefined) {
-            return apiResponse.errorMessage(res, 401, "User Id is required!");
-        }
-
+        if (!userId || userId === "" || userId === undefined) return apiResponse.errorMessage(res, 401, "User Id is required!");
+        
         const enquiryId = req.body.enquiryId;
+
+        // const checkEnquirySql = `SELECT id FROM user_contacts WHERE id = ${enquiryId} AND user_id = ${userId} AND profile_id = ${profileId}`;
+        // const [enquryRows]:any = await pool.query(checkEnquirySql);
+        // if (enquryRows.length === 0) return apiResponse.errorMessage(res, 400, "Invalid Enqury!");
 
         const sql = `DELETE FROM user_contacts WHERE user_id = ? AND id = ?`;
         const VALUES = [userId, enquiryId]
@@ -112,9 +116,9 @@ export const replyEnquiry =async (req:Request, res:Response) => {
     try {
         // const userId:string = res.locals.jwt.userId;
         let userId:any; 
-        const type = req.query.type; //type = business, user, null
-        if (type && type === config.businessType) {
-            userId = req.query.userId;
+        const type = req.body.type; //type = business, user, null
+        if (type && (type === config.businessType  || type === config.websiteType || type === config.vcfWebsite)) {
+            userId = req.body.userId;
         } else {
             userId = res.locals.jwt.userId;
         }
@@ -147,7 +151,7 @@ export const replyEnquiry =async (req:Request, res:Response) => {
 
 export const submitEnquiry =async (req:Request, res:Response) => {
     try {
-        const { username, name, email, phone, message } = req.body;
+        const { profileId, username, name, email, phone, message } = req.body;
         const createdAt = utility.dateWithFormat();
 
         const userSql = `SELECT id FROM users WHERE username = '${username}' LIMIT 1`;
@@ -155,8 +159,8 @@ export const submitEnquiry =async (req:Request, res:Response) => {
         if (userRows.length === 0) return apiResponse.errorMessage(res, 400, "Invalid username");
         const userId = userRows[0].id;
 
-        const sql = `INSERT INTO user_contacts(user_id, name, email, phone_num, msg, created_at) VALUES(?, ?, ?, ?, ?, ?)`;
-        const VALUES = [userId, name, email, phone, message, createdAt];
+        const sql = `INSERT INTO user_contacts(user_id, profile_id, name, email, phone_num, msg, created_at) VALUES(?, ?, ?, ?, ?, ?, ?)`;
+        const VALUES = [userId, profileId, name, email, phone, message, createdAt];
         const [rows]:any = await pool.query(sql, VALUES);
 
         if (rows.affectedRows > 0) {

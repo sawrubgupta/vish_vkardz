@@ -10,7 +10,8 @@ export const appointmentList =async (req:Request, res:Response) => {
         // const userId:string = res.locals.jwt.userId;
         let userId:any; 
         const type = req.query.type; //type = business, user, null
-        if (type && type === config.businessType) {
+        const profileId = req.query.profileId;
+        if (type && (type === config.businessType  || type === config.websiteType || type === config.vcfWebsite)) {
             userId = req.query.userId;
         } else {
             userId = res.locals.jwt.userId;
@@ -27,13 +28,13 @@ export const appointmentList =async (req:Request, res:Response) => {
         var page_size: any = config.pageSize;       
         const offset = (page - 1 ) * page_size;
 
-        const getPageQuery = `SELECT id, title, email, ap_date, ap_time, status, created_at FROM my_appointments WHERE user_id = ${userId}`;
+        const getPageQuery = `SELECT id, title, email, ap_date, ap_time, status, created_at FROM my_appointments WHERE user_id = ${userId} AND profile_id = ${profileId}`;
         const [result]:any= await pool.query(getPageQuery);
 
-        const sql = `SELECT id, title, email, ap_date, ap_time, status, created_at FROM my_appointments WHERE user_id = ${userId} ORDER BY created_at DESC LIMIT ${page_size} OFFSET ${offset}`;
+        const sql = `SELECT id, title, email, ap_date, ap_time, status, created_at FROM my_appointments WHERE user_id = ${userId} AND profile_id = ${profileId} ORDER BY created_at DESC LIMIT ${page_size} OFFSET ${offset}`;
         const [rows]:any = await pool.query(sql);
 
-        const getFeatureStatus = `SELECT status FROM users_features WHERE user_id = ${userId} AND feature_id = 10`;
+        const getFeatureStatus = `SELECT status FROM users_features WHERE user_id = ${userId} AND profile_id = ${profileId} AND feature_id = 10`;
         const [featureStatus]:any = await pool.query(getFeatureStatus);
 
         let totalPages:any = result.length/page_size;
@@ -73,9 +74,11 @@ export const deleteAppointment =async (req:Request, res:Response) => {
     try {
         // const userId:string = res.locals.jwt.userId;
         let userId:any; 
-        const type = req.query.type; //type = business, user, null
-        if (type && type === config.businessType) {
-            userId = req.query.userId;
+        const type = req.body.type; //type = business, user, null
+        const profileId = req.body.profileId;
+
+        if (type && (type === config.businessType  || type === config.websiteType || type === config.vcfWebsite)) {
+            userId = req.body.userId;
         } else {
             userId = res.locals.jwt.userId;
         }
@@ -84,12 +87,17 @@ export const deleteAppointment =async (req:Request, res:Response) => {
         }
 
         const appointmentId = req.body.appointmentId;
+        if (!appointmentId || appointmentId === null || appointmentId === undefined) return apiResponse.errorMessage(res, 400, "Appointment Id is required");
 
         const sql = `DELETE FROM my_appointments WHERE user_id = ? AND id = ?`;
         const VALUES = [userId, appointmentId];
         const [rows]:any = await pool.query(sql, VALUES);
 
-        return apiResponse.successResponse(res, "Appointment deleted successfully", null)
+        if (rows.affectedRows > 0) {
+            return apiResponse.successResponse(res, "Appointment deleted successfully", null)
+        } else {
+            return apiResponse.errorMessage(res, 400, "Failed, try again");
+        }
     } catch (error) {
         console.log(error);
         return apiResponse.errorMessage(res, 400, "Something went wrong");
@@ -103,9 +111,10 @@ export const manageAppointment =async (req:Request, res:Response) => {
     try {
         // const userId:string = res.locals.jwt.userId;
         let userId:any; 
-        const type = req.query.type; //type = business, user, null
-        if (type && type === config.businessType) {
-            userId = req.query.userId;
+        const type = req.body.type; //type = business, user, null
+        const profileId = req.body.profileId;
+        if (type && (type === config.businessType  || type === config.websiteType || type === config.vcfWebsite)) {
+            userId = req.body.userId;
         } else {
             userId = res.locals.jwt.userId;
         }
@@ -145,7 +154,7 @@ export const bookAppointment =async (req:Request, res:Response) => {
     try {
         let userId:any; 
         const type = req.body.type; //type = business, user, null
-        if (type && (type === config.businessType  || type === config.websiteType)) {
+        if (type && (type === config.businessType  || type === config.websiteType || type === config.vcfWebsite)) {
             userId = req.body.userId;
         } else {
             userId = res.locals.jwt.userId;
@@ -154,10 +163,10 @@ export const bookAppointment =async (req:Request, res:Response) => {
             return apiResponse.errorMessage(res, 401, "User Id is required!");
         }
         const createdAt = utility.dateWithFormat();
-        const { name, email, date, time } = req.body;
+        const { profileId, name, email, date, time } = req.body;
 
-        const sql = `INSERT INTO my_appointments(user_id, title, email, ap_date, ap_time, created_at) VALUES(?, ?, ?, ?, ?, ?)`;
-        const VALUES = [userId, name, email, date, time, createdAt];
+        const sql = `INSERT INTO my_appointments(user_id, profile_id, title, email, ap_date, ap_time, created_at) VALUES(?, ?, ?, ?, ?, ?, ?)`;
+        const VALUES = [userId, profileId, name, email, date, time, createdAt];
         const [rows]:any = await pool.query(sql, VALUES);
 
         if (rows.affectedRows > 0) {

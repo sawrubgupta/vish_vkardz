@@ -8,9 +8,9 @@ export const addUpdateAboutUs =async (req:Request, res:Response) => {
     try {
         // const userId:string = res.locals.jwt.userId;
         let userId:any; 
-        const type = req.query.type; //type = business, user, null
+        const type = req.body.type; //type = business, user, null
         if (type && (type === config.businessType  || type === config.websiteType || type === config.vcfWebsite)) {
-            userId = req.query.userId;
+            userId = req.body.userId;
         } else {
             userId = res.locals.jwt.userId;
         }
@@ -19,14 +19,18 @@ export const addUpdateAboutUs =async (req:Request, res:Response) => {
         }
 
         const createdAt = utility.dateWithFormat();
-        const { companyName, year, business, aboutUsDetail, image } = req.body;
+        const { companyName, year, business, aboutUsDetail, image, profileId, document } = req.body;
 
-        const getAboutUs = `SELECT id FROM about WHERE user_id = ${userId}`;
+        const checkProfile = `SELECT id FROM users_profile WHERE user_id = ${userId} AND id = ${profileId} LIMIT 1`;
+        const [profileRows]:any = await pool.query(checkProfile);
+        if (profileRows.length === 0) return apiResponse.errorMessage(res, 400, "Profile does not exist!");
+
+        const getAboutUs = `SELECT id FROM about WHERE user_id = ${userId} AND profile_id = ${profileId} LIMIT 1`;
         const [aboutUsRows]:any = await pool.query(getAboutUs);
 
         if (aboutUsRows.length > 0) {
-            const updateQuery = `UPDATE about SET company_name = ?, year = ?, business = ?, about_detail = ?, images = ?, document = ? WHERE user_id = ?`;
-            const VALUES = [companyName, year, business, aboutUsDetail, image, document, userId];
+            const updateQuery = `UPDATE about SET company_name = ?, year = ?, business = ?, about_detail = ?, images = ?, document = ? WHERE user_id = ? AND profile_id = ?`;
+            const VALUES = [companyName, year, business, aboutUsDetail, image, document, userId, profileId];
             const [updatedRows]:any = await pool.query(updateQuery, VALUES);
 
             if (updatedRows.affectedRows > 0) {
@@ -35,8 +39,8 @@ export const addUpdateAboutUs =async (req:Request, res:Response) => {
                 return apiResponse.errorMessage(res, 400, "Failed to update, try again");
             }
         } else {
-            const insertedQuery = `INSERT INTO about(user_id, company_name, business, year, about_detail, images, document, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
-            const insertVALUES = [userId, companyName, business, year, aboutUsDetail, image, document, createdAt];
+            const insertedQuery = `INSERT INTO about(user_id, profile_id, company_name, business, year, about_detail, images, document, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+            const insertVALUES = [userId, profileId, companyName, business, year, aboutUsDetail, image, document, createdAt];
             const [insertedRows]:any = await pool.query(insertedQuery, insertVALUES);
 
             if (insertedRows.affectedRows > 0) {
@@ -59,19 +63,19 @@ export const getAboutUs =async (req:Request, res:Response) => {
         // const userId:string = res.locals.jwt.userId;
         let userId:any; 
         const type = req.query.type; //type = business, user, null
+        const profileId = req.query.profileId;
         if (type && (type === config.businessType  || type === config.websiteType || type === config.vcfWebsite)) {
             userId = req.query.userId;
         } else {
             userId = res.locals.jwt.userId;
         }
-        if (!userId || userId === "" || userId === undefined) {
-            return apiResponse.errorMessage(res, 401, "User Id is required!");
-        }
+        if (!userId || userId === "" || userId === undefined) return apiResponse.errorMessage(res, 401, "User Id is required!");
+        
 
-        const sql = `SELECT id, company_name, business, year, about_detail, images, created_at, document FROM about WHERE user_id = ${userId}`;
+        const sql = `SELECT id, company_name, business, year, about_detail, images, created_at, document FROM about WHERE user_id = ${userId} AND profile_id = ${profileId} LIMIT 1`;
         const [rows]:any = await pool.query(sql);
 
-        const getFeatureStatus = `SELECT status FROM users_features WHERE user_id = ${userId} AND feature_id = 3`;
+        const getFeatureStatus = `SELECT status FROM users_features WHERE user_id = ${userId} AND profile_id = ${profileId} AND feature_id = 3 LIMIT 1`;
         const [featureStatusRRows]:any = await pool.query(getFeatureStatus);
         let featureStatus = featureStatusRRows[0].status;
 
@@ -100,6 +104,7 @@ export const deleteAboutUs =async (req:Request, res:Response) => {
         // const userId:string = res.locals.jwt.userId;
         let userId:any; 
         const type = req.query.type; //type = business, user, null
+        const profileId = req.query.profileId;
         if (type && (type === config.businessType  || type === config.websiteType || type === config.vcfWebsite)) {
             userId = req.query.userId;
         } else {
@@ -110,7 +115,7 @@ export const deleteAboutUs =async (req:Request, res:Response) => {
         }
 
 
-        const sql = `DELETE FROM about WHERE user_id = ${userId}`;
+        const sql = `DELETE FROM about WHERE user_id = ${userId} AND profile_id = ${profileId}`;
         const [rows]:any = await pool.query(sql);
 
         return apiResponse.successResponse(res, "Deleted Successfully", null);

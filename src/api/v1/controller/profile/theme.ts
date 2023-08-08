@@ -38,7 +38,7 @@ export const updateVcardLayout =async (req:Request, res:Response) => {
         // const userId:string = res.locals.jwt.userId;
         let userId:any; 
         const type = req.query.type; //type = business, user, null
-        if (type && type === config.businessType) {
+        if (type && (type === config.businessType  || type === config.websiteType || type === config.vcfWebsite)) {
             userId = req.query.userId;
         } else {
             userId = res.locals.jwt.userId;
@@ -57,7 +57,7 @@ export const updateVcardLayout =async (req:Request, res:Response) => {
         const [rows]:any = await pool.query(sql, VALUES);
 
         if (rows.affectedRows > 0) {
-            return apiResponse.successResponse(res, "Vcard layout updated successfully !", null);
+            return apiResponse.successResponse(res, "Layout updated successfully", null);
         } else {
             return apiResponse.errorMessage(res, 400, "Failed to update layout, try again");
         }

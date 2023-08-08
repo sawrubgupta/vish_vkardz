@@ -45,7 +45,7 @@ const activateCard = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         // const userId:string = res.locals.jwt.userId;
         let userId;
         const type = req.query.type; //type = business, user, null
-        if (type && type === development_1.default.businessType) {
+        if (type && (type === development_1.default.businessType || type === development_1.default.websiteType || type === development_1.default.vcfWebsite)) {
             userId = req.query.userId;
         }
         else {
@@ -109,7 +109,7 @@ const activateCard = (req, res) => __awaiter(void 0, void 0, void 0, function* (
                             //         featureStatus = 0;
                             //     }
                             // }
-                            if (element.id === 1 || element.id === 2 || element.id === 13 || element.id === 14 || element.id === 15) {
+                            if (element.id === 1 || element.id === 2 || element.id === 13 || element.id === 14 || element.id === 15 || (element.id >= 18)) {
                                 featureStatus = 1;
                             }
                             else {

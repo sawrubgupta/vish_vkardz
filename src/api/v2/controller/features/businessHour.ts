@@ -10,18 +10,17 @@ export const addBusinessHour = async (req: Request, res: Response) => {
         // const userId: string = res.locals.jwt.userId;
         let userId:any; 
         const type = req.query.type; //type = business, user, null
-        if (type && type === config.businessType) {
-            userId = req.query.userId;
+        const profileId = req.body.profileId;
+        if (type && (type === config.businessType  || type === config.websiteType || type === config.vcfWebsite)) {
+            userId = req.body.userId;
         } else {
             userId = res.locals.jwt.userId;
         }
-        if (!userId || userId === "" || userId === undefined) {
-            return apiResponse.errorMessage(res, 401, "User Id is required!");
-        }
-
+        if (!userId || userId === "" || userId === undefined) return apiResponse.errorMessage(res, 401, "User Id is required!");
+        
         const createdAt = utility.dateWithFormat();
 
-        const deleteQuery = `DELETE FROM business_hours WHERE user_id = ${userId}`;
+        const deleteQuery = `DELETE FROM business_hours WHERE user_id = ${userId} AND profile_id = ${profileId}`;
         const [data]: any = await pool.query(deleteQuery);
 
         let sql: any = `INSERT INTO business_hours(user_id, days, start_time, end_time, status, created_at) VALUES `;
@@ -57,7 +56,8 @@ export const businessHourList = async (req: Request, res: Response) => {
         // const userId = res.locals.jwt.userId;
         let userId:any; 
         const type = req.query.type; //type = business, user, null
-        if (type && type === config.businessType) {
+        const profileId = req.query.profileId;
+        if (type && (type === config.businessType  || type === config.websiteType || type === config.vcfWebsite)) {
             userId = req.query.userId;
         } else {
             userId = res.locals.jwt.userId;
@@ -65,11 +65,12 @@ export const businessHourList = async (req: Request, res: Response) => {
         if (!userId || userId === "" || userId === undefined) {
             return apiResponse.errorMessage(res, 401, "User Id is required!");
         }
+        if (!profileId || profileId == null) return apiResponse.errorMessage(res, 400, "Profile id is required");
 
-        const sql = `SELECT * FROM business_hours WHERE user_id = ${userId}`;
+        const sql = `SELECT * FROM business_hours WHERE user_id = ${userId} AND profile_id = ${profileId}`;
         const [rows]: any = await pool.query(sql);
 
-        const getFeatureStatus = `SELECT status FROM users_features WHERE user_id = ${userId} AND feature_id = 6`;
+        const getFeatureStatus = `SELECT status FROM users_features WHERE user_id = ${userId} AND profile_id = ${profileId} AND feature_id = 6`;
         const [featureStatusRRows]:any = await pool.query(getFeatureStatus);
         let featureStatus = featureStatusRRows[0].status;
 

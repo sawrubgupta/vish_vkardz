@@ -29,6 +29,7 @@ export default {
     basicPlan: 'basic',
     propersonalizePlan: 'propersonalize',
 
+    vcfType: 'vcf',
     vcfNumber: 'number',
     vcfPhone: 'phone',//not used in custom field
     vcfAddress: 'address',
@@ -42,6 +43,7 @@ export default {
     vcfDob: 'dob',
     vcfName: 'name',
 
+    otherType: 'other',
     socialType: 'social',
     contactType: 'contact',
     paymentType: 'payment',

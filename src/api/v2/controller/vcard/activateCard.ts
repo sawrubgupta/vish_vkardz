@@ -9,7 +9,7 @@ export const activateCard =async (req:Request, res:Response) => {
         // const userId:string = res.locals.jwt.userId;
         let userId:any; 
         const type = req.query.type; //type = business, user, null
-        if (type && type === config.businessType) {
+        if (type && (type === config.businessType  || type === config.websiteType || type === config.vcfWebsite)) {
             userId = req.query.userId;
         } else {
             userId = res.locals.jwt.userId;
@@ -81,7 +81,7 @@ export const activateCard =async (req:Request, res:Response) => {
                             //         featureStatus = 0;
                             //     }
                             // }
-                            if (element.id === 1 || element.id === 2 || element.id === 13 || element.id === 14 || element.id === 15) {
+                            if (element.id === 1 || element.id === 2 || element.id === 13 || element.id === 14 || element.id === 15 || (element.id >= 18)) {
                                 featureStatus = 1;
                             } else {
                                 featureStatus = 0;

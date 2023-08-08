@@ -9,7 +9,7 @@ export const getProfile =async (req:Request, res:Response) => {
     try {
         let userId:any; 
         const type = req.query.type; //type = business, user, null
-        if (type && type === config.businessType) {
+        if (type && (type === config.businessType  || type === config.websiteType || type === config.vcfWebsite)) {
             userId = req.query.userId;
         } else {
             userId = res.locals.jwt.userId;
@@ -64,7 +64,7 @@ export const updateProfile =async (req:Request, res:Response) => {
         // const userId: string = res.locals.jwt.userId;
         let userId:any; 
         const type = req.query.type; //type = business, user, null
-        if (type && type === config.businessType) {
+        if (type && (type === config.businessType  || type === config.websiteType || type === config.vcfWebsite)) {
             userId = req.query.userId;
         } else {
             userId = res.locals.jwt.userId;
@@ -115,7 +115,7 @@ export const updateVcardinfo =async (req:Request, res:Response) => {
         // const userId: string = res.locals.jwt.userId;
         let userId:any; 
         const type = req.query.type; //type = business, user, null
-        if (type && type === config.businessType) {
+        if (type && (type === config.businessType  || type === config.websiteType || type === config.vcfWebsite)) {
             userId = req.query.userId;
         } else {
             userId = res.locals.jwt.userId;
@@ -161,11 +161,12 @@ export const updateVcardinfo =async (req:Request, res:Response) => {
 // ====================================================================================================
 // ====================================================================================================
 
+//according new json
 export const updateImage =async (req:Request, res:Response) => {
     // const userId: string = res.locals.jwt.userId;
     let userId:any; 
     const type = req.query.type; //type = business, user, null
-    if (type && type === config.businessType) {
+    if (type && (type === config.businessType  || type === config.websiteType || type === config.vcfWebsite)) {
         userId = req.query.userId;
     } else {
         userId = res.locals.jwt.userId;
@@ -174,10 +175,11 @@ export const updateImage =async (req:Request, res:Response) => {
         return apiResponse.errorMessage(res, 401, "Please login !")
     }
 
-    const { profileImage, coverImage } = req.body;
+    const { profileId, profileImage, coverImage } = req.body;
+    if (!profileId || profileId === null || profileId === undefined) return apiResponse.errorMessage(res, 400, "Profile id is required");
 
-    const sql = `UPDATE users SET thumb = ?, cover_photo = ? WHERE id = ?`;
-    const VALUES = [profileImage, coverImage, userId];
+    const sql = `UPDATE users_profile SET profile_image = ?, cover_photo = ? WHERE user_id = ? AND id = ?`;
+    const VALUES = [profileImage, coverImage, userId, profileId];
     const [rows]:any = await pool.query(sql, VALUES);
 
     if (rows.affectedRows > 0) {
@@ -191,7 +193,7 @@ export const updateImage =async (req:Request, res:Response) => {
 // ====================================================================================================
 
 
-//updated prfile with new json
+//updated profile with new json
 export const vcardProfile =async (req:Request, res:Response) => {
     try {
         // const username = req.query.username;
@@ -206,7 +208,7 @@ export const vcardProfile =async (req:Request, res:Response) => {
         let newCardNumber = splitNewCardNumber[0] || newCardNum || key;
         console.log("newCardNumber", newCardNumber);
 
-        const userSql = `SELECT users.id, users.username, users.referral_code, users.offer_coin, users.country, users.country_name, business_admin.image, business_admin.company FROM users LEFT JOIN business_admin ON business_admin.id = users.admin_id WHERE users.deleted_at IS NULL AND (users.username = '${key}' OR users.username = '${newCardNumber}' OR users.card_number = '${key}' OR users.card_number = '${newCardNumber}' OR users.card_number_fix = '${key}' OR users.card_number_fix = '${newCardNumber}') LIMIT 1`;
+        const userSql = `SELECT users.id, users.username, users.type, users.referral_code, users.offer_coin, users.country, users.country_name, users.currency_code, users.device_type, business_admin.image, business_admin.company FROM users LEFT JOIN business_admin ON business_admin.id = users.admin_id WHERE users.deleted_at IS NULL AND (users.username = '${key}' OR users.username = '${newCardNumber}' OR users.card_number = '${key}' OR users.card_number = '${newCardNumber}' OR users.card_number_fix = '${key}' OR users.card_number_fix = '${newCardNumber}') LIMIT 1`;
         const [userRows]:any = await pool.query(userSql);
 
         if (userRows.length === 0) return apiResponse.errorMessage(res, 400, "Profile not found!");
@@ -239,6 +241,17 @@ export const vcardProfile =async (req:Request, res:Response) => {
         const getSocialSiteQuery = `SELECT social_sites.id, social_sites.name, social_sites.social_link, social_sites.social_img, social_sites.type, social_sites.status, social_sites.social_type, social_sites.primary_profile, vcard_social_sites.value, vcard_social_sites.label, vcard_social_sites.orders FROM social_sites LEFT JOIN vcard_social_sites ON social_sites.id = vcard_social_sites.site_id AND vcard_social_sites.user_id = ${userId} HAVING vcard_social_sites.value IS NOT NULL ORDER BY vcard_social_sites.value DESC, vcard_social_sites.orders IS NULL ASC`;
         const [socialRows]:any = await pool.query(getSocialSiteQuery);
 
+        const featureSql = `SELECT users_features.feature_id, features.type, features.features, features.slug, users_features.status FROM features LEFT JOIN users_features ON features.id = users_features.feature_id WHERE users_features.user_id = ${userId}`;
+        const [featureRows]:any = await pool.query(featureSql);
+
+        let vcf:any = {};
+        let socials:any = {};
+        let others:any = {};
+        for (const featureEle of featureRows) {
+            if (featureEle.type === config.vcfType) vcf[featureEle.slug] = featureEle.status;
+            if (featureEle.type === config.socialType) socials[featureEle.slug] = featureEle.status;
+            if (featureEle.type === config.otherType) others[featureEle.slug] = featureEle.status;
+        }
         // const gender:any = (vcfInfoRows.find((x: { type: string; }) => x.type === config.vcfGender))?.value??null;
         // const designation:any = (vcfInfoRows.find((x: { type: string; }) => x.type === config.vcfDesignation))?.value??null;
         // const department:any = (vcfInfoRows.find((x: { type: string; }) => x.type === config.vcfDepartment))?.value??"";
@@ -331,8 +344,40 @@ export const vcardProfile =async (req:Request, res:Response) => {
             gallery: gallareRows,
             business_hours: businessHourRows,
             about_us:aboutUsRows,
-            videos: videoRows
+            videos: videoRows,
 
+            profile_setting: {
+                is_card_linked: profileRows[0].is_card_linked,
+                is_expired: profileRows[0].is_expired,
+                profile_package: productRows[0].account_type,
+                package_name: productRows[0].package_name,
+                currency_code: userRows[0].currency_code,
+                device_type: userRows[0].device_type,
+                type: userRows[0].type,
+                username: userRows[0].username,
+                card_number: profileRows[0].card_number,
+                card_number_fix: profileRows[0].card_number_fix,
+                on_tap: {
+                    type: profileRows[0].on_tap_url,
+                    single_tap: "url"
+                },
+                pin: profileRows[0].set_password,
+                is_private_mode: profileRows[0].is_private,
+                // affiliator_code: "HSHS12",
+                profile_theme: profileRows[0].vcard_layouts,
+                profile_view: profileRows[0].hit,
+                colors: {
+                    font_color: profileRows[0].font,
+                    theme_color: profileRows[0].vcard_bg_color,
+                },
+                profile_features: {
+                    vcf: vcf,
+                    socials: socials,
+                    others: others
+                },
+                profile_language: profileRows[0].language,
+    
+            }
         }
 
         return apiResponse.successResponse(res, "Data Retrieved Successfully", profile_data);

@@ -42,7 +42,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.userToUserProfileDataTransfer = void 0;
+exports.addUserNewFeature = exports.userToUserProfileDataTransfer = void 0;
 const db_1 = __importDefault(require("../../../../db"));
 const apiResponse = __importStar(require("../../helper/apiResponse"));
 const utility = __importStar(require("../../helper/utility"));
@@ -109,6 +109,40 @@ exports.userToUserProfileDataTransfer = userToUserProfileDataTransfer;
 // UPDATE vcf_custom_field
 // JOIN users_profile ON vcf_custom_field.user_id = users_profile.user_id
 // SET vcf_custom_field.profile_id = users_profile.id;
-// export const 
+// ====================================================================================================
+// ====================================================================================================
+const addUserNewFeature = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        // const userId = res.locals.jwt.userId;
+        // if (userId || !userId) return apiResponse.errorMessage(res, 400, "you don't have access");
+        const userSql = `SELECT * FROM users`;
+        const [userRows] = yield db_1.default.query(userSql);
+        for (const userEle of userRows) {
+            const uid = userEle.id;
+            const getFeatures = `SELECT * FROM features WHERE id between 18 AND 38`;
+            const [featureData] = yield db_1.default.query(getFeatures);
+            let featureStatus = 1;
+            let featureResult;
+            let addFeatures = `INSERT INTO users_features(feature_id, user_id,status) VALUES`;
+            for (const element of featureData) {
+                // if (element.id === 1 || element.id === 2 || element.id === 13 || element.id === 14 || element.id === 15) {
+                //     featureStatus = 1
+                // } else {
+                //     featureStatus = 0
+                // }
+                addFeatures = addFeatures + `(${element.id},${uid},${featureStatus}), `;
+                featureResult = addFeatures.substring(0, addFeatures.lastIndexOf(','));
+            }
+            const [userFeatureData] = yield db_1.default.query(featureResult);
+            console.log("userFeatureData", userFeatureData);
+        }
+        return apiResponse.successResponse(res, "Success", null);
+    }
+    catch (error) {
+        console.log(error);
+        return apiResponse.somethingWentWrongMessage(res);
+    }
+});
+exports.addUserNewFeature = addUserNewFeature;
 // ====================================================================================================
 // ====================================================================================================

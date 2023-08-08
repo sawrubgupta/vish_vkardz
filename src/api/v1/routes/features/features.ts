@@ -17,6 +17,7 @@ const featureRouter = Router();
 
 featureRouter.get("/getUserFeature", tempAuthenticatingToken, featureController.getFeatureByUserId); //use in business type
 featureRouter.patch("/updateFeatures", tempAuthenticatingToken, featureController.updateUserFeaturesStatus); //use in business type
+featureRouter.get("/features", tempAuthenticatingToken, featureController.features); //use in business type
 
 featureRouter.put("/aboutUs", tempAuthenticatingToken, validation.aboutUsValidation, aboutUsCotroller.addUpdateAboutUs); //use in business type
 featureRouter.get("/aboutUs", tempAuthenticatingToken, aboutUsCotroller.getAboutUs);//use in business type

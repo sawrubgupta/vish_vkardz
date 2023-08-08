@@ -8,7 +8,7 @@ export const addCustomField =async (req:Request, res:Response) => {
     try {
         let userId:any; 
         const type = req.body.type; //type = business, user, null
-        if (type && type === config.businessType) {
+        if (type && (type === config.businessType  || type === config.websiteType || type === config.vcfWebsite)) {
             userId = req.body.userId;
         } else {
             userId = res.locals.jwt.userId;
@@ -41,7 +41,7 @@ export const addCustomField =async (req:Request, res:Response) => {
         }
         
         if (result.affectedRows > 0) {
-            return apiResponse.successResponse(res, "Custom Field added successfully", null);
+            return apiResponse.successResponse(res, "Success", null);
         } else {
             return apiResponse.errorMessage(res, 400, "Failed to add custom field, Please try again!");
         }
@@ -58,7 +58,7 @@ export const deleteVcf =async (req:Request, res:Response) => {
     try {
         let userId:any; 
         const type = req.body.type; //type = business, user, null
-        if (type && type === config.businessType) {
+        if (type && (type === config.businessType  || type === config.websiteType || type === config.vcfWebsite)) {
             userId = req.body.userId;
         } else {
             userId = res.locals.jwt.userId;
@@ -87,7 +87,7 @@ export const getVcf =async (req:Request, res:Response) => {
     try {
         let userId:any; 
         const type = req.query.type; //type = business, user, null
-        if (type && type === config.businessType) {
+        if (type && (type === config.businessType  || type === config.websiteType || type === config.vcfWebsite)) {
             userId = req.query.userId;
         } else {
             userId = res.locals.jwt.userId;
@@ -146,7 +146,7 @@ export const deleteUsercf =async (req:Request, res:Response) => {
     try {
         let userId:any; 
         const type = req.body.type; //type = business, user, null
-        if (type && type === config.businessType) {
+        if (type && (type === config.businessType  || type === config.websiteType || type === config.vcfWebsite)) {
             userId = req.body.userId;
         } else {
             userId = res.locals.jwt.userId;
@@ -176,7 +176,7 @@ export const getUserCustomField =async (req:Request, res:Response) => {
         let userId:any; 
         const type = req.query.type; //type = business, user, null
         const profileId = req.query.profileId;
-        if (type && type === config.businessType) {
+        if (type && (type === config.businessType  || type === config.websiteType || type === config.vcfWebsite)) {
             userId = req.query.userId;
         } else {
             userId = res.locals.jwt.userId;

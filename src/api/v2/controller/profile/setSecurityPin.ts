@@ -4,13 +4,13 @@ import * as apiResponse from '../../helper/apiResponse';
 import * as utility from "../../helper/utility";
 import config  from '../../config/development';
 
-
+//according v2
 export const setPin =async (req:Request, res:Response) => {
     try {
         // const userId:string = res.locals.jwt.userId;
         let userId:any; 
         const type = req.query.type; //type = business, user, null
-        if (type && type === config.businessType) {
+        if (type && (type === config.businessType  || type === config.websiteType || type === config.vcfWebsite)) {
             userId = req.query.userId;
         } else {
             userId = res.locals.jwt.userId;
@@ -19,11 +19,10 @@ export const setPin =async (req:Request, res:Response) => {
             return apiResponse.errorMessage(res, 401, "User Id is required!");
         }
 
-        const isPasswordEnable = req.body.isPasswordEnable;
-        const securityPin = req.body.securityPin;
+        const { securityPin, profileId } = req.body;
         
-        const sql = `UPDATE users SET is_password_enable = ?, set_password = ? WHERE id = ?`;
-        const VALUES = [isPasswordEnable, securityPin, userId]
+        const sql = `UPDATE users_profile SET set_password = ? WHERE user_id = ? AND id = ?`;
+        const VALUES = [securityPin, userId, profileId]
         const [rows]:any = await pool.query(sql, VALUES);
 
         if (rows.affectedRows > 0) {
@@ -39,12 +38,13 @@ export const setPin =async (req:Request, res:Response) => {
 // ====================================================================================================
 // ====================================================================================================
 
+//according v2
 export const removePin =async (req:Request, res:Response) => {
     try {
         // const userId:string = res.locals.jwt.userId;
         let userId:any; 
         const type = req.query.type; //type = business, user, null
-        if (type && type === config.businessType) {
+        if (type && (type === config.businessType  || type === config.websiteType || type === config.vcfWebsite)) {
             userId = req.query.userId;
         } else {
             userId = res.locals.jwt.userId;
@@ -52,8 +52,9 @@ export const removePin =async (req:Request, res:Response) => {
         if (!userId || userId === "" || userId === undefined) {
             return apiResponse.errorMessage(res, 401, "User Id is required!");
         }
+        const profileId = req.query.profileId;
 
-        const sql = `UPDATE users SET is_password_enable = 0 WHERE id = ${userId}`;
+        const sql = `UPDATE users_profile SET set_password = null WHERE user_id = ${userId} AND id = ${profileId}`;
         const [rows]:any = await pool.query(sql);
 
         if (rows.affectedRows > 0) {

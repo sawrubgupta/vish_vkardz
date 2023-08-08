@@ -10,7 +10,7 @@ export const addProduct =async (req:Request, res:Response) => {
         // const userId:string = res.locals.jwt.userId;
         let userId:any; 
         const type = req.query.type; //type = business, user, null
-        if (type && type === config.businessType) {
+        if (type && (type === config.businessType  || type === config.websiteType || type === config.vcfWebsite)) {
             userId = req.query.userId;
         } else {
             userId = res.locals.jwt.userId;
@@ -62,6 +62,10 @@ export const getProducts =async (req:Request, res:Response) => {
         var page_size: any = config.pageSize;       
         const offset = (page - 1 ) * page_size;
 
+        const userSql = `SELECT phone FROM users WHERE id = ${userId} LIMIT 1`;
+        const [userRows]:any = await pool.query(userSql);
+        const userPhone = userRows[0].phone;
+
         const getPageQuery = `SELECT id, title, overview as description, images, price, status FROM services WHERE user_id = ${userId}`;
         const [result]:any= await pool.query(getPageQuery);
 
@@ -80,6 +84,7 @@ export const getProducts =async (req:Request, res:Response) => {
                 status: true,
                 data: rows,
                 featureStatus: featureStatus[0].status,
+                userPhone,
                 totalPage: totalPage,
                 currentPage: page,
                 totalLength: result.length,
@@ -91,6 +96,7 @@ export const getProducts =async (req:Request, res:Response) => {
                 status: true,
                 data: null,
                 featureStatus: featureStatus[0].status,
+                userPhone,
                 totalPage: totalPage,
                 currentPage: page,
                 totalLength: result.length,
@@ -111,7 +117,7 @@ export const updateProduct =async (req:Request, res:Response) => {
         // const userId:string = res.locals.jwt.userId;
         let userId:any; 
         const type = req.query.type; //type = business, user, null
-        if (type && (type === config.businessType  || type === config.websiteType)) {
+        if (type && (type === config.businessType  || type === config.websiteType || type === config.vcfWebsite)) {
             userId = req.query.userId;
         } else {
             userId = res.locals.jwt.userId;
@@ -146,7 +152,7 @@ export const deleteProduct =async (req:Request, res:Response) => {
         // const userId:string = res.locals.jwt.userId;
         let userId:any; 
         const type = req.query.type; //type = business, user, null
-        if (type && type === config.businessType) {
+        if (type && (type === config.businessType  || type === config.websiteType || type === config.vcfWebsite)) {
             userId = req.query.userId;
         } else {
             userId = res.locals.jwt.userId;

@@ -52,7 +52,7 @@ const addCustomField = (req, res) => __awaiter(void 0, void 0, void 0, function*
     try {
         let userId;
         const type = req.body.type; //type = business, user, null
-        if (type && type === development_1.default.businessType) {
+        if (type && (type === development_1.default.businessType || type === development_1.default.websiteType || type === development_1.default.vcfWebsite)) {
             userId = req.body.userId;
         }
         else {
@@ -98,7 +98,7 @@ const addCustomField = (req, res) => __awaiter(void 0, void 0, void 0, function*
             finally { if (e_1) throw e_1.error; }
         }
         if (result.affectedRows > 0) {
-            return apiResponse.successResponse(res, "Custom Field added successfully", null);
+            return apiResponse.successResponse(res, "Success", null);
         }
         else {
             return apiResponse.errorMessage(res, 400, "Failed to add custom field, Please try again!");
@@ -116,7 +116,7 @@ const deleteVcf = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         let userId;
         const type = req.body.type; //type = business, user, null
-        if (type && type === development_1.default.businessType) {
+        if (type && (type === development_1.default.businessType || type === development_1.default.websiteType || type === development_1.default.vcfWebsite)) {
             userId = req.body.userId;
         }
         else {
@@ -145,7 +145,7 @@ const getVcf = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         let userId;
         const type = req.query.type; //type = business, user, null
-        if (type && type === development_1.default.businessType) {
+        if (type && (type === development_1.default.businessType || type === development_1.default.websiteType || type === development_1.default.vcfWebsite)) {
             userId = req.query.userId;
         }
         else {
@@ -203,7 +203,7 @@ const deleteUsercf = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     try {
         let userId;
         const type = req.body.type; //type = business, user, null
-        if (type && type === development_1.default.businessType) {
+        if (type && (type === development_1.default.businessType || type === development_1.default.websiteType || type === development_1.default.vcfWebsite)) {
             userId = req.body.userId;
         }
         else {
@@ -233,7 +233,7 @@ const getUserCustomField = (req, res) => __awaiter(void 0, void 0, void 0, funct
         let userId;
         const type = req.query.type; //type = business, user, null
         const profileId = req.query.profileId;
-        if (type && type === development_1.default.businessType) {
+        if (type && (type === development_1.default.businessType || type === development_1.default.websiteType || type === development_1.default.vcfWebsite)) {
             userId = req.query.userId;
         }
         else {

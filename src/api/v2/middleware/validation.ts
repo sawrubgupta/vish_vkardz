@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import * as apiResponse from '../helper/apiResponse'
 import Joi from "joi";
+import config from '../config/development';
 
 async function validationCheck(value: any) {
     let msg = value.error.details[0].message;
@@ -41,17 +42,18 @@ export const registrationValidation = async (req: Request, res: Response, next: 
 
 export const socialRegistrationValidation = async (req: Request, res: Response, next: NextFunction) => {
     const schema = Joi.object({
-        name: Joi.string().trim().min(3).max(70).trim().required(),
+        name: Joi.string().trim().allow(null, ""),
         type: Joi.string().trim().required(),
         socialId: Joi.string().trim().allow(null).allow(''),
         email: Joi.string().email().max(80).required(),
         password: Joi.string().min(3).max(30).required().allow(null).allow(''),
-        username: Joi.string().trim().min(2).max(50).required(),
+        username: Joi.string().allow(null, ""),
         country: Joi.number().integer().required(),
-        phone: Joi.string().trim().min(8).max(20).trim().required(),
+        phone: Joi.string().allow(null, ""),
         countryName: Joi.string().trim().allow(''),
-        dial_code: Joi.string().required(),
-        fcmToken: Joi.string().trim().required(),
+        dial_code: Joi.string().allow(null, ""),
+        refer_code: Joi.string().allow('').allow(null),
+        fcmToken: Joi.string().allow('').allow(null),
         deviceId: Joi.allow('').allow(null),
         deviceType: Joi.string().allow('').allow(null),
     });
@@ -91,7 +93,7 @@ export const socialLoginValidation = async (req: Request, res: Response, next: N
     const schema = Joi.object({
         password: Joi.string().min(3).max(30).allow('').allow(null),
         email: Joi.string().required().allow('').allow(null),
-        fcmToken: Joi.string().trim().required(),
+        fcmToken: Joi.string().allow('').allow(null),
         type: Joi.string().trim().required(),
         socialId: Joi.string().trim().allow(null).allow(''),
     });
@@ -128,8 +130,8 @@ export const changePasswordValidation = async (req: Request, res: Response, next
 
 export const settingValidation = async (req: Request, res: Response, next: NextFunction) => {
     const schema = Joi.object({
-        pushNotificationEnable: Joi.boolean(),
-        emailNotificationEnable: Joi.boolean(),
+        pushNotificationEnable: Joi.boolean().allow(0, 1),
+        emailNotificationEnable: Joi.boolean().allow(0, 1),
         currencyCode: Joi.string().min(1).max(4).allow(''),
         languageSelection: Joi.string().min(1).max(50).allow('')
     });
@@ -181,6 +183,7 @@ export const updateVcardinfoValidation = async (req: Request, res: Response, nex
         country: Joi.number().allow(''),
         countryName: Joi.string().allow('').allow(null),
         gender: Joi.string().max(200).allow(''),
+        image: Joi.string().allow("", null)
     });
 
     const value = schema.validate(req.body);
@@ -198,6 +201,10 @@ export const updateVcardinfoValidation = async (req: Request, res: Response, nex
 export const editSocialLinksValidation = async (req: Request, res: Response, next: NextFunction) => {
 
     const schema = Joi.object({
+        type: Joi.string().allow("").allow(null),
+        userId: Joi.allow("").allow(null),
+        userSocialId: Joi.number().required(),
+        profileId: Joi.number().required(),
         siteId: Joi.number().integer().required(),
         siteValue: Joi.string().max(100).allow(''),
         orders: Joi.number().integer(),
@@ -239,9 +246,12 @@ export const addVcfValidation = async (req: Request, res: Response, next: NextFu
     const schema = Joi.object({
         type: Joi.string().allow('').allow(null),
         userId: Joi.number().allow('').allow(null),
+        profileId: Joi.number().required(),
         vcfData: Joi.array().items(
             Joi.object({
                 vcfId: Joi.number().allow('').allow(null),
+                icon: Joi.string().allow('', null),
+                name: Joi.string().allow('', null),
                 vcfType: Joi.string().required(),
                 vcfValue: Joi.string().required(),
                 status: Joi.boolean().allow(0, 1),
@@ -260,8 +270,6 @@ export const addVcfValidation = async (req: Request, res: Response, next: NextFu
 
 // ====================================================================================================
 // ====================================================================================================
-
-
 
 /*
 export const affiliateRegValidation = async (
@@ -327,9 +335,6 @@ export const affiliateRegValidation = async (
 // ====================================================================================================
 // ====================================================================================================
 
-
-
-
 /*
     // qucick setup 
     export const quickSetupValidation = async (req: Request,res: Response,next: NextFunction) => {
@@ -371,8 +376,6 @@ export const affiliateRegValidation = async (
 
 // ====================================================================================================
 // ====================================================================================================
-
-
 
 /*
     export const updateVkardzValidation =async (req:Request, res:Response, next:NextFunction) => {
@@ -429,7 +432,6 @@ export const activateCardValidation =async (req:Request, res:Response, next:Next
 // ====================================================================================================
 // ====================================================================================================
 
-
 /*
     export const userFeedbackValidation =async (req:Request, res:Response, next:NextFunction) => {
             const schema = Joi.object({
@@ -472,7 +474,6 @@ export const enquiryValidation = async(req: Request, res: Response, next: NextFu
 
 // ====================================================================================================
 // ====================================================================================================
-
 
 /*
 //not used
@@ -544,8 +545,9 @@ export const deliveryAddressValidation = async (req: Request, res: Response, nex
         locality: Joi.string().normalize().max(100).required(),
         city: Joi.string().required(),
         state: Joi.string().required(),
-        pincode: Joi.required(),
+        pincode: Joi.string().min(3).max(8).required(),
         country: Joi.allow('').allow(null),
+        isDefault: Joi.number().allow("", null),
         country_name: Joi.string().allow('').allow(null),
     });
 
@@ -573,7 +575,7 @@ export const updateDdeliveryAddressValidation = async (req: Request, res: Respon
         locality: Joi.string().normalize().max(100).required(),
         city: Joi.string().required(),
         state: Joi.string().required(),
-        pincode: Joi.required(),
+        pincode: Joi.string().min(3).max(8).required(),
         country: Joi.allow('').allow(null),
         country_name: Joi.string().allow('').allow(null),
     });
@@ -618,6 +620,7 @@ export const aboutUsValidation = async (req: Request, res: Response, next: NextF
         business: Joi.string().allow("").allow(null),
         aboutUsDetail: Joi.string().allow("").allow(null),
         image: Joi.string().trim().allow(''),
+        coverImage: Joi.string().trim().allow(''),
         document: Joi.string().allow('').allow(null),
     });
 
@@ -635,8 +638,12 @@ export const aboutUsValidation = async (req: Request, res: Response, next: NextF
 
 export const userProductsValidation = async (req: Request, res: Response, next: NextFunction) => {
     const schema = Joi.object({
+        type: Joi.string().allow("").allow(null),
+        userId: Joi.allow("").allow(null),
+        profileId: Joi.number().required(),
+        productId: Joi.number().allow("").allow(null),
         title: Joi.string().max(50).required(),
-        description: Joi.string().min(1).max(80).trim().required(),
+        description: Joi.string().min(1).max(3000).trim().required(),
         price: Joi.string().required(),
         image: Joi.string().required(),
         currencyCode: Joi.string().allow('').allow(null),
@@ -738,6 +745,8 @@ export const purchaseValidation = async (req: Request, res: Response, next: Next
 export const setProfilePinValidation = async (req: Request, res: Response, next: NextFunction) => {
 
     const schema = Joi.object({
+        type: Joi.string().allow("", null),
+        userId: Joi.allow(null, ''),
         profileId: Joi.number().required(),
         securityPin: Joi.number().integer().min(1).required(),
     });
@@ -757,6 +766,9 @@ export const setProfilePinValidation = async (req: Request, res: Response, next:
 export const businessHourValidation = async (req: Request, res: Response, next: NextFunction) => {
 
     const schema = Joi.object({
+        type: Joi.string().allow("", null),
+        userId: Joi.allow(null, ''),
+        profileId: Joi.number().required(),
         businessHours: Joi.array().max(7).items(
             Joi.object({
                 days: Joi.number().required(),
@@ -778,7 +790,6 @@ export const businessHourValidation = async (req: Request, res: Response, next: 
 
 // ====================================================================================================
 // ====================================================================================================
-
 
 export const productRatingValidation = async (req: Request, res: Response, next: NextFunction) => {
 
@@ -818,7 +829,27 @@ export const primaryProfileValidation = async (req: Request, res: Response, next
 // ====================================================================================================
 // ====================================================================================================
 
-export const updatePackageValidation = async (req: Request, res: Response, next: NextFunction) => {
+export const addPrimaryLinkValidation = async(req: Request, res: Response, next: NextFunction) => {
+
+    const schema = Joi.object({
+        type: Joi.string().allow("", null),
+        userId: Joi.allow(null, ''),
+        profileId: Joi.number().required(),
+        primaryProfileLink: Joi.string().allow("", null)
+    })
+
+    const value = schema.validate(req.body);
+    
+    if (value.error) {
+        const errMsg = await validationCheck(value);
+        return await apiResponse.errorMessage(res,400, errMsg);
+    }
+    next();
+}
+// ====================================================================================================
+// ====================================================================================================
+
+export const oldUpdatePackageValidation = async (req: Request, res: Response, next: NextFunction) => {
 
     const schema = Joi.object({
         txnId: Joi.string().required(),
@@ -1078,14 +1109,331 @@ export const updateFeaturesValidation = async (req: Request, res: Response, next
     const schema = Joi.object({
         type: Joi.string().allow('').allow(null),
         userId: Joi.number().allow('').allow(null),
-        vcfData: Joi.array().items(
+        profileId: Joi.number().required(),
+        features: Joi.array().items(
             Joi.object({
-                vcfId: Joi.number().allow('').allow(null),
-                vcfType: Joi.string().required(),
-                vcfValue: Joi.string().required(),
+                featureId: Joi.number().required(),
                 status: Joi.boolean().allow(0, 1),
             })
         )
+    })
+
+    const value = schema.validate(req.body);
+
+    if (value.error) {
+        const errMsg = await validationCheck(value);
+        return await apiResponse.errorMessage(res, 400, errMsg);
+    }
+    next();
+}
+
+// ====================================================================================================
+// ====================================================================================================
+
+export const vcardLayoutValidation = async (req: Request, res: Response, next: NextFunction) => {
+    const schema = Joi.object({
+        type: Joi.string().allow("").allow(null),
+        userId: Joi.allow("").allow(null),
+        profileId: Joi.number().required(),
+        profileColor: Joi.string().required(),
+        styleId: Joi.required()
+    });
+
+    const value = schema.validate(req.body);
+
+    if (value.error) {
+        const errMsg = await validationCheck(value);
+        return await apiResponse.errorMessage(res, 400, errMsg);
+    }
+    next();
+};
+
+// ====================================================================================================
+// ====================================================================================================
+
+export const activateCardValidation = async (req: Request, res: Response, next: NextFunction) => {
+
+    const schema = Joi.object({
+        type: Joi.string().allow("").allow(null),
+        userId: Joi.allow("").allow(null),
+        profileId: Joi.number().required(),
+        productType: Joi.string().allow(null, ""),
+        code: Joi.required()
+    });
+
+    const value = schema.validate(req.body);
+
+    if (value.error) {
+        const errMsg = await validationCheck(value);
+        return await apiResponse.errorMessage(res, 400, errMsg);
+    }
+    next();
+}
+
+// ====================================================================================================
+// ====================================================================================================
+
+export const updatePackageValidation = async (req: Request, res: Response, next: NextFunction) => {
+
+    const schema = Joi.object({
+        txnId: Joi.string().required(), 
+        priceCurrencyCode: Joi.string().required(), 
+        paymentType: Joi.string().required(), 
+        // packageId: Joi.number().required(),
+        packageSlug: Joi.string().allow('', null), 
+        price: Joi.number().required(), 
+        status: Joi.required(), 
+        packageType: Joi.string().required(), 
+        couponDiscount: Joi.required(), 
+        gstAmount: Joi.number().required(), 
+    })
+
+    const value = schema.validate(req.body);
+
+    if (value.error) {
+        const errMsg = await validationCheck(value);
+        return await apiResponse.errorMessage(res, 400, errMsg);
+    }
+    next();
+}
+
+// ====================================================================================================
+// ====================================================================================================
+
+export const addProfileValidation = async (req: Request, res: Response, next: NextFunction) => {
+
+    const schema = Joi.object({
+        themeName: Joi.string().allow(null, ""),
+        type: Joi.string().allow(null,''), 
+        userId: Joi.number().allow(null, ''), 
+        latitude: Joi.string().allow('', null),
+        longitude: Joi.string().allow('', null),
+        details: Joi.array().items(
+            Joi.object({
+                // type: Joi.string().allow(`${config.vcfName}`).required(),
+                type: Joi.string().required(),
+                value: Joi.string().allow("").allow(null),
+            })
+        )
+    })
+
+    const value = schema.validate(req.body);
+
+    if (value.error) {
+        const errMsg = await validationCheck(value);
+        return await apiResponse.errorMessage(res, 400, errMsg);
+    }
+    next();
+}
+
+// ====================================================================================================
+// ====================================================================================================
+
+export const updateUserProfileValidation = async (req: Request, res: Response, next: NextFunction) => {
+
+    const schema = Joi.object({
+        profileId: Joi.number().required(),
+        themeName: Joi.string().allow(null, ""),
+        type: Joi.string().allow(null,''), 
+        userId: Joi.number().allow(null, ''), 
+        latitude: Joi.string().allow('', null),
+        longitude: Joi.string().allow('', null),
+        vcfInfo: Joi.array().items(
+            Joi.object({
+                vcfId: Joi.number().allow("", null),
+                type: Joi.string().required(),
+                value: Joi.string().allow("").allow(null),
+            })
+        )
+    })
+
+    const value = schema.validate(req.body);
+
+    if (value.error) {
+        const errMsg = await validationCheck(value);
+        return await apiResponse.errorMessage(res, 400, errMsg);
+    }
+    next();
+}
+
+// ====================================================================================================
+// ====================================================================================================
+
+export const addUpdateUserProfileValidation = async (req: Request, res: Response, next: NextFunction) => {
+
+    const schema = Joi.object({
+        profileId: Joi.number().allow(null),
+        themeName: Joi.string().allow(null, ""),
+        type: Joi.string().allow(null,''), 
+        userId: Joi.number().allow(null, ''), 
+        latitude: Joi.string().allow('', null),
+        longitude: Joi.string().allow('', null),
+        vcfInfo: Joi.array().items(
+            Joi.object({
+                vcfId: Joi.number().allow("", null),
+                type: Joi.string().required(),
+                value: Joi.string().allow("").allow(null),
+            })
+        )
+    })
+
+    const value = schema.validate(req.body);
+
+    if (value.error) {
+        const errMsg = await validationCheck(value);
+        return await apiResponse.errorMessage(res, 400, errMsg);
+    }
+    next();
+}
+
+// ====================================================================================================
+// ====================================================================================================
+
+export const addTimingValidation = async (req: Request, res: Response, next: NextFunction) => {
+
+    const schema = Joi.object({
+        type: Joi.string().allow(null,''), 
+        userId: Joi.number().allow(null, ''), 
+        profileId: Joi.number().required(), 
+        startTime: Joi.string().required(), 
+        endTime: Joi.string().required()  
+    })
+
+    const value = schema.validate(req.body);
+
+    if (value.error) {
+        const errMsg = await validationCheck(value);
+        return await apiResponse.errorMessage(res, 400, errMsg);
+    }
+    next();
+}
+
+// ====================================================================================================
+// ====================================================================================================
+
+export const updateTimingValidation = async (req: Request, res: Response, next: NextFunction) => {
+
+    const schema = Joi.object({
+        type: Joi.string().allow(null,''), 
+        userId: Joi.number().allow(null, ''), 
+        timingId: Joi.number().required(),
+        profileId: Joi.number().required(), 
+        startTime: Joi.string().required(), 
+        endTime: Joi.string().required()  
+    })
+
+    const value = schema.validate(req.body);
+
+    if (value.error) {
+        const errMsg = await validationCheck(value);
+        return await apiResponse.errorMessage(res, 400, errMsg);
+    }
+    next();
+}
+
+// ====================================================================================================
+// ====================================================================================================
+
+export const removeCardValidation = async (req: Request, res: Response, next: NextFunction) => {
+
+    const schema = Joi.object({
+        type: Joi.string().allow(null,''), 
+        userId: Joi.number().allow(null, ''), 
+        profileId: Joi.number().required(), 
+        cardId: Joi.number().required(), 
+    })
+
+    const value = schema.validate(req.body);
+
+    if (value.error) {
+        const errMsg = await validationCheck(value);
+        return await apiResponse.errorMessage(res, 400, errMsg);
+    }
+    next();
+}
+
+// ====================================================================================================
+// ====================================================================================================
+
+
+export const addSocialLinksValidation = async (req: Request, res: Response, next: NextFunction) => {
+
+    const schema = Joi.object({
+        type: Joi.string().allow("").allow(null),
+        userId: Joi.allow("").allow(null),
+        profileId: Joi.number().required(),
+        siteId: Joi.number().integer().required(),
+        siteValue: Joi.string().max(100).allow(''),
+        orders: Joi.number().integer(),
+        siteLabel: Joi.string().max(20).allow('')
+    })
+
+    const value = schema.validate(req.body);
+
+    if (value.error) {
+        const errMsg = await validationCheck(value);
+        return await apiResponse.errorMessage(res, 400, errMsg);
+    }
+    next();
+}
+
+// ====================================================================================================
+// ====================================================================================================
+
+
+export const addUpdateSocialLinksValidation = async (req: Request, res: Response, next: NextFunction) => {
+
+    const schema = Joi.object({
+        type: Joi.string().allow("").allow(null),
+        userId: Joi.allow("").allow(null),
+        profileId: Joi.number().required(),
+        siteId: Joi.number().integer().required(),
+        siteValue: Joi.string().max(100).allow(''),
+        orders: Joi.number().integer(),
+        siteLabel: Joi.string().max(20).allow('')
+    })
+
+    const value = schema.validate(req.body);
+
+    if (value.error) {
+        const errMsg = await validationCheck(value);
+        return await apiResponse.errorMessage(res, 400, errMsg);
+    }
+    next();
+}
+
+// ====================================================================================================
+// ====================================================================================================
+
+export const deleteSocialLinkValidation = async (req: Request, res: Response, next: NextFunction) => {
+
+    const schema = Joi.object({
+        type: Joi.string().allow("").allow(null),
+        userId: Joi.allow("").allow(null),
+        profileId: Joi.number().required(),
+        siteId: Joi.number().required(),
+        userSocialId: Joi.number().required(),
+    })
+
+    const value = schema.validate(req.body);
+
+    if (value.error) {
+        const errMsg = await validationCheck(value);
+        return await apiResponse.errorMessage(res, 400, errMsg);
+    }
+    next();
+}
+
+// ====================================================================================================
+// ====================================================================================================
+
+export const socialStatusValidation = async (req: Request, res: Response, next: NextFunction) => {
+
+    const schema = Joi.object({
+        type: Joi.string().allow("").allow(null),
+        userId: Joi.allow("").allow(null),
+        userSocialId: Joi.number().required(),
+        status: Joi.boolean().allow(0, 1).required(),
     })
 
     const value = schema.validate(req.body);

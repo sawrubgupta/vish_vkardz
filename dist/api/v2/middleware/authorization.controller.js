@@ -44,6 +44,7 @@ exports.authenticatingToken = authenticatingToken;
 // ====================================================================================================
 function tempAuthenticatingToken(req, res, next) {
     const authHeaders = req.headers['authorization'];
+    const type = req.body.type;
     const token = authHeaders === null || authHeaders === void 0 ? void 0 : authHeaders.split(" ")[1];
     // if(token === null || token === undefined){
     //     return res.status(401).json({
@@ -52,23 +53,29 @@ function tempAuthenticatingToken(req, res, next) {
     //         message: "Unauthorized access!",
     //       });
     // }
-    if (token) {
-        jsonwebtoken_1.default.verify(token, secretKey, (err, user) => __awaiter(this, void 0, void 0, function* () {
-            if (err) {
-                console.log(err);
-                return res.status(401).json({
-                    status: false,
-                    data: null,
-                    message: "Unauthorized access!",
-                });
-            }
-            res.locals.jwt = user;
-            next();
-        }));
-    }
-    else {
+    if (type && (type === development_1.default.businessType || type === development_1.default.websiteType || type === development_1.default.vcfWebsite)) {
         res.locals.jwt = "";
         next();
+    }
+    else {
+        if (token) {
+            jsonwebtoken_1.default.verify(token, secretKey, (err, user) => __awaiter(this, void 0, void 0, function* () {
+                if (err) {
+                    console.log(err);
+                    return res.status(401).json({
+                        status: false,
+                        data: null,
+                        message: "Unauthorized access!",
+                    });
+                }
+                res.locals.jwt = user;
+                next();
+            }));
+        }
+        else {
+            res.locals.jwt = "";
+            next();
+        }
     }
 }
 exports.tempAuthenticatingToken = tempAuthenticatingToken;

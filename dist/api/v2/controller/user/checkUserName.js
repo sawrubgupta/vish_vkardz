@@ -36,31 +36,31 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.checkEmail = exports.validUserName = void 0;
-const db_1 = __importDefault(require("../../../../db"));
+const dbV2_1 = __importDefault(require("../../../../dbV2"));
 const utility = __importStar(require("../../helper/utility"));
 const apiResponse = __importStar(require("../../helper/apiResponse"));
+const responseMsg_1 = __importDefault(require("../../config/responseMsg"));
+const checkUserNameMsg = responseMsg_1.default.user.checkUserName;
 const validUserName = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const username = req.query.username;
         const englishCheck = utility.englishCheck(username);
-        if (englishCheck != "") {
+        if (englishCheck != "")
             return apiResponse.errorMessage(res, 400, englishCheck);
-        }
-        if (!username) {
-            return apiResponse.errorMessage(res, 400, "Enter Valid UserName.");
-        }
+        if (!username)
+            return apiResponse.errorMessage(res, 400, checkUserNameMsg.validUserName.invalidUsername);
         const checkUserNameQuery = `Select username from users where username = '${username}' limit 1`;
-        const [rows] = yield db_1.default.query(checkUserNameQuery);
+        const [rows] = yield dbV2_1.default.query(checkUserNameQuery);
         if (rows.length > 0) {
-            return apiResponse.errorMessage(res, 400, "Username is not available !");
+            return apiResponse.errorMessage(res, 400, checkUserNameMsg.validUserName.failedMsg);
         }
         else {
-            return apiResponse.successResponse(res, "Username is available!", null);
+            return apiResponse.successResponse(res, checkUserNameMsg.validUserName.successMsg, null);
         }
     }
     catch (error) {
         console.log(error);
-        return apiResponse.errorMessage(res, 400, "Something went wrong");
+        return apiResponse.somethingWentWrongMessage(res);
     }
 });
 exports.validUserName = validUserName;
@@ -70,23 +70,22 @@ const checkEmail = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     try {
         const email = req.query.email;
         let emailExist;
-        if (!email || email === null) {
-            return apiResponse.errorMessage(res, 400, "Enter Valid Email.");
-        }
+        if (!email || email === null)
+            return apiResponse.errorMessage(res, 400, checkUserNameMsg.checkEmail.invalidEmail);
         const checkEmailQuery = `Select email from users where email = '${email}' AND deleted_at IS NULL limit 1`;
-        const [rows] = yield db_1.default.query(checkEmailQuery);
+        const [rows] = yield dbV2_1.default.query(checkEmailQuery);
         if (rows.length > 0) {
             emailExist = 1;
-            return apiResponse.successResponse(res, "Email Id already exist!", emailExist);
+            return apiResponse.successResponse(res, checkUserNameMsg.checkEmail.successMsg, emailExist);
         }
         else {
             emailExist = 0;
-            return apiResponse.successResponse(res, "Email Id Not Registered!", emailExist);
+            return apiResponse.successResponse(res, checkUserNameMsg.checkEmail.emailNotExist, emailExist);
         }
     }
     catch (error) {
         console.log(error);
-        return apiResponse.errorMessage(res, 400, "Something went wrong");
+        return apiResponse.somethingWentWrongMessage(res);
     }
 });
 exports.checkEmail = checkEmail;

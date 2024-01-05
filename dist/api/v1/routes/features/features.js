@@ -38,6 +38,7 @@ const validation = __importStar(require("../../middleware/validation"));
 const featureRouter = (0, express_1.Router)();
 featureRouter.get("/getUserFeature", authorization_controller_1.tempAuthenticatingToken, featureController.getFeatureByUserId); //use in business type
 featureRouter.patch("/updateFeatures", authorization_controller_1.tempAuthenticatingToken, featureController.updateUserFeaturesStatus); //use in business type
+featureRouter.get("/features", authorization_controller_1.tempAuthenticatingToken, featureController.features); //use in business type
 featureRouter.put("/aboutUs", authorization_controller_1.tempAuthenticatingToken, validation.aboutUsValidation, aboutUsCotroller.addUpdateAboutUs); //use in business type
 featureRouter.get("/aboutUs", authorization_controller_1.tempAuthenticatingToken, aboutUsCotroller.getAboutUs); //use in business type
 featureRouter.delete("/deleteAboutUs", authorization_controller_1.tempAuthenticatingToken, aboutUsCotroller.deleteAboutUs); //use in business type
@@ -45,8 +46,8 @@ featureRouter.post("/addProducts", authorization_controller_1.tempAuthenticating
 featureRouter.get("/getProducts", authorization_controller_1.tempAuthenticatingToken, productController.getProducts); //use in business type
 featureRouter.patch("/updateProduct", authorization_controller_1.tempAuthenticatingToken, validation.userProductsValidation, productController.updateProduct); //use in business tpe
 featureRouter.delete("/deleteProduct", authorization_controller_1.tempAuthenticatingToken, productController.deleteProduct); //use in business type
-featureRouter.post("/addBusinessHour", authorization_controller_1.authenticatingToken, validation.businessHourValidation, businessHourController.addBusinessHour); //use in business type
-featureRouter.get("/businessHour", authorization_controller_1.authenticatingToken, businessHourController.businessHourList); //use in business type
+featureRouter.post("/addBusinessHour", authorization_controller_1.tempAuthenticatingToken, validation.businessHourValidation, businessHourController.addBusinessHour); //use in business type
+featureRouter.get("/businessHour", authorization_controller_1.tempAuthenticatingToken, businessHourController.businessHourList); //use in business type
 featureRouter.post("/portfolio", authorization_controller_1.tempAuthenticatingToken, gallaryController.gallary); //use in business type
 featureRouter.get("/getPortfolio", authorization_controller_1.tempAuthenticatingToken, gallaryController.getPortfolio); //use in business type
 featureRouter.delete("/deletePortfolio", authorization_controller_1.tempAuthenticatingToken, gallaryController.deleteImage); //use in business type

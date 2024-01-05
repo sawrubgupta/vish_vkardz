@@ -37,39 +37,50 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.forgotPassword = void 0;
 const apiResponse = __importStar(require("../../helper/apiResponse"));
-const db_1 = __importDefault(require("../../../../db"));
+const dbV2_1 = __importDefault(require("../../../../dbV2"));
 const utility = __importStar(require("../../helper/utility"));
 const md5_1 = __importDefault(require("md5"));
+const responseMsg_1 = __importDefault(require("../../config/responseMsg"));
+const fs_1 = __importDefault(require("fs"));
+const path_1 = __importDefault(require("path"));
+const handlebars_1 = __importDefault(require("handlebars"));
+const forgotPasswordMsg = responseMsg_1.default.user.forgotPassword;
 const forgotPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const email = req.body.email;
         const tempPass = utility.randomString(6);
         const hash = (0, md5_1.default)(tempPass);
         if (!email)
-            return apiResponse.errorMessage(res, 400, "Email required");
-        const emailCheckSql = `SELECT email, id FROM users where email = '${email}' limit 1`;
-        const [rows] = yield db_1.default.query(emailCheckSql);
+            return apiResponse.errorMessage(res, 400, forgotPasswordMsg.forgotPassword.invalidEmail);
+        const emailCheckSql = `SELECT username, email, id FROM users where email = '${email}' AND deleted_at IS NULL limit 1`;
+        const [rows] = yield dbV2_1.default.query(emailCheckSql);
         if (rows.length > 0) {
             const updatePassSql = `Update users Set password = ? where id = ?`;
             const VALUES = [hash, rows[0].id];
-            const [updatePassword] = yield db_1.default.query(updatePassSql, VALUES);
+            const [updatePassword] = yield dbV2_1.default.query(updatePassSql, VALUES);
             if (updatePassword.affectedRows > 0) {
-                const result = yield utility.sendMail(email, "Password Reset", "You have requested a new password here it is: " + tempPass);
+                const a = path_1.default.join('./views', 'forgotPassword.hbs');
+                console.log("a", a);
+                var source = fs_1.default.readFileSync(path_1.default.join('./views', 'forgotPassword.hbs'), 'utf8');
+                var template = handlebars_1.default.compile(source);
+                var htmlData = { name: rows[0].username, newPassword: tempPass };
+                var sendData = template(htmlData);
+                const result = yield utility.sendHtmlMail(email, "Password Reset Request", sendData);
                 if (result === false)
-                    return apiResponse.errorMessage(res, 400, "Failed to send mail");
-                return apiResponse.successResponse(res, "Check your mail inbox for new Password", null);
+                    return apiResponse.errorMessage(res, 400, "Failed to send mail, contact support");
+                return apiResponse.successResponse(res, forgotPasswordMsg.forgotPassword.successMsg, null);
             }
             else {
-                return apiResponse.errorMessage(res, 400, "Something Went Wrong, Please Try again later");
+                return apiResponse.errorMessage(res, 400, forgotPasswordMsg.forgotPassword.failedMsg);
             }
         }
         else {
-            return apiResponse.errorMessage(res, 400, "Email not registered with us ! ");
+            return apiResponse.errorMessage(res, 400, forgotPasswordMsg.forgotPassword.invalidEmail);
         }
     }
     catch (error) {
         console.log(error);
-        return apiResponse.errorMessage(res, 400, "Something went wrong");
+        return apiResponse.somethingWentWrongMessage(res);
     }
 });
 exports.forgotPassword = forgotPassword;

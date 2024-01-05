@@ -92,3 +92,27 @@ export const getPrimarySite =async (req:Request, res:Response) => {
 
 // ====================================================================================================
 // ====================================================================================================
+
+export const addPrimaryLink = async (req: Request, res: Response) => {
+    try {
+        const userId = res.locals.jwt.userId;
+        const { primaryProfileLink } = req.body
+
+        const primaryProfileQuery = `UPDATE users SET primary_profile_link = ? WHERE id = ?`;
+        const VALUES = [primaryProfileLink, userId];
+        const [rows]: any = await pool.query(primaryProfileQuery, VALUES);
+
+        if (rows.affectedRows > 0) {
+            return apiResponse.successResponse(res, "Primary Profile Added Successfully", null)
+        } else {
+            return apiResponse.errorMessage(res, 400, "Failed to Add Primary Profile, try again!");
+        }
+
+    } catch (error) {
+        console.log(error);
+        return apiResponse.errorMessage(res, 400, "Something Went Wrong");
+    }
+}
+
+// ====================================================================================================
+// ====================================================================================================

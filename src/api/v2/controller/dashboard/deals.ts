@@ -1,7 +1,10 @@
 import { Request, Response } from "express";
-import pool from '../../../../db';
+import pool from '../../../../dbV2';
 import * as apiResponse from '../../helper/apiResponse';
 import * as utility from "../../helper/utility";
+import resMsg from '../../config/responseMsg';
+
+const contactSyncResMsg = resMsg.dashboard.deals;
 
 export const dealOfTheDay =async (req:Request, res:Response) => {
     try {
@@ -10,14 +13,38 @@ export const dealOfTheDay =async (req:Request, res:Response) => {
 
 
         if (rows.length > 0) {
-            return apiResponse.successResponse(res, "Deals of the day list", rows);
+            let productIdsArr = [];
+            for (const ele of rows) {
+                let productId = ele.product_id;
+                productIdsArr.push(productId);                
+            }
+            
+            const productImageSql = `SELECT product_id, image FROM product_image WHERE product_id IN(${productIdsArr})`;
+            const [productImageRows]:any = await pool.query(productImageSql);
+
+            let rowIndex =-1
+            let imageDataIndex = -1;
+            for(const element of rows){
+                rowIndex++;
+                rows[rowIndex].productImg = []
+    
+                for(const imgEle of productImageRows){
+                    imageDataIndex++;
+                    if(element.product_id === imgEle.product_id){
+                        (rows[rowIndex].productImg).push(imgEle.image);
+                    }
+                }
+            }
+
+
+            return apiResponse.successResponse(res, contactSyncResMsg.dealOfTheDay.successMsg, rows);
         } else {
-            return apiResponse.successResponse(res, "No data found", null);
+            return apiResponse.successResponse(res, contactSyncResMsg.dealOfTheDay.noDataFoundMsg, null);
         }
 
     } catch (error) {
         console.log(error);
-        return apiResponse.errorMessage(res, 400, "Somethong went wrong")
+        return apiResponse.somethingWentWrongMessage(res);
     }
 }
 

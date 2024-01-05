@@ -1,5 +1,5 @@
 import {Request, Response, NextFunction} from "express";
-import pool from "../../../../db";
+import pool from "../../../../dbV2";
 import * as utility from "../../helper/utility";
 import * as apiResponse from '../../helper/apiResponse';
 

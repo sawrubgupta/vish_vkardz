@@ -1,27 +1,24 @@
 import { Request, Response } from "express";
-import pool from '../../../../db';
+import pool from '../../../../dbV2';
 import * as apiResponse from '../../helper/apiResponse';
 import * as utility from "../../helper/utility";
 import _ from 'lodash';
+import resMsg from '../../config/responseMsg';
+
+const contactSyncResMsg = resMsg.dashboard.contactSync;
 
 
 export const contactSync =async (req:Request, res:Response) => {
     try {
         let contacts:any = req.body.contacts;
-        if (contacts.length > 100) {
-            return apiResponse.errorMessage(res, 400, "Max Length is 100");
-        }
-        console.log("contacts", contacts);
-        
-        contacts = _.uniqBy(contacts, 'phone');
-        console.log("uniq cotacts", contacts);
-        
+        if (contacts.length > 100) return apiResponse.errorMessage(res, 400, contactSyncResMsg.contactSync.maxLengthMsg);
+                
+        contacts = _.uniqBy(contacts, 'phone');        
         let arr:any = [];
         for (const ele of contacts) {
             let phones = ele.phone;
             arr.push(phones);
         }
-        console.log(arr);
 
         const checkSql = `SELECT phone FROM sync_contacts WHERE phone IN(${arr})`;
         const [rows]:any = await pool.query(checkSql);
@@ -31,7 +28,6 @@ export const contactSync =async (req:Request, res:Response) => {
             const res = contacts.filter((x:any) => !rows.some((y:any) => y.phone === x.phone));
             // finalArr.push(res)
             finalArr = res;
-            console.log("res", res);
             
         } else {
             finalArr = contacts
@@ -84,19 +80,19 @@ export const contactSync =async (req:Request, res:Response) => {
                 result = insertQuery.substring(0,insertQuery.lastIndexOf(','));
             }
             const [data]:any = await pool.query(result)
-            console.log("finalArr",finalArr);
             
             if (data.affectedRows > 0) {
-                return apiResponse.successResponse(res, "Contact Insert Successfully", null);
+                return apiResponse.successResponse(res, contactSyncResMsg.contactSync.successMsg, null);
             } else {
-                return apiResponse.errorMessage(res, 400, "Failed!");
-            }    
-        } else {
-            return apiResponse.successResponse(res, "Record Already Exist!", null);
-        }
+                return apiResponse.errorMessage(res, 400, contactSyncResMsg.contactSync.failedMsg);
+            }  
+        }  
+        // } else {
+        //     return apiResponse.successResponse(res, "Record Already Exist!", null);
+        // }
     } catch (error) {
         console.log(error);
-        return apiResponse.errorMessage(res, 400, "Something Went Wrong");
+        return apiResponse.somethingWentWrongMessage(res);
     }
 }
 

@@ -35,7 +35,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.privateUserProfileValidation = exports.bookAppointmentValidation = exports.customUserInfoValidation = exports.deleteVideosValidation = exports.videosValidation = exports.validatePinValidation = exports.captureLeadtValidation = exports.exchangeContactValidation = exports.enquiryValidation = exports.contactUsValidation = exports.updatePackageValidation = exports.primaryProfileValidation = exports.productRatingValidation = exports.businessHourValidation = exports.setProfilePinValidation = exports.purchaseValidation = exports.userProductsValidation = exports.aboutUsValidation = exports.redeemCouponCodeValidation = exports.updateDdeliveryAddressValidation = exports.deliveryAddressValidation = exports.customizeCardValidation = exports.cartValidation = exports.addVcfValidation = exports.switchAccountValidation = exports.editSocialLinksValidation = exports.updateVcardinfoValidation = exports.updateProfileValidation = exports.settingValidation = exports.changePasswordValidation = exports.socialLoginValidation = exports.loginValidation = exports.socialRegistrationValidation = exports.registrationValidation = void 0;
+exports.socialStatusValidation = exports.deleteSocialLinkValidation = exports.addUpdateSocialLinksValidation = exports.addSocialLinksValidation = exports.removeCardValidation = exports.updateTimingValidation = exports.addTimingValidation = exports.addUpdateUserProfileValidation = exports.updateUserProfileValidation = exports.addProfileValidation = exports.updatePackageValidation = exports.activateCardValidation = exports.vcardLayoutValidation = exports.updateFeaturesValidation = exports.manageAppointmentValidation = exports.privateUserProfileValidation = exports.bookAppointmentValidation = exports.customUserInfoValidation = exports.deleteVideosValidation = exports.videosValidation = exports.validatePinValidation = exports.captureLeadtValidation = exports.exchangeContactValidation = exports.enquiryValidation = exports.contactUsValidation = exports.oldUpdatePackageValidation = exports.addPrimaryLinkValidation = exports.primaryProfileValidation = exports.productRatingValidation = exports.businessHourValidation = exports.setProfilePinValidation = exports.purchaseValidation = exports.userProductsValidation = exports.aboutUsValidation = exports.redeemCouponCodeValidation = exports.updateDdeliveryAddressValidation = exports.deliveryAddressValidation = exports.customizeCardValidation = exports.cartValidation = exports.addVcfValidation = exports.switchAccountValidation = exports.editSocialLinksValidation = exports.updateVcardinfoValidation = exports.updateProfileValidation = exports.settingValidation = exports.changePasswordValidation = exports.socialLoginValidation = exports.loginValidation = exports.socialRegistrationValidation = exports.registrationValidation = void 0;
 const apiResponse = __importStar(require("../helper/apiResponse"));
 const joi_1 = __importDefault(require("joi"));
 function validationCheck(value) {
@@ -73,17 +73,18 @@ exports.registrationValidation = registrationValidation;
 // ====================================================================================================
 const socialRegistrationValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const schema = joi_1.default.object({
-        name: joi_1.default.string().trim().min(3).max(70).trim().required(),
+        name: joi_1.default.string().trim().allow(null, ""),
         type: joi_1.default.string().trim().required(),
         socialId: joi_1.default.string().trim().allow(null).allow(''),
         email: joi_1.default.string().email().max(80).required(),
         password: joi_1.default.string().min(3).max(30).required().allow(null).allow(''),
-        username: joi_1.default.string().trim().min(2).max(50).required(),
+        username: joi_1.default.string().allow(null, ""),
         country: joi_1.default.number().integer().required(),
-        phone: joi_1.default.string().trim().min(8).max(20).trim().required(),
+        phone: joi_1.default.string().allow(null, ""),
         countryName: joi_1.default.string().trim().allow(''),
-        dial_code: joi_1.default.string().required(),
-        fcmToken: joi_1.default.string().trim().required(),
+        dial_code: joi_1.default.string().allow(null, ""),
+        refer_code: joi_1.default.string().allow('').allow(null),
+        fcmToken: joi_1.default.string().allow('').allow(null),
         deviceId: joi_1.default.allow('').allow(null),
         deviceType: joi_1.default.string().allow('').allow(null),
     });
@@ -117,7 +118,7 @@ const socialLoginValidation = (req, res, next) => __awaiter(void 0, void 0, void
     const schema = joi_1.default.object({
         password: joi_1.default.string().min(3).max(30).allow('').allow(null),
         email: joi_1.default.string().required().allow('').allow(null),
-        fcmToken: joi_1.default.string().trim().required(),
+        fcmToken: joi_1.default.string().allow('').allow(null),
         type: joi_1.default.string().trim().required(),
         socialId: joi_1.default.string().trim().allow(null).allow(''),
     });
@@ -148,8 +149,8 @@ exports.changePasswordValidation = changePasswordValidation;
 // ====================================================================================================
 const settingValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const schema = joi_1.default.object({
-        pushNotificationEnable: joi_1.default.boolean(),
-        emailNotificationEnable: joi_1.default.boolean(),
+        pushNotificationEnable: joi_1.default.boolean().allow(0, 1),
+        emailNotificationEnable: joi_1.default.boolean().allow(0, 1),
         currencyCode: joi_1.default.string().min(1).max(4).allow(''),
         languageSelection: joi_1.default.string().min(1).max(50).allow('')
     });
@@ -193,6 +194,7 @@ const updateVcardinfoValidation = (req, res, next) => __awaiter(void 0, void 0, 
         country: joi_1.default.number().allow(''),
         countryName: joi_1.default.string().allow('').allow(null),
         gender: joi_1.default.string().max(200).allow(''),
+        image: joi_1.default.string().allow("", null)
     });
     const value = schema.validate(req.body);
     if (value.error) {
@@ -206,6 +208,10 @@ exports.updateVcardinfoValidation = updateVcardinfoValidation;
 // ====================================================================================================
 const editSocialLinksValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const schema = joi_1.default.object({
+        type: joi_1.default.string().allow("").allow(null),
+        userId: joi_1.default.allow("").allow(null),
+        userSocialId: joi_1.default.number().required(),
+        profileId: joi_1.default.number().required(),
         siteId: joi_1.default.number().integer().required(),
         siteValue: joi_1.default.string().max(100).allow(''),
         orders: joi_1.default.number().integer(),
@@ -239,8 +245,11 @@ const addVcfValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, f
     const schema = joi_1.default.object({
         type: joi_1.default.string().allow('').allow(null),
         userId: joi_1.default.number().allow('').allow(null),
+        profileId: joi_1.default.number().required(),
         vcfData: joi_1.default.array().items(joi_1.default.object({
             vcfId: joi_1.default.number().allow('').allow(null),
+            icon: joi_1.default.string().allow('', null),
+            name: joi_1.default.string().allow('', null),
             vcfType: joi_1.default.string().required(),
             vcfValue: joi_1.default.string().required(),
             status: joi_1.default.boolean().allow(0, 1),
@@ -508,8 +517,9 @@ const deliveryAddressValidation = (req, res, next) => __awaiter(void 0, void 0, 
         locality: joi_1.default.string().normalize().max(100).required(),
         city: joi_1.default.string().required(),
         state: joi_1.default.string().required(),
-        pincode: joi_1.default.required(),
+        pincode: joi_1.default.string().min(3).max(8).required(),
         country: joi_1.default.allow('').allow(null),
+        isDefault: joi_1.default.number().allow("", null),
         country_name: joi_1.default.string().allow('').allow(null),
     });
     const value = schema.validate(req.body);
@@ -534,7 +544,7 @@ const updateDdeliveryAddressValidation = (req, res, next) => __awaiter(void 0, v
         locality: joi_1.default.string().normalize().max(100).required(),
         city: joi_1.default.string().required(),
         state: joi_1.default.string().required(),
-        pincode: joi_1.default.required(),
+        pincode: joi_1.default.string().min(3).max(8).required(),
         country: joi_1.default.allow('').allow(null),
         country_name: joi_1.default.string().allow('').allow(null),
     });
@@ -565,11 +575,15 @@ exports.redeemCouponCodeValidation = redeemCouponCodeValidation;
 // ====================================================================================================
 const aboutUsValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const schema = joi_1.default.object({
+        type: joi_1.default.string().allow("").allow(null),
+        userId: joi_1.default.allow("").allow(null),
+        profileId: joi_1.default.number().required(),
         companyName: joi_1.default.string().trim().required(),
         year: joi_1.default.string().required(),
         business: joi_1.default.string().allow("").allow(null),
         aboutUsDetail: joi_1.default.string().allow("").allow(null),
         image: joi_1.default.string().trim().allow(''),
+        coverImage: joi_1.default.string().trim().allow(''),
         document: joi_1.default.string().allow('').allow(null),
     });
     const value = schema.validate(req.body);
@@ -584,8 +598,12 @@ exports.aboutUsValidation = aboutUsValidation;
 // ====================================================================================================
 const userProductsValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const schema = joi_1.default.object({
+        type: joi_1.default.string().allow("").allow(null),
+        userId: joi_1.default.allow("").allow(null),
+        profileId: joi_1.default.number().required(),
+        productId: joi_1.default.number().allow("").allow(null),
         title: joi_1.default.string().max(50).required(),
-        description: joi_1.default.string().min(1).max(80).trim().required(),
+        description: joi_1.default.string().min(1).max(3000).trim().required(),
         price: joi_1.default.string().required(),
         image: joi_1.default.string().required(),
         currencyCode: joi_1.default.string().allow('').allow(null),
@@ -678,6 +696,8 @@ exports.purchaseValidation = purchaseValidation;
 // ====================================================================================================
 const setProfilePinValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const schema = joi_1.default.object({
+        type: joi_1.default.string().allow("", null),
+        userId: joi_1.default.allow(null, ''),
         profileId: joi_1.default.number().required(),
         securityPin: joi_1.default.number().integer().min(1).required(),
     });
@@ -693,6 +713,9 @@ exports.setProfilePinValidation = setProfilePinValidation;
 // ====================================================================================================
 const businessHourValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const schema = joi_1.default.object({
+        type: joi_1.default.string().allow("", null),
+        userId: joi_1.default.allow(null, ''),
+        profileId: joi_1.default.number().required(),
         businessHours: joi_1.default.array().max(7).items(joi_1.default.object({
             days: joi_1.default.number().required(),
             startTime: joi_1.default.string().required(),
@@ -740,7 +763,24 @@ const primaryProfileValidation = (req, res, next) => __awaiter(void 0, void 0, v
 exports.primaryProfileValidation = primaryProfileValidation;
 // ====================================================================================================
 // ====================================================================================================
-const updatePackageValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+const addPrimaryLinkValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const schema = joi_1.default.object({
+        type: joi_1.default.string().allow("", null),
+        userId: joi_1.default.allow(null, ''),
+        profileId: joi_1.default.number().required(),
+        primaryProfileLink: joi_1.default.string().allow("", null)
+    });
+    const value = schema.validate(req.body);
+    if (value.error) {
+        const errMsg = yield validationCheck(value);
+        return yield apiResponse.errorMessage(res, 400, errMsg);
+    }
+    next();
+});
+exports.addPrimaryLinkValidation = addPrimaryLinkValidation;
+// ====================================================================================================
+// ====================================================================================================
+const oldUpdatePackageValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const schema = joi_1.default.object({
         txnId: joi_1.default.string().required(),
         priceCurrencyCode: joi_1.default.string().required(),
@@ -755,7 +795,7 @@ const updatePackageValidation = (req, res, next) => __awaiter(void 0, void 0, vo
     }
     next();
 });
-exports.updatePackageValidation = updatePackageValidation;
+exports.oldUpdatePackageValidation = oldUpdatePackageValidation;
 // ====================================================================================================
 // ====================================================================================================
 const contactUsValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
@@ -778,6 +818,7 @@ exports.contactUsValidation = contactUsValidation;
 const enquiryValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const schema = joi_1.default.object({
         username: joi_1.default.string().required(),
+        profileId: joi_1.default.number().required(),
         name: joi_1.default.string().required(),
         email: joi_1.default.string().email().required(),
         phone: joi_1.default.required(),
@@ -898,6 +939,7 @@ const bookAppointmentValidation = (req, res, next) => __awaiter(void 0, void 0, 
     const schema = joi_1.default.object({
         type: joi_1.default.string().allow("", null),
         userId: joi_1.default.number().allow("", null),
+        profileId: joi_1.default.number().required(),
         name: joi_1.default.string().required(),
         email: joi_1.default.string().email().required(),
         date: joi_1.default.string().required(),
@@ -926,5 +968,302 @@ const privateUserProfileValidation = (req, res, next) => __awaiter(void 0, void 
     next();
 });
 exports.privateUserProfileValidation = privateUserProfileValidation;
+// ====================================================================================================
+// ====================================================================================================
+const manageAppointmentValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const schema = joi_1.default.object({
+        type: joi_1.default.string().allow("").allow(null),
+        userId: joi_1.default.allow("").allow(null),
+        profileId: joi_1.default.number().allow("").allow(null),
+        appointmentId: joi_1.default.number().required(),
+        status: joi_1.default.string().required()
+    });
+    const value = schema.validate(req.body);
+    if (value.error) {
+        const errMsg = yield validationCheck(value);
+        return yield apiResponse.errorMessage(res, 400, errMsg);
+    }
+    next();
+});
+exports.manageAppointmentValidation = manageAppointmentValidation;
+// ====================================================================================================
+// ====================================================================================================
+const updateFeaturesValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const schema = joi_1.default.object({
+        type: joi_1.default.string().allow('').allow(null),
+        userId: joi_1.default.number().allow('').allow(null),
+        profileId: joi_1.default.number().required(),
+        features: joi_1.default.array().items(joi_1.default.object({
+            featureId: joi_1.default.number().required(),
+            status: joi_1.default.boolean().allow(0, 1),
+        }))
+    });
+    const value = schema.validate(req.body);
+    if (value.error) {
+        const errMsg = yield validationCheck(value);
+        return yield apiResponse.errorMessage(res, 400, errMsg);
+    }
+    next();
+});
+exports.updateFeaturesValidation = updateFeaturesValidation;
+// ====================================================================================================
+// ====================================================================================================
+const vcardLayoutValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const schema = joi_1.default.object({
+        type: joi_1.default.string().allow("").allow(null),
+        userId: joi_1.default.allow("").allow(null),
+        profileId: joi_1.default.number().required(),
+        profileColor: joi_1.default.string().required(),
+        styleId: joi_1.default.required()
+    });
+    const value = schema.validate(req.body);
+    if (value.error) {
+        const errMsg = yield validationCheck(value);
+        return yield apiResponse.errorMessage(res, 400, errMsg);
+    }
+    next();
+});
+exports.vcardLayoutValidation = vcardLayoutValidation;
+// ====================================================================================================
+// ====================================================================================================
+const activateCardValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const schema = joi_1.default.object({
+        type: joi_1.default.string().allow("").allow(null),
+        userId: joi_1.default.allow("").allow(null),
+        profileId: joi_1.default.number().required(),
+        productType: joi_1.default.string().allow(null, ""),
+        code: joi_1.default.required()
+    });
+    const value = schema.validate(req.body);
+    if (value.error) {
+        const errMsg = yield validationCheck(value);
+        return yield apiResponse.errorMessage(res, 400, errMsg);
+    }
+    next();
+});
+exports.activateCardValidation = activateCardValidation;
+// ====================================================================================================
+// ====================================================================================================
+const updatePackageValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const schema = joi_1.default.object({
+        txnId: joi_1.default.string().required(),
+        priceCurrencyCode: joi_1.default.string().required(),
+        paymentType: joi_1.default.string().required(),
+        // packageId: Joi.number().required(),
+        packageSlug: joi_1.default.string().allow('', null),
+        price: joi_1.default.number().required(),
+        status: joi_1.default.required(),
+        packageType: joi_1.default.string().required(),
+        couponDiscount: joi_1.default.required(),
+        gstAmount: joi_1.default.number().required(),
+    });
+    const value = schema.validate(req.body);
+    if (value.error) {
+        const errMsg = yield validationCheck(value);
+        return yield apiResponse.errorMessage(res, 400, errMsg);
+    }
+    next();
+});
+exports.updatePackageValidation = updatePackageValidation;
+// ====================================================================================================
+// ====================================================================================================
+const addProfileValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const schema = joi_1.default.object({
+        themeName: joi_1.default.string().allow(null, ""),
+        type: joi_1.default.string().allow(null, ''),
+        userId: joi_1.default.number().allow(null, ''),
+        latitude: joi_1.default.string().allow('', null),
+        longitude: joi_1.default.string().allow('', null),
+        details: joi_1.default.array().items(joi_1.default.object({
+            // type: Joi.string().allow(`${config.vcfName}`).required(),
+            type: joi_1.default.string().required(),
+            value: joi_1.default.string().allow("").allow(null),
+        }))
+    });
+    const value = schema.validate(req.body);
+    if (value.error) {
+        const errMsg = yield validationCheck(value);
+        return yield apiResponse.errorMessage(res, 400, errMsg);
+    }
+    next();
+});
+exports.addProfileValidation = addProfileValidation;
+// ====================================================================================================
+// ====================================================================================================
+const updateUserProfileValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const schema = joi_1.default.object({
+        profileId: joi_1.default.number().required(),
+        themeName: joi_1.default.string().allow(null, ""),
+        type: joi_1.default.string().allow(null, ''),
+        userId: joi_1.default.number().allow(null, ''),
+        latitude: joi_1.default.string().allow('', null),
+        longitude: joi_1.default.string().allow('', null),
+        vcfInfo: joi_1.default.array().items(joi_1.default.object({
+            vcfId: joi_1.default.number().allow("", null),
+            type: joi_1.default.string().required(),
+            value: joi_1.default.string().allow("").allow(null),
+        }))
+    });
+    const value = schema.validate(req.body);
+    if (value.error) {
+        const errMsg = yield validationCheck(value);
+        return yield apiResponse.errorMessage(res, 400, errMsg);
+    }
+    next();
+});
+exports.updateUserProfileValidation = updateUserProfileValidation;
+// ====================================================================================================
+// ====================================================================================================
+const addUpdateUserProfileValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const schema = joi_1.default.object({
+        profileId: joi_1.default.number().allow(null),
+        themeName: joi_1.default.string().allow(null, ""),
+        type: joi_1.default.string().allow(null, ''),
+        userId: joi_1.default.number().allow(null, ''),
+        latitude: joi_1.default.string().allow('', null),
+        longitude: joi_1.default.string().allow('', null),
+        vcfInfo: joi_1.default.array().items(joi_1.default.object({
+            vcfId: joi_1.default.number().allow("", null),
+            type: joi_1.default.string().required(),
+            value: joi_1.default.string().allow("").allow(null),
+        }))
+    });
+    const value = schema.validate(req.body);
+    if (value.error) {
+        const errMsg = yield validationCheck(value);
+        return yield apiResponse.errorMessage(res, 400, errMsg);
+    }
+    next();
+});
+exports.addUpdateUserProfileValidation = addUpdateUserProfileValidation;
+// ====================================================================================================
+// ====================================================================================================
+const addTimingValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const schema = joi_1.default.object({
+        type: joi_1.default.string().allow(null, ''),
+        userId: joi_1.default.number().allow(null, ''),
+        profileId: joi_1.default.number().required(),
+        startTime: joi_1.default.string().required(),
+        endTime: joi_1.default.string().required()
+    });
+    const value = schema.validate(req.body);
+    if (value.error) {
+        const errMsg = yield validationCheck(value);
+        return yield apiResponse.errorMessage(res, 400, errMsg);
+    }
+    next();
+});
+exports.addTimingValidation = addTimingValidation;
+// ====================================================================================================
+// ====================================================================================================
+const updateTimingValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const schema = joi_1.default.object({
+        type: joi_1.default.string().allow(null, ''),
+        userId: joi_1.default.number().allow(null, ''),
+        timingId: joi_1.default.number().required(),
+        profileId: joi_1.default.number().required(),
+        startTime: joi_1.default.string().required(),
+        endTime: joi_1.default.string().required()
+    });
+    const value = schema.validate(req.body);
+    if (value.error) {
+        const errMsg = yield validationCheck(value);
+        return yield apiResponse.errorMessage(res, 400, errMsg);
+    }
+    next();
+});
+exports.updateTimingValidation = updateTimingValidation;
+// ====================================================================================================
+// ====================================================================================================
+const removeCardValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const schema = joi_1.default.object({
+        type: joi_1.default.string().allow(null, ''),
+        userId: joi_1.default.number().allow(null, ''),
+        profileId: joi_1.default.number().required(),
+        cardId: joi_1.default.number().required(),
+    });
+    const value = schema.validate(req.body);
+    if (value.error) {
+        const errMsg = yield validationCheck(value);
+        return yield apiResponse.errorMessage(res, 400, errMsg);
+    }
+    next();
+});
+exports.removeCardValidation = removeCardValidation;
+// ====================================================================================================
+// ====================================================================================================
+const addSocialLinksValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const schema = joi_1.default.object({
+        type: joi_1.default.string().allow("").allow(null),
+        userId: joi_1.default.allow("").allow(null),
+        profileId: joi_1.default.number().required(),
+        siteId: joi_1.default.number().integer().required(),
+        siteValue: joi_1.default.string().max(100).allow(''),
+        orders: joi_1.default.number().integer(),
+        siteLabel: joi_1.default.string().max(20).allow('')
+    });
+    const value = schema.validate(req.body);
+    if (value.error) {
+        const errMsg = yield validationCheck(value);
+        return yield apiResponse.errorMessage(res, 400, errMsg);
+    }
+    next();
+});
+exports.addSocialLinksValidation = addSocialLinksValidation;
+// ====================================================================================================
+// ====================================================================================================
+const addUpdateSocialLinksValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const schema = joi_1.default.object({
+        type: joi_1.default.string().allow("").allow(null),
+        userId: joi_1.default.allow("").allow(null),
+        profileId: joi_1.default.number().required(),
+        siteId: joi_1.default.number().integer().required(),
+        siteValue: joi_1.default.string().max(100).allow(''),
+        orders: joi_1.default.number().integer(),
+        siteLabel: joi_1.default.string().max(20).allow('')
+    });
+    const value = schema.validate(req.body);
+    if (value.error) {
+        const errMsg = yield validationCheck(value);
+        return yield apiResponse.errorMessage(res, 400, errMsg);
+    }
+    next();
+});
+exports.addUpdateSocialLinksValidation = addUpdateSocialLinksValidation;
+// ====================================================================================================
+// ====================================================================================================
+const deleteSocialLinkValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const schema = joi_1.default.object({
+        type: joi_1.default.string().allow("").allow(null),
+        userId: joi_1.default.allow("").allow(null),
+        profileId: joi_1.default.number().required(),
+        siteId: joi_1.default.number().required(),
+        userSocialId: joi_1.default.number().required(),
+    });
+    const value = schema.validate(req.body);
+    if (value.error) {
+        const errMsg = yield validationCheck(value);
+        return yield apiResponse.errorMessage(res, 400, errMsg);
+    }
+    next();
+});
+exports.deleteSocialLinkValidation = deleteSocialLinkValidation;
+// ====================================================================================================
+// ====================================================================================================
+const socialStatusValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const schema = joi_1.default.object({
+        type: joi_1.default.string().allow("").allow(null),
+        userId: joi_1.default.allow("").allow(null),
+        userSocialId: joi_1.default.number().required(),
+        status: joi_1.default.boolean().allow(0, 1).required(),
+    });
+    const value = schema.validate(req.body);
+    if (value.error) {
+        const errMsg = yield validationCheck(value);
+        return yield apiResponse.errorMessage(res, 400, errMsg);
+    }
+    next();
+});
+exports.socialStatusValidation = socialStatusValidation;
 // ====================================================================================================
 // ====================================================================================================

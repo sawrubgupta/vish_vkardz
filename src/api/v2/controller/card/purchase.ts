@@ -1,16 +1,20 @@
 import { Request, Response } from "express";
-import pool from '../../../../db';
+import pool from '../../../../dbV2';
 import * as apiResponse from '../../helper/apiResponse';
 import * as utility from "../../helper/utility";
 import * as notify from "../../helper/notification"
-import config  from '../../config/development';
+import config from '../../config/development';
+import responseMsg from '../../config/responseMsg';
+import fs from 'fs';
+import path from 'path';
+import Handlebars from "handlebars";
 
-export const cardPurchase =async (req:Request, res:Response) => {
+const purchaseResponseMsg = responseMsg.card.purchase;
+
+export const cardPurchase = async (req: Request, res: Response) => {
     try {
-        const userId:string = res.locals.jwt.userId;
-        if (!userId || userId === "" || userId === undefined) {
-            return apiResponse.errorMessage(res, 401, "Please login !");
-        }
+        const userId: string = res.locals.jwt.userId;
+        if (!userId || userId === "" || userId === undefined) return apiResponse.errorMessage(res, 401, purchaseResponseMsg.cardPurchase.invalidUserIdMsg);
         // const isReturnPolicyAccepted = req.body.isReturnPolicyAccepted;
         // if (isReturnPolicyAccepted === 0) {
         //     return apiResponse.errorMessage(res, 400, "Please Accept return policy");
@@ -20,20 +24,19 @@ export const cardPurchase =async (req:Request, res:Response) => {
 
         var paymentType = '';
         const { orderType, isGiftEnable, giftMessage } = req.body;
-        if (orderType !== "online" && orderType !== "offline") {
-            return apiResponse.errorMessage(res, 400, "Order type not define");
-        }
+        if (orderType !== "online" && orderType !== "offline") return apiResponse.errorMessage(res, 400, purchaseResponseMsg.cardPurchase.invalidOrderType);
+
         // let reedemCoinStatus = req.body.coinReedem;
         // let coins = req.body.reedemCoins.coins;
         const deliveryDetails = req.body.deliveryDetails;
         const paymentInfo = req.body.paymentInfo;
         const orderlist = req.body.orderlist;
-        let rows:any;
+        let rows: any;
 
         // if (reedemCoinStatus === true) {
-            // const checkUserSql = `SELECT id, offer_coin FROM users WHERE id = ${userId} LIMIT 1`;
-            // const [userRows]:any = await pool.query(checkUserSql);
-            // if (userRows[0].offer_coin < coins) return apiResponse.errorMessage(res, 400, "Insufficient coins");
+        // const checkUserSql = `SELECT id, offer_coin FROM users WHERE id = ${userId} LIMIT 1`;
+        // const [userRows]:any = await pool.query(checkUserSql);
+        // if (userRows[0].offer_coin < coins) return apiResponse.errorMessage(res, 400, "Insufficient coins");
         //     if (coins > 400) {
         //         coins = 400;
         //     }
@@ -64,7 +67,7 @@ export const cardPurchase =async (req:Request, res:Response) => {
             [rows] = await pool.query(sql, VALUES);
 
         } else {
-            const randomAlhpa= utility.randomString(4);
+            const randomAlhpa = utility.randomString(4);
             const randomNum = Math.floor(Math.random() * (9999 - 1000));
             const offlineTrx = 'op-' + randomAlhpa + '-' + randomNum;
             const paymentType = 1;
@@ -72,12 +75,12 @@ export const cardPurchase =async (req:Request, res:Response) => {
             const offlineSql = `INSERT INTO all_payment_info(user_id, txn_id, username, email, currency_code, price, name, phone_number, locality, country, city, address, pincode, contact_info, delivery_charges, payment_type, vat_num, note, is_gift_enable, gift_message, status, order_status, created_at, approve_time) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
             const offlineVALUES = [userId, offlineTrx, paymentInfo.username, paymentInfo.email, paymentInfo.price_currency_code, paymentInfo.price, deliveryDetails.name, deliveryDetails.phoneNumber, deliveryDetails.locality, deliveryDetails.country, deliveryDetails.city, deliveryDetails.address, deliveryDetails.pincode, deliveryDetails.email, paymentInfo.deliveryCharge, paymentType, deliveryDetails.vat_number, paymentInfo.note, isGiftEnable, giftMessage, paymentInfo.status, 'placed', createdAt, '0000-00-00 00:00:00'];
             [rows] = await pool.query(offlineSql, offlineVALUES);
-        } 
-        
+        }
+
         const paymentId = rows.insertId;
-        let orderListSql:any = `INSERT INTO orderlist(user_id, order_id, product_id, qty, sub_total, created_at) VALUES `;
-        let result:any = "";
-        
+        let orderListSql: any = `INSERT INTO orderlist(user_id, order_id, product_id, qty, sub_total, created_at) VALUES `;
+        let result: any = "";
+
         // let customizeSql = `INSERT INTO customize_card(user_id, product_id, name, designation, qty, created_at) VALUES`;
         // const VALUES = [userId, productId, name, designation, qty, createdAt];
         // const customize_id = rows.insertId;
@@ -85,12 +88,12 @@ export const cardPurchase =async (req:Request, res:Response) => {
         // const addLogoQuery = `INSERT INTO customize_card_files(customize_id, type, file_name) VALUES (?, ?, ?)`;
         // const fileVALUES = [customize_id, "cusfile", logo];
         // const [data]:any = await pool.query(addLogoQuery, fileVALUES);
-        const orderId  = rows.insertId;
+        const orderId = rows.insertId;
         if (rows.affectedRows > 0) {
             for await (const element of orderlist) {
-                const productId =  element.product_id;
-                const qty =  element.qty;
-                const subTotal =  element.sub_total;
+                const productId = element.product_id;
+                const qty = element.qty;
+                const subTotal = element.sub_total;
                 // const orderId  = rows.insertId;
 
                 const isCustomizable = element.isCustomizable;
@@ -99,64 +102,72 @@ export const cardPurchase =async (req:Request, res:Response) => {
                 const logo = element.customzeLogo;
                 const customizeQty = element.customizeQty;
                 const otherInfo = element.otherInfo;
-                
+
                 orderListSql = orderListSql + `(${userId}, ${orderId}, ${productId}, ${qty}, '${subTotal}', '${createdAt}'),`;
-                result = orderListSql.substring(0,orderListSql.lastIndexOf(','));
+                result = orderListSql.substring(0, orderListSql.lastIndexOf(','));
 
                 if (isCustomizable === 1) {
-                    let customizeSql = `INSERT INTO customize_card(user_id, product_id, name, designation, qty, other_info, created_at) VALUES(?, ?, ?, ?, ?, ?, ?)`;
-                    const VALUES = [userId, productId, name, designation, customizeQty, otherInfo, createdAt];
-                    const [customizeRows]:any = await pool.query(customizeSql, VALUES)
+                    let customizeSql = `INSERT INTO user_customize_card(user_id, product_id, order_id, name, designation, qty, other_info, image, created_at) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+                    const VALUES = [userId, productId, orderId, name, designation, customizeQty, otherInfo, logo, createdAt];
+                    const [customizeRows]: any = await pool.query(customizeSql, VALUES)
                     const customize_id = customizeRows.insertId;
-            
-                    const addLogoQuery = `INSERT INTO customize_card_files(customize_id, type, file_name) VALUES (?, ?, ?)`;
-                    const fileVALUES = [customize_id, "cusfile", logo];
-                    const [data]:any = await pool.query(addLogoQuery, fileVALUES);
-                }       
+                }
             }
-            const [data]:any = await pool.query(result);
+            const [data]: any = await pool.query(result);
 
             const orderStatusQuery = `INSERT INTO order_tracking(user_id, order_id, status, expected_date, delivey_date) VALUES(?, ?, ?, ?, ?)`;
             const orderStatusValues = [userId, orderId, 'placed', createdAt, createdAt];
-            const [orderStatusRows]:any = await pool.query(orderStatusQuery, orderStatusValues);
+            const [orderStatusRows]: any = await pool.query(orderStatusQuery, orderStatusValues);
 
-            
+
             if (data.affectedRows > 0) {
                 const deleteCartQuery = `DELETE FROM cart_details WHERE user_id = ${userId}`;
-                const [deleteCartRows]:any = await pool.query(deleteCartQuery);
-                
+                const [deleteCartRows]: any = await pool.query(deleteCartQuery);
+
                 const getFcm = `SELECT fcm_token FROM users WHERE id = ${userId}`;
-                const [rows]:any = await pool.query(getFcm);
-             
-                let fcm:any;
+                const [rows]: any = await pool.query(getFcm);
+
+                let fcm: any;
                 for (const ele of rows) {
                     fcm = [ele.fcm_token];
                 }
                 var notificationData = {
-                    title:"Order Completion",
-                    body:`Your order received successfully`
+                    title: "Order Completion",
+                    body: `Your order received successfully`
                 }
                 const result = await notify.fcmSend(notificationData, fcm, null)
                 const notificationQuery = `INSERT INTO notifications(user_id, identity, type, title, body, created_at) VALUES(?, ?, ?, ?, ?, ?)`;
-                const VALUES = [userId, paymentId, 'purchase_card', notificationData.title, notificationData.body, createdAt];
-                const [notificationRows]:any = await pool.query(notificationQuery, VALUES);
+                const VALUES = [userId, paymentId, config.cardPurchase, notificationData.title, notificationData.body, createdAt];
+                const [notificationRows]: any = await pool.query(notificationQuery, VALUES);
                 // return apiResponse.successResponse(res, "Purchase Successfully!", null);
+
+                var source: string = fs.readFileSync(path.join('./views', 'orderConfirmation.hbs'), 'utf8');
+                var template = Handlebars.compile(source);
+                // ₹ $
+
+                var htmlData = { name: paymentInfo.username, orderDate: createdAt, totalAmount: paymentInfo.price, address: `${deliveryDetails.address} ${deliveryDetails.city} -${deliveryDetails.pincode}`,  };
+                var sendData = template(htmlData);
+    
+                const emailResult:any = await utility.sendHtmlMail(deliveryDetails.email, "Order Confirmation", sendData);
+                if (emailResult == false) console.log("Failed to send email", result);
+                console.log("email result", result);
+    
                 return res.status(200).json({
                     status: true,
                     data: null,
                     paymentId: paymentId,
-                    message: "Purchase Successfully!"
+                    message: purchaseResponseMsg.cardPurchase.successMsg
                 })
-                } else {
-                return apiResponse.errorMessage(res, 400, "Something went wrong, please try again later or contact our support team");
+            } else {
+                return apiResponse.errorMessage(res, 400, purchaseResponseMsg.cardPurchase.failedMsg);
             }
         } else {
-            return apiResponse.errorMessage(res, 400, "Purchase Failed, Please try again");
+            return apiResponse.errorMessage(res, 400, purchaseResponseMsg.cardPurchase.failedMsg);
         }
-          
+
     } catch (error) {
         console.log(error);
-        return apiResponse.errorMessage(res, 400, "Something went wrong");
+        return apiResponse.somethingWentWrongMessage(res);
     }
 }
 

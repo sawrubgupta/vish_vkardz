@@ -28,16 +28,21 @@ const homeController = __importStar(require("../../controller/dashboard/home"));
 const mixingDataController = __importStar(require("../../controller/dashboard/mixingData"));
 const dealsController = __importStar(require("../../controller/dashboard/deals"));
 const contactsController = __importStar(require("../../controller/dashboard/contactSync"));
+const tutorialsController = __importStar(require("../../controller/dashboard/tutorials"));
 const authorization_controller_1 = require("../../middleware/authorization.controller");
 const dashboardRouter = (0, express_1.Router)();
 dashboardRouter.get("/home", authorization_controller_1.tempAuthenticatingToken, homeController.home);
 dashboardRouter.get("/bestSellerProducts", authorization_controller_1.tempAuthenticatingToken, homeController.bestSellerProducts);
 dashboardRouter.get("/mixingData", mixingDataController.mixingData);
 dashboardRouter.get("/DealsOfTheDay", dealsController.dealOfTheDay);
-dashboardRouter.get("/recommendedProducts", authorization_controller_1.tempAuthenticatingToken, homeController.recommendedProducts);
+dashboardRouter.get("/recommendedProducts", authorization_controller_1.tempAuthenticatingToken, homeController.recommendedProducts); //not used
+dashboardRouter.get("/videoTutorials", tutorialsController.tutorials); //not used
 dashboardRouter.post("/contactSync", contactsController.contactSync);
+dashboardRouter.get("/test", mixingDataController.test);
 //for daa transfer only----
-const dbDataTransfer = __importStar(require("../../controller/dashboard/dbDataTransfer"));
-dashboardRouter.post("/userToUserProfileDataTransfer", authorization_controller_1.authenticatingToken, dbDataTransfer.userToUserProfileDataTransfer);
-dashboardRouter.post("/addUserNewFeature", authorization_controller_1.authenticatingToken, dbDataTransfer.addUserNewFeature);
+// import * as dbDataTransfer from '../../controller/dashboard/dbDataTransfer';
+// dashboardRouter.post("/userToUserProfileDataTransfer", authenticatingToken, dbDataTransfer.userToUserProfileDataTransfer);
+// dashboardRouter.post("/addUserNewFeature", authenticatingToken, dbDataTransfer.addUserNewFeature);
+// dashboardRouter.post("/vcInfoDataAdd", authenticatingToken, dbDataTransfer.vcInfoDataAdd);
+// dashboardRouter.post("/cardDataTransfer", authenticatingToken, dbDataTransfer.cardDataTransfer);
 exports.default = dashboardRouter;

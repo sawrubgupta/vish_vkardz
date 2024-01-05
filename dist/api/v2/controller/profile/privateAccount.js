@@ -36,25 +36,27 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.privateProfile = exports.switchToPublic = void 0;
-const db_1 = __importDefault(require("../../../../db"));
+const dbV2_1 = __importDefault(require("../../../../dbV2"));
 const apiResponse = __importStar(require("../../helper/apiResponse"));
+const responseMsg_1 = __importDefault(require("../../config/responseMsg"));
+const privateAccountResMsg = responseMsg_1.default.profile.privateAccount;
 const switchToPublic = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userId = res.locals.jwt.userId;
         const isPrivate = req.body.isPrivate;
         const sql = `UPDATE users SET is_private = ? WHERE id = ?`;
         const VALUES = [isPrivate, userId];
-        const [rows] = yield db_1.default.query(sql, VALUES);
+        const [rows] = yield dbV2_1.default.query(sql, VALUES);
         if (rows.affectedRows > 0) {
-            return apiResponse.successResponse(res, "Account Switch Successfully", null);
+            return apiResponse.successResponse(res, privateAccountResMsg.switchToPublic.successMsg, null);
         }
         else {
-            return apiResponse.errorMessage(res, 400, "Failed to Switch Account, Please try again!");
+            return apiResponse.errorMessage(res, 400, privateAccountResMsg.switchToPublic.failedMsg);
         }
     }
     catch (error) {
         console.log(error);
-        return apiResponse.errorMessage(res, 400, "Something Went Wrong");
+        return apiResponse.somethingWentWrongMessage(res);
     }
 });
 exports.switchToPublic = switchToPublic;
@@ -66,12 +68,12 @@ const privateProfile = (req, res) => __awaiter(void 0, void 0, void 0, function*
         const { profileId, isPrivate } = req.body;
         const sql = `UPDATE users_profile SET is_private = ? WHERE user_id = ? AND id = ?`;
         const VALUES = [isPrivate, userId, profileId];
-        const [rows] = yield db_1.default.query(sql, VALUES);
+        const [rows] = yield dbV2_1.default.query(sql, VALUES);
         if (rows.affectedRows > 0) {
-            return apiResponse.successResponse(res, "Success", null);
+            return apiResponse.successResponse(res, privateAccountResMsg.privateProfile.successMsg, null);
         }
         else {
-            return apiResponse.errorMessage(res, 400, "Failed!, try again");
+            return apiResponse.errorMessage(res, 400, privateAccountResMsg.privateProfile.failedMsg);
         }
     }
     catch (error) {

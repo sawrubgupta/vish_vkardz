@@ -35,8 +35,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.contactUs = void 0;
-const db_1 = __importDefault(require("../../../../db"));
+exports.nfcDeviceList = exports.contactUs = void 0;
+const dbV2_1 = __importDefault(require("../../../../dbV2"));
 const apiResponse = __importStar(require("../../helper/apiResponse"));
 const utility = __importStar(require("../../helper/utility"));
 const contactUs = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -45,7 +45,7 @@ const contactUs = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const currentDate = utility.dateWithFormat();
         const sql = `INSERT INTO contact_us(name, email, subject, message, created_at) VALUES(?, ?, ?, ?, ?)`;
         const VALUES = [name, email, subject, message, currentDate];
-        const [rows] = yield db_1.default.query(sql, VALUES);
+        const [rows] = yield dbV2_1.default.query(sql, VALUES);
         if (rows.affectedRows > 0) {
             return apiResponse.successResponse(res, "Success", null);
         }
@@ -59,5 +59,19 @@ const contactUs = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.contactUs = contactUs;
+// ====================================================================================================
+// ====================================================================================================
+const nfcDeviceList = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const sql = `SELECT * FROM nfc_devices`;
+        const [rows] = yield dbV2_1.default.query(sql);
+        return apiResponse.successResponse(res, "Data Retrieved Successfully", rows);
+    }
+    catch (e) {
+        console.log(e);
+        return apiResponse.somethingWentWrongMessage(res);
+    }
+});
+exports.nfcDeviceList = nfcDeviceList;
 // ====================================================================================================
 // ====================================================================================================

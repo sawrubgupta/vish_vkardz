@@ -1,8 +1,11 @@
 import { Request, Response } from "express";
-import pool from '../../../../db';
+import pool from '../../../../dbV2';
 import * as apiResponse from '../../helper/apiResponse';
 import * as utility from "../../helper/utility";
 import config  from '../../config/development';
+import resMsg from '../../config/responseMsg';
+
+const videosResMsg = resMsg.features.videos;
 
 export const addVideos = async (req:Request, res:Response) => {
     try {
@@ -14,9 +17,8 @@ export const addVideos = async (req:Request, res:Response) => {
         } else {
             userId = res.locals.jwt.userId;
         }
-        if (!userId || userId === "" || userId === undefined) {
-            return apiResponse.errorMessage(res, 401, "User Id is required!");
-        }
+        if (!userId || userId === "" || userId === undefined) return apiResponse.errorMessage(res, 401, videosResMsg.addVideos.nullUserId);
+
         const createdAt = utility.dateWithFormat();
         const { profileId, videoType, url, thumbnail } = req.body;
 
@@ -25,9 +27,9 @@ export const addVideos = async (req:Request, res:Response) => {
         const [rows]:any = await pool.query(sql, VALUES);
 
         if (rows.affectedRows > 0) {
-            return apiResponse.successResponse(res, "Video added successfully", null);
+            return apiResponse.successResponse(res, videosResMsg.addVideos.successMsg, null);
         } else {
-            return apiResponse.errorMessage(res, 400, "Failed!, try again");
+            return apiResponse.errorMessage(res, 400, videosResMsg.addVideos.failedMsg);
         }
     } catch (error) {
         console.log(error);
@@ -47,9 +49,8 @@ export const getVideos =async (req:Request, res:Response) => {
         } else {
             userId = res.locals.jwt.userId;
         }
-        if (!userId || userId === "" || userId === undefined) {
-            return apiResponse.errorMessage(res, 401, "User Id is required!");
-        }
+        if (!userId || userId === "" || userId === undefined) return apiResponse.errorMessage(res, 401, videosResMsg.getVideos.nullUserId);
+        
         const profileId = req.query.profileId;
 
         var getPage:any = req.query.page;
@@ -76,7 +77,7 @@ export const getVideos =async (req:Request, res:Response) => {
                 totalPage: totalPage,
                 currentPage: page,
                 totalLength: result[0].length,
-                message: "Data Retrieved Successflly"
+                message: videosResMsg.getVideos.successMsg
             })
         } else {
             return res.status(200).json({
@@ -85,7 +86,7 @@ export const getVideos =async (req:Request, res:Response) => {
                 totalPage: totalPage,
                 currentPage: page,
                 totalLength: result[0].length,
-                message: "No data found"
+                message: videosResMsg.getVideos.noDataFoundMsg
             })
         }
     } catch (error) {
@@ -105,7 +106,7 @@ export const deleteVideos = async (req:Request, res:Response) => {
         const sql = `DELETE FROM videos WHERE user_id = ${userId} AND profile_id = ${profileId} AND id = ${videoId}`;
         const [rows]:any = await pool.query(sql);
 
-        return apiResponse.successResponse(res, "Video Deleted Successfully", null);
+        return apiResponse.successResponse(res, videosResMsg.deleteVideos.successMsg, null);
     } catch (error) {
         console.log(error);       
         return apiResponse.somethingWentWrongMessage(res);

@@ -36,15 +36,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateVcardLayout = exports.getLayout = void 0;
-const db_1 = __importDefault(require("../../../../db"));
+const dbV2_1 = __importDefault(require("../../../../dbV2"));
 const apiResponse = __importStar(require("../../helper/apiResponse"));
 const development_1 = __importDefault(require("../../config/development"));
+const responseMsg_1 = __importDefault(require("../../config/responseMsg"));
+const themeResMsg = responseMsg_1.default.profile.theme;
 const getLayout = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const sql = `SELECT * FROM layout_types`;
-        let [layoutTypeData] = yield db_1.default.query(sql);
-        const sql1 = `SELECT * FROM vkard_layouts`;
-        const [data] = yield db_1.default.query(sql1);
+        let [layoutTypeData] = yield dbV2_1.default.query(sql);
+        const sql1 = `SELECT * FROM vkard_layouts WHERE status = 1`;
+        const [data] = yield dbV2_1.default.query(sql1);
         let rowIndex = -1;
         for (const element of layoutTypeData) {
             rowIndex++;
@@ -57,11 +59,11 @@ const getLayout = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 }
             }
         }
-        return apiResponse.successResponse(res, "Layouts get Succesfully", layoutTypeData);
+        return apiResponse.successResponse(res, themeResMsg.getLayout.successMsg, layoutTypeData);
     }
     catch (error) {
         console.log(error);
-        return apiResponse.errorMessage(res, 400, "Something went wrong");
+        return apiResponse.somethingWentWrongMessage(res);
     }
 });
 exports.getLayout = getLayout;
@@ -71,34 +73,33 @@ const updateVcardLayout = (req, res) => __awaiter(void 0, void 0, void 0, functi
     try {
         // const userId:string = res.locals.jwt.userId;
         let userId;
-        const type = req.query.type; //type = business, user, null
+        const type = req.body.type; //type = business, user, null
+        const profileId = req.body.profileId;
         if (type && (type === development_1.default.businessType || type === development_1.default.websiteType || type === development_1.default.vcfWebsite)) {
-            userId = req.query.userId;
+            userId = req.body.userId;
         }
         else {
             userId = res.locals.jwt.userId;
         }
-        if (!userId || userId === "" || userId === undefined) {
-            return apiResponse.errorMessage(res, 401, "Please login !");
-        }
-        const profileColor = req.body.profileColor;
-        let styleId = req.body.styleId;
+        if (!userId || userId === "" || userId === undefined)
+            return apiResponse.errorMessage(res, 401, themeResMsg.updateVcardLayout.nullUserId);
+        const { profileColor, styleId } = req.body;
         // if (!styleId || styleId === "") {
         //     styleId = 1;
         // }
-        const sql = `UPDATE users SET vcard_layouts = ?, vcard_bg_color = ? WHERE id = ?`;
-        const VALUES = [styleId, profileColor, userId];
-        const [rows] = yield db_1.default.query(sql, VALUES);
+        const sql = `UPDATE users_profile SET vcard_layouts = ?, vcard_bg_color = ? WHERE user_id = ? AND id = ?`;
+        const VALUES = [styleId, profileColor, userId, profileId];
+        const [rows] = yield dbV2_1.default.query(sql, VALUES);
         if (rows.affectedRows > 0) {
-            return apiResponse.successResponse(res, "Layout updated successfully", null);
+            return apiResponse.successResponse(res, themeResMsg.updateVcardLayout.successMsg, null);
         }
         else {
-            return apiResponse.errorMessage(res, 400, "Failed to update layout, try again");
+            return apiResponse.errorMessage(res, 400, themeResMsg.updateVcardLayout.failedMsg);
         }
     }
     catch (error) {
         console.log(error);
-        return apiResponse.errorMessage(res, 400, "Something went wrong");
+        return apiResponse.somethingWentWrongMessage(res);
     }
 });
 exports.updateVcardLayout = updateVcardLayout;

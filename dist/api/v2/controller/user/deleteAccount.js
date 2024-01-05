@@ -36,28 +36,34 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteAccount = void 0;
-const db_1 = __importDefault(require("../../../../db"));
+const dbV2_1 = __importDefault(require("../../../../dbV2"));
 const apiResponse = __importStar(require("../../helper/apiResponse"));
 const utility = __importStar(require("../../helper/utility"));
+const responseMsg_1 = __importDefault(require("../../config/responseMsg"));
+const deleteAccountMsg = responseMsg_1.default.user.deleteAccount;
 const deleteAccount = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userId = res.locals.jwt.userId;
         const createdAt = utility.dateWithFormat();
-        // console.log(userId);
-        console.log(createdAt);
         const sql = `UPDATE users SET status = ?, deleted_at = ? WHERE id = ?`;
         const VALUES = [0, createdAt, userId];
-        const [rows] = yield db_1.default.query(sql, VALUES);
+        const [rows] = yield dbV2_1.default.query(sql, VALUES);
         if (rows.affectedRows > 0) {
-            return apiResponse.successResponse(res, "Account Deleted Successfully", null);
+            const sql = `UPDATE users_profile SET deleted_at = ? WHERE user_id = ?`;
+            const VALUES = [createdAt, userId];
+            const [rows] = yield dbV2_1.default.query(sql, VALUES);
+            const userCardSql = `UPDATE user_card SET deactivated_at = ? WHERE user_id = ?`;
+            const cardVALUES = [createdAt, userId];
+            const [cardRows] = yield dbV2_1.default.query(userCardSql, cardVALUES);
+            return apiResponse.successResponse(res, deleteAccountMsg.deleteAccount.successMsg, null);
         }
         else {
-            return apiResponse.errorMessage(res, 400, "Failed, try again");
+            return apiResponse.errorMessage(res, 400, deleteAccountMsg.deleteAccount.failedMsg);
         }
     }
     catch (error) {
         console.log(error);
-        return apiResponse.errorMessage(res, 400, "Something went wrong");
+        return apiResponse.somethingWentWrongMessage(res);
     }
 });
 exports.deleteAccount = deleteAccount;

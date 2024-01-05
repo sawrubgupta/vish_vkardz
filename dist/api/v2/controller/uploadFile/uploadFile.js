@@ -42,6 +42,7 @@ const authorization_controller_1 = require("../../middleware/authorization.contr
 const apiResponse = __importStar(require("../../helper/apiResponse"));
 var destinationPath = "";
 var dbImagePath = "";
+//not used
 exports.storage = multer_1.default.diskStorage({
     destination: function (req, file, cb) {
         let type = req.body.type;

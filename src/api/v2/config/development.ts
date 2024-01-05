@@ -2,25 +2,33 @@ import 'dotenv/config';
 
 export default {
     smtp:{
-        name:"noreply@vkardz.com",
+        name:"mail.appitronsolutions.com",
         host:"mail.appitronsolutions.com", //process.env.SMTP_HOST, 
         secure: true,//true
-        port: 465,//465
+        port: 465, //process.env.SMTP_PORT,//465
+        secureConnection: false,
+        // requireTLS: true,
+
         auth: {
-            user: "vishal@appitronsolutions.com", //process.env.SMTP_USER, 
-            pass: "vishal123456", //process.env.SMTP_PASSWORD, 
+            user: process.env.SMTP_USER,//"vishal@appitronsolutions.com", //, 
+            pass: process.env.SMTP_PASSWORD, // "vishal123456", //, 
         },  // here it goes
-        tls: {
-            rejectUnauthorized: false
-        }
+        // tls: {
+        //     // ciphers:'SSLv3',
+        //     rejectUnauthorized: false
+        // }
     },
     vcardLink: `https://vkardz.com/`,
+    vkardUrl: `https://vkardz.com/`,
+    apiBaseUrl: `https://api.vkardz.in/api/v2`,
+    imgUrl: "https://vkardz.s3.ap-south-1.amazonaws.com/",
 
     AWS:{
         region: process.env.AWS_REGION,
         accessKeyId: process.env.AWS_ACCESS_KEY_ID,
         secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
     },
+    webhookSecret: "",  
 
     websiteType: 'web',
     allUsers: 'all',
@@ -28,6 +36,10 @@ export default {
     deactivateUsers: 'deactivateUsers',
     basicPlan: 'basic',
     propersonalizePlan: 'propersonalize',
+    proPlan: 'pro',
+    productType: 'product',
+    galleryType: 'gallery',
+    profileType: 'profile',
 
     vcfType: 'vcf',
     vcfNumber: 'number',
@@ -47,6 +59,7 @@ export default {
     socialType: 'social',
     contactType: 'contact',
     paymentType: 'payment',
+    businessType: 'business',
 
     referrerType: 'referrer',
     refereeType: 'referee',
@@ -54,13 +67,18 @@ export default {
     redeemStatus: 'REDEEM',
     expiredStatus: 'EXPIRED',
     couponRedeem: 'COUPON_REEDEM',
+    vKoin: 'vkoin',
+    earnCoin: 'earn_coin',
+    latlongDistance: 40,
+
+    cardPurchase: 'purchase_card',
+    cancelOrder: 'canceled',
 
     secretKey:"nss6DpYlq5CHw6Hn0jPqXJwtkHXuMDdYynDiRFNS6_Y", //process.env.SECRET,
     resumeLimit:10,
     vKardzPhone: "+91 6377256382",
     templateLimit:6,
-    pageSize:20,
-    businessType: 'business',
+    pageSize:21,
     memberType: 'member',
     ASSIGNEDStatus: "ASSIGNED",
     orderStatus: ["placed","processed","dispatched","delivered"],

@@ -26,6 +26,160 @@ SET vcf_custom_field.profile_id = users_profile.id;
 
 database changes:
 ------------------------------new changes--------------------------------
+04-01-2024
+CREATE TABLE `nfc_devices` (
+   `id` INT(11) NOT NULL AUTO_INCREMENT ,
+   `brand` VARCHAR(55) NOT NULL ,
+   `name` VARCHAR(55) NOT NULL , 
+   `platform` VARCHAR(55) NULL DEFAULT NULL , 
+   `release_date` VARCHAR(55) NULL DEFAULT NULL , 
+   PRIMARY KEY (`id`)
+) ENGINE = InnoDB;
+
+28-12-2023
+CREATE TABLE `all_files` (
+ `id` INT(11) NOT NULL AUTO_INCREMENT ,
+ `user_id` INT(11) NULL DEFAULT NULL ,
+ `type` VARCHAR(55) NOT NULL ,
+ `url` VARCHAR(255) NOT NULL ,
+ `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ,
+ PRIMARY KEY  (`id`)
+) ENGINE = InnoDB;
+ALTER TABLE `all_files` ADD `profile_id` INT(11) NULL DEFAULT NULL AFTER `user_id`;
+ALTER TABLE `all_files` ADD `file_type` VARCHAR(55) NULL DEFAULT NULL AFTER `type`;
+
+INSERT INTO all_files(user_id, profile_id, type, file_type, url) SELECT about.user_id, about.profile_id, 'about', 'img', about.images FROM about WHERE about.images is not null AND about.images != '';
+INSERT INTO all_files(user_id, profile_id, type, file_type, url) SELECT about.user_id, about.profile_id, 'about', 'img', about.cover_image FROM about WHERE about.cover_image is not null AND about.cover_image != '';
+INSERT INTO all_files(user_id, profile_id, type, file_type, url) SELECT about.user_id, about.profile_id, 'about', 'docfile', about.document FROM about WHERE about.document is not null AND about.document != '';
+
+INSERT INTO all_files(user_id, profile_id, type, file_type, url) SELECT portfolio.user_id, portfolio.profile_id, 'portfolio', 'img', portfolio.image FROM portfolio WHERE portfolio.image is not null AND portfolio.image != '';
+INSERT INTO all_files(user_id, profile_id, type, file_type, url) SELECT services.user_id, services.profile_id, 'services', 'img', services.images FROM services WHERE services.images is not null AND services.images != '';
+
+INSERT INTO all_files(user_id, type, file_type, url) SELECT users.id, 'thumb', 'img', users.thumb FROM users WHERE users.thumb is not null AND users.thumb != '';
+INSERT INTO all_files(user_id, profile_id, type, file_type, url) SELECT users_profile.user_id, users_profile.id, 'profile', 'img', users_profile.profile_image FROM users_profile WHERE users_profile.profile_image is not null AND users_profile.profile_image != '';
+INSERT INTO all_files(user_id, profile_id, type, file_type, url) SELECT users_profile.user_id, users_profile.id, 'cover', 'img', users_profile.cover_photo FROM users_profile WHERE users_profile.cover_photo is not null AND users_profile.cover_photo != '';
+
+
+27-12-2023
+CREATE TABLE `feature_requests` (
+ `id` INT(11) NOT NULL AUTO_INCREMENT ,
+ `user_id` INT(11) NOT NULL ,
+ `message` TEXT NOT NULL ,
+ `status` VARCHAR(55) NOT NULL DEFAULT 'PENDING',
+ `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ,
+ PRIMARY KEY (`id`)
+) ENGINE = InnoDB;
+
+25-12-2023
+CREATE TABLE `support_tickets` (
+ `id` INT(11) NOT NULL AUTO_INCREMENT ,
+ `user_id` INT(11) NOT NULL ,
+ `subject` VARCHAR(255) NULL DEFAULT NULL,
+ `message` TEXT NOT NULL ,
+ `status` VARCHAR(55) NOT NULL DEFAULT 'PENDING',
+ `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ,
+ PRIMARY KEY (`id`)
+) ENGINE = InnoDB;
+
+21-12-2023
+CREATE TABLE `vkardz_products` (
+ `id` INT(11) NOT NULL AUTO_INCREMENT ,
+ `slug` VARCHAR(55) NOT NULL ,
+ `title` VARCHAR(200) NOT NULL ,
+ `description` TEXT NULL DEFAULT NULL ,
+ `image` VARCHAR(255) NULL DEFAULT NULL ,
+ `status` BOOLEAN NOT NULL DEFAULT TRUE ,
+ PRIMARY KEY (`id`)
+) ENGINE = InnoDB;
+
+20-12-2023
+alter table video_tutorials add column type varchar(55) default null after category_id;
+
+18-12-2023
+ALTER TABLE user_card ADD COLUMN deactivated_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP;
+
+15-10-2023
+alter table users_profile add column primary_profile_link varchar(255) default null after on_tap_url; 
+
+CREATE TABLE `video_tutorials` (
+ `id` INT(11) NOT NULL AUTO_INCREMENT ,
+ `category_id` INT(11) NOT NULL ,
+ `title` VARCHAR(255) NULL DEFAULT NULL ,
+ `thumbnails` VARCHAR(255) NULL DEFAULT NULL ,
+ `url` VARCHAR(255) NOT NULL ,
+ `status` BOOLEAN NOT NULL DEFAULT TRUE ,
+ PRIMARY KEY (`id`)
+) ENGINE = InnoDB;
+
+CREATE TABLE `tutorial_category` (
+ `id` INT(11) NOT NULL AUTO_INCREMENT ,
+ `type` VARCHAR(55) NULL DEFAULT NULL ,
+ `category_name` VARCHAR(255) NOT NULL ,
+ `status` BOOLEAN NOT NULL DEFAULT TRUE ,
+ PRIMARY KEY (`id`)
+) ENGINE = InnoDB;
+
+11-10-2023
+UPDATE users_features JOIN users ON users_features.user_id = users.id SET users_features.status = users.is_password_enable WHERE users_features.feature_id = 38;
+
+02-10-2023
+INSERT INTO `vkoin_limit` (`id`, `referrer_coin`, `referee_coin`, `contact_sync_coin`, `profile_view_coin`, `share_profile_coin`, `coin_in_one_inr`, `coin_in_one_usd`, `created_at`, `updated_at`) VALUES (1, 100, 10, 100, 1, 1, 1, 82, '2023-06-28 12:47:04', '2023-06-28 12:47:57');
+ALTER TABLE `faq` ADD `type` VARCHAR(55) NOT NULL AFTER `id`;
+ALTER TABLE `faq` CHANGE `created_at` `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP;
+INSERT INTO `faq`(`type`, `heading`, `title`, `details`, `status`) VALUES ('vkoin','What is VCoins?','What is VCoins?','answer',1),('vkoin','How do I earn VCoins?','How do I earn VCoins?','answer',1),('vkoin','How can I use my VCoins?','How can I use my VCoins?','answer',1),('vkoin','How can I take my refund back to my original source?','How can I take my refund back to my original source?','answer',1),('vkoin','Does my VCoins received as refund also expired?','Does my VCoins received as refund also expired?','answer',1),('vkoin','Can my VCoins be gifted?','Can my VCoins be gifted?','answer',1)
+
+23-08-2023
+ALTER TABLE `vcf_custom_field` ADD `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP AFTER `status`;
+
+21-08-2023
+ALTER TABLE `users_profile` ADD `themes` INT(11) NOT NULL DEFAULT '1' AFTER `user_id`;
+UPDATE vcf_info JOIN users ON vcf_info.user_id = users.id SET vcf_info.value = CONCAT(users.dial_code, ' ', users.phone) WHERE vcf_info.type = 'phone';
+
+18-08-2023
+ALTER TABLE `users_profile` ADD `theme_name` VARCHAR(55) NULL DEFAULT NULL AFTER `user_id`;
+ALTER TABLE `features` ADD `icon` VARCHAR(55) NULL DEFAULT NULL AFTER `slug`;
+UPDATE vcf_info JOIN users_profile ON vcf_info.user_id = users_profile.user_id SET vcf_info.profile_id = users_profile.id;
+
+16-08-2023
+ALTER TABLE `users_profile` ADD `profile_id` VARCHAR(55) NOT NULL AFTER `id`;
+UPDATE users_profile JOIN users ON users.id = users_profile.user_id SET users_profile.profile_id = users.username;
+CREATE TABLE `users_package` (
+ `id` INT(11) NOT NULL AUTO_INCREMENT ,
+ `user_id` INT(11) NOT NULL ,
+ `package_id` INT(11) NOT NULL DEFAULT '16' ,
+ `package_slug` VARCHAR(55) NOT NULL DEFAULT 'pro' ,
+ `start_time` DATETIME NOT NULL ,
+ `end_time` TIMESTAMP NOT NULL ,
+ `expired_at` TIMESTAMP NULL DEFAULT NULL ,
+ `is_expired` TINYINT NOT NULL DEFAULT '0' ,
+ `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ,
+ `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ,
+ PRIMARY KEY (`id`)
+) ENGINE = InnoDB;
+
+10-08-2023
+ALTER TABLE `users_profile` CHANGE `account_type` `account_type` INT(11) NOT NULL DEFAULT '16';
+ALTER TABLE `vcard_social_sites` ADD `profile_id` INT(11) NOT NULL AFTER `user_id`;
+(UPDATE vcard_social_sites JOIN users_profile ON vcard_social_sites.user_id = users_profile.user_id SET vcard_social_sites.profile_id = users_profile.id;)
+ALTER TABLE `user_card` ADD `profile_id` INT(11) NOT NULL AFTER `user_id`;
+ALTER TABLE `user_card` ADD `package_name` VARCHAR(55) NOT NULL DEFAULT 'pro' AFTER `account_type`;
+ALTER TABLE `user_card` ADD `is_expired` BOOLEAN NOT NULL DEFAULT FALSE AFTER `is_private`;
+
+09-08-2023
+ALTER TABLE `card_activation` ADD `package_slug` VARCHAR(55) NOT NULL DEFAULT 'pro' AFTER `package_type`;
+(UPDATE card_activation set package_slug = 'propersonalize' WHERE package_type = 18;)
+
+INSERT INTO vcf_info(user_id, profile_id, type, value) SELECT users.id, users_profile.id, 'name', users.full_name FROM users LEFT JOIN users_profile ON users_profile.user_id = users.id;
+INSERT INTO vcf_info(user_id, profile_id, type, value) SELECT users.id, users_profile.id, 'email', users.display_email FROM users LEFT JOIN users_profile ON users_profile.user_id = users.id;
+INSERT INTO vcf_info(user_id, profile_id, type, value) SELECT users.id, users_profile.id, 'phone', users.display_number FROM users LEFT JOIN users_profile ON users_profile.user_id = users.id;
+INSERT INTO vcf_info(user_id, profile_id, type, value) SELECT users.id, users_profile.id, 'website', users.website FROM users LEFT JOIN users_profile ON users_profile.user_id = users.id;
+INSERT INTO vcf_info(user_id, profile_id, type, value) SELECT users.id, users_profile.id, 'company', users.company_name FROM users LEFT JOIN users_profile ON users_profile.user_id = users.id;
+INSERT INTO vcf_info(user_id, profile_id, type, value) SELECT users.id, users_profile.id, 'address', users.address FROM users LEFT JOIN users_profile ON users_profile.user_id = users.id;
+INSERT INTO vcf_info(user_id, profile_id, type, value) SELECT users.id, users_profile.id, 'gender', users.gender FROM users LEFT JOIN users_profile ON users_profile.user_id = users.id;
+INSERT INTO vcf_info(user_id, profile_id, type, value) SELECT users.id, users_profile.id, 'designation', users.designation FROM users LEFT JOIN users_profile ON users_profile.user_id = users.id;
+
+INSERT INTO vcf_info(user_id, profile_id, type, value) SELECT vcf_custom_field.user_id, vcf_custom_field.profile_id, vcf_custom_field.type, vcf_custom_field.value FROM vcf_custom_field;
+
 08-08-2023
 ALTER TABLE `about` ADD `profile_id` INT(11) NOT NULL AFTER `user_id`;
 (UPDATE about JOIN users_profile ON about.user_id = users_profile.user_id SET about.profile_id = users_profile.id;)
@@ -39,6 +193,9 @@ ALTER TABLE `user_contacts` ADD `profile_id` INT(11) NOT NULL AFTER `user_id`;
 (UPDATE user_contacts JOIN users_profile ON user_contacts.user_id = users_profile.user_id SET user_contacts.profile_id = users_profile.id;)
 ALTER TABLE `portfolio` ADD `profile_id` INT(11) NOT NULL AFTER `user_id`;
 (UPDATE portfolio JOIN users_profile ON portfolio.user_id = users_profile.user_id SET portfolio.profile_id = users_profile.id;)
+ALTER TABLE `services` ADD `profile_id` INT(11) NOT NULL AFTER `user_id`;
+(UPDATE services JOIN users_profile ON services.user_id = users_profile.user_id SET services.profile_id = users_profile.id;)
+
 
 07-08-2023
 ALTER TABLE `features` ADD `type` VARCHAR(55) NULL DEFAULT NULL AFTER `id`;

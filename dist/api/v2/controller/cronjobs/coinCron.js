@@ -43,7 +43,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.coinCron = void 0;
-const db_1 = __importDefault(require("../../../../db"));
+const dbV2_1 = __importDefault(require("../../../../dbV2"));
 const utility = __importStar(require("../../helper/utility"));
 const development_1 = __importDefault(require("../../config/development"));
 const coinCron = () => __awaiter(void 0, void 0, void 0, function* () {
@@ -53,7 +53,7 @@ const coinCron = () => __awaiter(void 0, void 0, void 0, function* () {
         const currentDate = utility.getTimeAndDate();
         const date = currentDate[0];
         const sql = `SELECT * FROM user_coins WHERE expired_at = '${date}' AND coin_status = '${development_1.default.activeStatus}'`;
-        const [rows] = yield db_1.default.query(sql);
+        const [rows] = yield dbV2_1.default.query(sql);
         if (rows.length > 0) {
             try {
                 // const updateSql = `UPDATE user_coins SET coin_status = ?, updated_at = ? WHERE expired_at = ?`;
@@ -67,10 +67,10 @@ const coinCron = () => __awaiter(void 0, void 0, void 0, function* () {
                         const expiredCoin = ele.coin - ele.used_coin_amount;
                         const updateSql = `INSERT INTO user_coins(user_id, type, coin, used_coin_amount, coin_status, created_at, expired_at) VALUES(?, ?, ?, ?, ?, ?, ?)`;
                         const VALUES = [ele.user_id, development_1.default.expiredStatus, ele.coin, ele.used_coin_amount, development_1.default.expiredStatus, createdAt, date];
-                        const [updatedRows] = yield db_1.default.query(updateSql, VALUES);
+                        const [updatedRows] = yield dbV2_1.default.query(updateSql, VALUES);
                         if (updatedRows.affectedRows > 0) {
                             const updateUserSql = `UPDATE users SET offer_coin = offer_coin - ${expiredCoin} WHERE id = ${ele.user_id}`;
-                            const [userRows] = yield db_1.default.query(updateUserSql);
+                            const [userRows] = yield dbV2_1.default.query(updateUserSql);
                             console.log("Status Change Successfully");
                         }
                         else {

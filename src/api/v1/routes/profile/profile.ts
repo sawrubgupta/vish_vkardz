@@ -27,6 +27,7 @@ profileRouter.get("/getLayots", themeController.getLayout);//use in business typ
 profileRouter.patch("/updateVcardLayout", tempAuthenticatingToken, themeController.updateVcardLayout); //use in business type
 
 profileRouter.post('/addPrimaryProfile', authenticatingToken, validation.primaryProfileValidation, primaryProfileController.setPrimaryProfile);
+profileRouter.post('/primaryProfileLink', authenticatingToken, validation.addPrimaryLinkValidation, primaryProfileController.addPrimaryLink);
 profileRouter.get('/getPrimrySites', authenticatingToken, primaryProfileController.getPrimarySite);
 
 profileRouter.post('/switchAccount', authenticatingToken, validation.switchAccountValidation, switchAccountController.switchToPublic);

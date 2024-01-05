@@ -6,6 +6,7 @@ import * as apiResponse from "../../helper/apiResponse";
 var destinationPath : string = "";
 var dbImagePath : string = "";
 
+//not used
 export var storage = multer.diskStorage({
     destination: function (req, file, cb) {
         let type = req.body.type;

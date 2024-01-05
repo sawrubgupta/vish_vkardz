@@ -1,9 +1,13 @@
 import { Request, Response } from "express";
-import pool from '../../../../db';
+import pool from '../../../../dbV2';
 import * as apiResponse from '../../helper/apiResponse';
 import * as utility from "../../helper/utility";
 import config  from '../../config/development';
+import resMsg from '../../config/responseMsg';
 
+const primaryProfileResMsg = resMsg.profile.primaryProfile;
+
+//old (most probably not used)
 export const setPrimaryProfile =async (req:Request, res:Response) => {
     try {
         const userId = res.locals.jwt.userId;
@@ -21,9 +25,9 @@ export const setPrimaryProfile =async (req:Request, res:Response) => {
             const [rows]:any = await pool.query(primaryProfileQuery, VALUES);
 
             if (rows.affectedRows > 0) {
-                return apiResponse.successResponse(res, "Primary Profile Added Successfully", primaryProfileSlug)
+                return apiResponse.successResponse(res, primaryProfileResMsg.setPrimaryProfile.successMsg, primaryProfileSlug);
             } else {
-                return apiResponse.errorMessage(res, 400, "Failed to Add Primary Profile, try again!");
+                return apiResponse.errorMessage(res, 400, primaryProfileResMsg.setPrimaryProfile.failedMsg);
             }
         } else if (primaryProfileSlug === 'vcard') {
             let uName:string;
@@ -45,16 +49,16 @@ export const setPrimaryProfile =async (req:Request, res:Response) => {
             const [rows]:any = await pool.query(primaryProfileQuery, VALUES);
 
             if (rows.affectedRows > 0) {
-                return apiResponse.successResponse(res, "Primary Profile Added Successfully", primaryProfileSlug)
+                return apiResponse.successResponse(res, primaryProfileResMsg.setPrimaryProfile.successMsg, primaryProfileSlug)
             } else {
-                return apiResponse.errorMessage(res, 400, "Failed to Add Primary Profile, try again!");
+                return apiResponse.errorMessage(res, 400, primaryProfileResMsg.setPrimaryProfile.failedMsg);
             }
         } else {
             return apiResponse.errorMessage(res, 400, `Please add '${primaryProfileSlug}' Information`);
         }
     } catch (error) {
         console.log(error);
-        return apiResponse.errorMessage(res, 400, "Something Went Wrong");
+        return apiResponse.somethingWentWrongMessage(res);
     }
 }
 
@@ -83,10 +87,42 @@ export const getPrimarySite =async (req:Request, res:Response) => {
                 }
             });
         });
-        return apiResponse.successResponse(res, "Data Retrieved successfully", siteRows);
+        return apiResponse.successResponse(res, primaryProfileResMsg.getPrimarySite.successMsg, siteRows);
     } catch (error) {
         console.log(error);
-        return apiResponse.errorMessage(res, 400, "Something Went Wrong");
+        return apiResponse.somethingWentWrongMessage(res);
+    }
+}
+
+// ====================================================================================================
+// ====================================================================================================
+
+//new v4
+export const addPrimaryLink = async (req: Request, res: Response) => {
+    try {
+        let userId:any; 
+        const type = req.body.type; //type = business, user, null
+        if (type && (type === config.businessType  || type === config.websiteType || type === config.vcfWebsite)) {
+            userId = req.body.userId;
+        } else {
+            userId = res.locals.jwt.userId;
+        }
+        if (!userId || userId === "" || userId === undefined) return apiResponse.errorMessage(res, 401, "UserId id is required");
+        const { profileId, primaryProfileLink } = req.body
+
+        const primaryProfileQuery = `UPDATE users_profile SET primary_profile_link = ? WHERE id = ? AND user_id = ?`;
+        const VALUES = [ primaryProfileLink, profileId, userId];
+        const [rows]: any = await pool.query(primaryProfileQuery, VALUES);
+
+        if (rows.affectedRows > 0) {
+            return apiResponse.successResponse(res, primaryProfileResMsg.addPrimaryLink.successMsg, null);
+        } else {
+            return apiResponse.errorMessage(res, 400, primaryProfileResMsg.addPrimaryLink.failedMsg);
+        }
+
+    } catch (error) {
+        console.log(error);
+        return apiResponse.somethingWentWrongMessage(res);
     }
 }
 

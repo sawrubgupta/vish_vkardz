@@ -36,13 +36,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.transactionHistory = void 0;
-const db_1 = __importDefault(require("../../../../db"));
+const dbV2_1 = __importDefault(require("../../../../dbV2"));
 const apiResponse = __importStar(require("../../helper/apiResponse"));
+const responseMsg_1 = __importDefault(require("../../config/responseMsg"));
+const orderResMsg = responseMsg_1.default.orders.transaction;
 const transactionHistory = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userId = res.locals.jwt.userId;
         const sql = `SELECT id, txn_id, price, country, payment_type, status, created_at FROM all_payment_info WHERE user_id = ${userId} ORDER BY created_at DESC`;
-        const [rows] = yield db_1.default.query(sql);
+        const [rows] = yield dbV2_1.default.query(sql);
         if (rows.length > 0) {
             rows.forEach((element, index) => {
                 if (rows[index].payment_type === 1) {
@@ -52,15 +54,15 @@ const transactionHistory = (req, res) => __awaiter(void 0, void 0, void 0, funct
                     rows[index].paymntMethod = 'online';
                 }
             });
-            return apiResponse.successResponse(res, "Transacion list are here", rows);
+            return apiResponse.successResponse(res, orderResMsg.transactionHistory.successMsg, rows);
         }
         else {
-            return apiResponse.successResponse(res, "No transactions yet!", null);
+            return apiResponse.successResponse(res, orderResMsg.transactionHistory.noDataFoundMsg, null);
         }
     }
     catch (error) {
         console.log(error);
-        return apiResponse.errorMessage(res, 400, "Something went wrong");
+        return apiResponse.somethingWentWrongMessage(res);
     }
 });
 exports.transactionHistory = transactionHistory;

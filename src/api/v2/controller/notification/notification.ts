@@ -1,4 +1,4 @@
-import pool from "../../../../db";
+import pool from "../../../../dbV2";
 import { Request, Response } from "express";
 import * as apiResponse from '../../helper/apiResponse';
 // import { dateWithFormat } from "../utility/utility";
@@ -25,6 +25,16 @@ export const getNotification =async (req:Request, res: Response) => {
         const sql = `SELECT * FROM notifications WHERE user_id = ${userId} ORDER BY created_at desc limit ${page_size} offset ${offset}`;
         const [rows]:any = await pool.query(sql);
 
+        let rowsIndex = -1;
+        for (const ele of rows) {
+            rowsIndex++;
+            if (ele.type === config.cardPurchase) {
+                const productSql = `SELECT products.name, products.product_image, products.image_back, products.image_other FROM products LEFT JOIN orderlist ON orderlist.product_id = products.product_id WHERE orderlist.order_id = ${ele.identity} LIMIT 1`;
+                const [productRows]:any = await pool.query(productSql);
+
+                rows[rowsIndex].productDetail = productRows[0] || {}; 
+            }
+        }
         let totalPages: any = result.length / page_size;
         let totalPage = Math.ceil(totalPages);
 
@@ -92,3 +102,6 @@ export const sendNotification =async (req:Request, res:Response) => {
         
     }
 }
+
+// ====================================================================================================
+// ====================================================================================================

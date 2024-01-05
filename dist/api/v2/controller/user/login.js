@@ -36,10 +36,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.socialLogin = exports.login = void 0;
-const db_1 = __importDefault(require("../../../../db"));
+const dbV2_1 = __importDefault(require("../../../../dbV2"));
 const utility = __importStar(require("../../helper/utility"));
 const apiResponse = __importStar(require("../../helper/apiResponse"));
 const md5_1 = __importDefault(require("md5"));
+const responseMsg_1 = __importDefault(require("../../config/responseMsg"));
+const loginMsg = responseMsg_1.default.user.login;
 const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const email = req.body.email || req.body.phone || req.body.username;
@@ -50,7 +52,7 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         let uName;
         const hash = (0, md5_1.default)(password);
         const getUser = `SELECT * FROM users where email = '${email}' or phone = '${email}' or username = '${email}' limit 1`;
-        const [userRows] = yield db_1.default.query(getUser);
+        const [userRows] = yield dbV2_1.default.query(getUser);
         if (userRows.length === 0) {
             return apiResponse.errorMessage(res, 400, "User not registered with us, Please signup");
         }
@@ -69,7 +71,7 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             userRows[0].share_url = vcardProfileLink;
             const sql = `UPDATE users set login_time = ?, fcm_token = ? where id = ?`;
             const VALUES = [createdAt, fcmToken, userRows[0].id];
-            const [data] = yield db_1.default.query(sql, VALUES);
+            const [data] = yield dbV2_1.default.query(sql, VALUES);
             if (data.affectedRows > 0) {
                 let token = yield utility.jwtGenerate(userRows[0].id);
                 delete userRows[0].password;
@@ -107,16 +109,14 @@ const socialLogin = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         const hash = (0, md5_1.default)(password);
         const emailSql = `SELECT * FROM users where status = 1 AND deleted_at IS NULL AND (email = ? or username = ? or phone = ? or facebook_id = ? or google_id = ? or apple_id = ?) LIMIT 1`;
         const emailValues = [email, email, email, socialId, socialId, socialId];
-        const [userRow] = yield db_1.default.query(emailSql, emailValues);
-        if (userRow.length === 0) {
-            return apiResponse.errorMessage(res, 400, "User not registered with us, Please signup");
-        }
+        const [userRow] = yield dbV2_1.default.query(emailSql, emailValues);
+        if (userRow.length === 0)
+            return apiResponse.errorMessage(res, 400, loginMsg.socialLogin.notRegistered);
         if (type === "email") {
             const userSql = `SELECT * FROM users WHERE deleted_at IS NULL AND (email = '${email}' || username = '${email}') LIMIT 1`;
-            const [userRows] = yield db_1.default.query(userSql);
-            if (userRows.length === 0) {
-                return apiResponse.errorMessage(res, 400, "User not registered with us, Please signup");
-            }
+            const [userRows] = yield dbV2_1.default.query(userSql);
+            if (userRows.length === 0)
+                return apiResponse.errorMessage(res, 400, loginMsg.socialLogin.notRegistered);
             const isLoggedIn = hash === userRows[0].password; // true
             if (isLoggedIn) {
                 if (userRows[0].card_number !== null && userRows[0].card_number !== undefined && userRows[0].card_number !== '') {
@@ -132,112 +132,124 @@ const socialLogin = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
                 userRows[0].share_url = vcardProfileLink;
                 const sql = `UPDATE users set login_time = ?, fcm_token = ? where id = ?`;
                 const VALUES = [createdAt, fcmToken, userRows[0].id];
-                const [data] = yield db_1.default.query(sql, VALUES);
+                const [data] = yield dbV2_1.default.query(sql, VALUES);
                 if (data.affectedRows > 0) {
                     let token = yield utility.jwtGenerate(userRows[0].id);
                     delete userRows[0].password;
                     delete userRows[0].id;
+                    const resData = {
+                        username: userRows[0].username,
+                    };
                     return res.status(200).json({
                         status: true,
                         token,
-                        data: userRows[0],
-                        message: "Successfully logged in !"
+                        data: resData,
+                        message: loginMsg.socialLogin.successMsg
                     });
                 }
                 else {
-                    return apiResponse.errorMessage(res, 400, "Failed to login, try again");
+                    return apiResponse.errorMessage(res, 400, loginMsg.socialLogin.failedMsg);
                 }
             }
             else {
-                return apiResponse.errorMessage(res, 400, "Unfortunately, Email and Password is incorrect !");
+                return apiResponse.errorMessage(res, 400, loginMsg.socialLogin.wrongPassword);
             }
         }
         else if (type === "facebook") {
             //    const sql = `SELECT * FROM users WHERE deleted_at IS NULL AND (email = '${email}' || facebook_id = '${socialId}' ) LIMIT 1`;
             const sql = `SELECT * FROM users WHERE deleted_at IS NULL AND (email = '${email}') LIMIT 1`;
-            const [fbRows] = yield db_1.default.query(sql);
+            const [fbRows] = yield dbV2_1.default.query(sql);
             if (fbRows.length > 0) {
                 const sql = `UPDATE users set login_time = ?, fcm_token = ?, facebook_id = '${socialId}' where id = ?`;
                 const VALUES = [createdAt, fcmToken, fbRows[0].id];
-                const [data] = yield db_1.default.query(sql, VALUES);
+                const [data] = yield dbV2_1.default.query(sql, VALUES);
                 if (data.affectedRows > 0) {
                     let token = yield utility.jwtGenerate(fbRows[0].id);
                     delete fbRows[0].password;
                     delete fbRows[0].id;
+                    const resData = {
+                        username: fbRows[0].username,
+                    };
                     return res.status(200).json({
                         status: true,
                         token,
-                        data: fbRows[0],
-                        message: "Successfully logged in !"
+                        data: resData,
+                        message: loginMsg.socialLogin.successMsg
                     });
                 }
                 else {
-                    return apiResponse.errorMessage(res, 400, "Failed to login, try again");
+                    return apiResponse.errorMessage(res, 400, loginMsg.socialLogin.failedMsg);
                 }
             }
             else {
-                return apiResponse.errorMessage(res, 400, "User not exist !");
+                return apiResponse.errorMessage(res, 400, loginMsg.socialLogin.notRegistered);
             }
         }
         else if (type === "google") {
             const sql = `SELECT * FROM users WHERE deleted_at IS NULL AND  (email = '${email}') LIMIT 1`;
-            const [fbRows] = yield db_1.default.query(sql);
+            const [fbRows] = yield dbV2_1.default.query(sql);
             if (fbRows.length > 0) {
                 const sql = `UPDATE users set login_time = ?, fcm_token = ?, google_id = '${socialId}' where id = ?`;
                 const VALUES = [createdAt, fcmToken, fbRows[0].id];
-                const [data] = yield db_1.default.query(sql, VALUES);
+                const [data] = yield dbV2_1.default.query(sql, VALUES);
                 if (data.affectedRows > 0) {
                     let token = yield utility.jwtGenerate(fbRows[0].id);
                     delete fbRows[0].password;
                     delete fbRows[0].id;
+                    const resData = {
+                        username: fbRows[0].username,
+                    };
                     return res.status(200).json({
                         status: true,
                         token,
-                        data: fbRows[0],
-                        message: "Successfully logged in !"
+                        data: resData,
+                        message: loginMsg.socialLogin.successMsg
                     });
                 }
                 else {
-                    return apiResponse.errorMessage(res, 400, "Failed to login, try again");
+                    return apiResponse.errorMessage(res, 400, loginMsg.socialLogin.failedMsg);
                 }
             }
             else {
-                return apiResponse.errorMessage(res, 400, "User not exist !");
+                return apiResponse.errorMessage(res, 400, loginMsg.socialLogin.notRegistered);
             }
         }
         else if (type === "apple") {
             const sql = `SELECT * FROM users WHERE deleted_at IS NULL AND  (email = '${email}') LIMIT 1`;
-            const [fbRows] = yield db_1.default.query(sql);
+            const [fbRows] = yield dbV2_1.default.query(sql);
             if (fbRows.length > 0) {
                 const sql = `UPDATE users set login_time = ?, fcm_token = ?, apple_id = '${socialId}' where id = ?`;
                 const VALUES = [createdAt, fcmToken, fbRows[0].id];
-                const [data] = yield db_1.default.query(sql, VALUES);
+                const [data] = yield dbV2_1.default.query(sql, VALUES);
                 if (data.affectedRows > 0) {
                     let token = yield utility.jwtGenerate(fbRows[0].id);
                     delete fbRows[0].password;
                     delete fbRows[0].id;
+                    const resData = {
+                        username: fbRows[0].username,
+                    };
                     return res.status(200).json({
                         status: true,
                         token,
-                        data: fbRows[0],
-                        message: "Successfully logged in !"
+                        data: resData,
+                        message: loginMsg.socialLogin.successMsg
                     });
                 }
                 else {
-                    return apiResponse.errorMessage(res, 400, "Failed to login, try again");
+                    return apiResponse.errorMessage(res, 400, loginMsg.socialLogin.failedMsg);
                 }
             }
             else {
-                return apiResponse.errorMessage(res, 400, "User not exist !");
+                return apiResponse.errorMessage(res, 400, loginMsg.socialLogin.notRegistered);
             }
         }
         else {
-            return apiResponse.errorMessage(res, 400, "Wrong type passed !");
+            return apiResponse.errorMessage(res, 400, loginMsg.socialLogin.wrongType);
         }
     }
     catch (error) {
         console.log("Something went wrong", error);
-        return apiResponse.errorMessage(res, 400, "Something went wrong");
+        return apiResponse.somethingWentWrongMessage(res);
     }
 });
 exports.socialLogin = socialLogin;

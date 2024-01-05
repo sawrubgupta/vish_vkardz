@@ -36,10 +36,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteVideos = exports.getVideos = exports.addVideos = void 0;
-const db_1 = __importDefault(require("../../../../db"));
+const dbV2_1 = __importDefault(require("../../../../dbV2"));
 const apiResponse = __importStar(require("../../helper/apiResponse"));
 const utility = __importStar(require("../../helper/utility"));
 const development_1 = __importDefault(require("../../config/development"));
+const responseMsg_1 = __importDefault(require("../../config/responseMsg"));
+const videosResMsg = responseMsg_1.default.features.videos;
 const addVideos = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // const userId = res.locals.jwt.userId;
@@ -51,19 +53,18 @@ const addVideos = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         else {
             userId = res.locals.jwt.userId;
         }
-        if (!userId || userId === "" || userId === undefined) {
-            return apiResponse.errorMessage(res, 401, "User Id is required!");
-        }
+        if (!userId || userId === "" || userId === undefined)
+            return apiResponse.errorMessage(res, 401, videosResMsg.addVideos.nullUserId);
         const createdAt = utility.dateWithFormat();
         const { profileId, videoType, url, thumbnail } = req.body;
         const sql = `INSERT INTO videos(user_id, profile_id, type, url, thumbnail, created_at) VALUES(?, ?, ?, ?, ?, ?)`;
         const VALUES = [userId, profileId, videoType, url, thumbnail, createdAt];
-        const [rows] = yield db_1.default.query(sql, VALUES);
+        const [rows] = yield dbV2_1.default.query(sql, VALUES);
         if (rows.affectedRows > 0) {
-            return apiResponse.successResponse(res, "Video added successfully", null);
+            return apiResponse.successResponse(res, videosResMsg.addVideos.successMsg, null);
         }
         else {
-            return apiResponse.errorMessage(res, 400, "Failed!, try again");
+            return apiResponse.errorMessage(res, 400, videosResMsg.addVideos.failedMsg);
         }
     }
     catch (error) {
@@ -84,9 +85,8 @@ const getVideos = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         else {
             userId = res.locals.jwt.userId;
         }
-        if (!userId || userId === "" || userId === undefined) {
-            return apiResponse.errorMessage(res, 401, "User Id is required!");
-        }
+        if (!userId || userId === "" || userId === undefined)
+            return apiResponse.errorMessage(res, 401, videosResMsg.getVideos.nullUserId);
         const profileId = req.query.profileId;
         var getPage = req.query.page;
         var page = parseInt(getPage);
@@ -96,9 +96,9 @@ const getVideos = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         var page_size = development_1.default.pageSize;
         const offset = (page - 1) * page_size;
         const pageQuery = `SELECT COUNT(id) AS length FROM videos WHERE user_id = ${userId} AND profile_id = ${profileId}`;
-        const [result] = yield db_1.default.query(pageQuery);
+        const [result] = yield dbV2_1.default.query(pageQuery);
         const sql = `SELECT * FROM videos WHERE user_id = ${userId} AND profile_id = ${profileId} ORDER BY created_at DESC LIMIT ${page_size} OFFSET ${offset}`;
-        const [rows] = yield db_1.default.query(sql);
+        const [rows] = yield dbV2_1.default.query(sql);
         let totalPages = result[0].length / page_size;
         let totalPage = Math.ceil(totalPages);
         if (rows.length > 0) {
@@ -108,7 +108,7 @@ const getVideos = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 totalPage: totalPage,
                 currentPage: page,
                 totalLength: result[0].length,
-                message: "Data Retrieved Successflly"
+                message: videosResMsg.getVideos.successMsg
             });
         }
         else {
@@ -118,7 +118,7 @@ const getVideos = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 totalPage: totalPage,
                 currentPage: page,
                 totalLength: result[0].length,
-                message: "No data found"
+                message: videosResMsg.getVideos.noDataFoundMsg
             });
         }
     }
@@ -135,8 +135,8 @@ const deleteVideos = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         const userId = res.locals.jwt.userId;
         const { profileId, videoId } = req.body;
         const sql = `DELETE FROM videos WHERE user_id = ${userId} AND profile_id = ${profileId} AND id = ${videoId}`;
-        const [rows] = yield db_1.default.query(sql);
-        return apiResponse.successResponse(res, "Video Deleted Successfully", null);
+        const [rows] = yield dbV2_1.default.query(sql);
+        return apiResponse.successResponse(res, videosResMsg.deleteVideos.successMsg, null);
     }
     catch (error) {
         console.log(error);

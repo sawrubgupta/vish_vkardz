@@ -8,7 +8,7 @@ const user_1 = __importDefault(require("./user/user"));
 const vcard_1 = __importDefault(require("./vcard/vcard"));
 const card_1 = __importDefault(require("./card/card"));
 const dashboard_1 = __importDefault(require("./dashboard/dashboard"));
-const uploadFile_1 = __importDefault(require("../controller/uploadFile/uploadFile"));
+// import uploadRoute from "../controller/uploadFile/uploadFile";
 const features_1 = __importDefault(require("./features/features"));
 const profile_1 = __importDefault(require("./profile/profile"));
 const invoice_1 = __importDefault(require("./invoice/invoice"));
@@ -17,6 +17,7 @@ const wallet_1 = __importDefault(require("./wallet/wallet"));
 const follow_1 = __importDefault(require("./follower/follow"));
 const package_1 = __importDefault(require("./service/package"));
 const website_1 = __importDefault(require("./website/website"));
+const s3upload_1 = __importDefault(require("../controller/uploadFile/s3upload"));
 // import staticDataRoute from "./static_data/staticData"
 // import subscriptionRoute from "./subscription/subscription"
 // import vkardzRoute from "./vkardz/vkardz"
@@ -30,7 +31,7 @@ const indexRoute = (0, express_1.Router)();
 indexRoute.use("/user", user_1.default);
 indexRoute.use("/vcard", vcard_1.default);
 indexRoute.use("/card", card_1.default);
-indexRoute.use("/uploads", uploadFile_1.default);
+// indexRoute.use("/uploads", uploadRoute);
 indexRoute.use("/dashboard", dashboard_1.default);
 indexRoute.use("/features", features_1.default);
 indexRoute.use("/profile", profile_1.default);
@@ -40,6 +41,7 @@ indexRoute.use("/wallet", wallet_1.default);
 indexRoute.use("/userFollow", follow_1.default);
 indexRoute.use("/service", package_1.default);
 indexRoute.use("/web", website_1.default);
+indexRoute.use("/uploads", s3upload_1.default);
 // indexRoute.use("/staticData",staticDataRoute);
 // indexRoute.use("/subscription",subscriptionRoute);
 // indexRoute.use("/vkardz",vkardzRoute);

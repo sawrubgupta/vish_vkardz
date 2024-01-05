@@ -57,6 +57,11 @@ function default_1(app) {
     }));
     app.use(express_1.default.static(__dirname + "./public_html"));
     app.use('/api', api_index_routes_1.default);
+    app.use('/api/v1', (req, res) => {
+        res.status(400).json({
+            message: 'We`ve released a new version, Please update your application.'
+        });
+    });
     app.use('*', (req, res) => {
         res.status(404).json({
             message: 'Resource not available'

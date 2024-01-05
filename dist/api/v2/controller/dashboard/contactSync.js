@@ -43,33 +43,30 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.contactSyncSG = exports.favUserScan = exports.contactSync = void 0;
-const db_1 = __importDefault(require("../../../../db"));
+const dbV2_1 = __importDefault(require("../../../../dbV2"));
 const apiResponse = __importStar(require("../../helper/apiResponse"));
 const utility = __importStar(require("../../helper/utility"));
 const lodash_1 = __importDefault(require("lodash"));
+const responseMsg_1 = __importDefault(require("../../config/responseMsg"));
+const contactSyncResMsg = responseMsg_1.default.dashboard.contactSync;
 const contactSync = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         let contacts = req.body.contacts;
-        if (contacts.length > 100) {
-            return apiResponse.errorMessage(res, 400, "Max Length is 100");
-        }
-        console.log("contacts", contacts);
+        if (contacts.length > 100)
+            return apiResponse.errorMessage(res, 400, contactSyncResMsg.contactSync.maxLengthMsg);
         contacts = lodash_1.default.uniqBy(contacts, 'phone');
-        console.log("uniq cotacts", contacts);
         let arr = [];
         for (const ele of contacts) {
             let phones = ele.phone;
             arr.push(phones);
         }
-        console.log(arr);
         const checkSql = `SELECT phone FROM sync_contacts WHERE phone IN(${arr})`;
-        const [rows] = yield db_1.default.query(checkSql);
+        const [rows] = yield dbV2_1.default.query(checkSql);
         let finalArr = [];
         if (rows.length > 0) {
             const res = contacts.filter((x) => !rows.some((y) => y.phone === x.phone));
             // finalArr.push(res)
             finalArr = res;
-            console.log("res", res);
         }
         else {
             finalArr = contacts;
@@ -112,22 +109,21 @@ const contactSync = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
                 insertQuery = insertQuery + ` ('${name}', '${dialCode}', '${phone}', '${email}'), `;
                 result = insertQuery.substring(0, insertQuery.lastIndexOf(','));
             }
-            const [data] = yield db_1.default.query(result);
-            console.log("finalArr", finalArr);
+            const [data] = yield dbV2_1.default.query(result);
             if (data.affectedRows > 0) {
-                return apiResponse.successResponse(res, "Contact Insert Successfully", null);
+                return apiResponse.successResponse(res, contactSyncResMsg.contactSync.successMsg, null);
             }
             else {
-                return apiResponse.errorMessage(res, 400, "Failed!");
+                return apiResponse.errorMessage(res, 400, contactSyncResMsg.contactSync.failedMsg);
             }
         }
-        else {
-            return apiResponse.successResponse(res, "Record Already Exist!", null);
-        }
+        // } else {
+        //     return apiResponse.successResponse(res, "Record Already Exist!", null);
+        // }
     }
     catch (error) {
         console.log(error);
-        return apiResponse.errorMessage(res, 400, "Something Went Wrong");
+        return apiResponse.somethingWentWrongMessage(res);
     }
 });
 exports.contactSync = contactSync;
@@ -136,7 +132,7 @@ exports.contactSync = contactSync;
 //notused
 const favUserScan = (users, uid, res) => __awaiter(void 0, void 0, void 0, function* () {
     const sql = `SELECT fav_uid FROM favourite where uid = '${uid}' `;
-    let [data] = yield db_1.default.query(sql);
+    let [data] = yield dbV2_1.default.query(sql);
     if (data.length === 0) {
         users.forEach((element, index) => {
             users[index].isFavourite = false;
@@ -178,7 +174,7 @@ const contactSyncSG = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         if (contactArray.length < 1)
             return apiResponse.errorMessage(res, 400, "Please pass the contact pay ");
         const contactSql = `SELECT phone, id FROM users where phone IN(${stringValue}) and deleted_at is null LIMIT 100`;
-        const [contactData] = yield db_1.default.query(contactSql);
+        const [contactData] = yield dbV2_1.default.query(contactSql);
         // const dbData: any = contactData.rows;
         console.log("contactSql", contactSql);
         console.log("contactData", contactData);
@@ -238,7 +234,7 @@ const contactSyncSG = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         console.log("insertSql", insertSql);
         console.log("result", result);
         return;
-        const [rows] = yield db_1.default.query(result);
+        const [rows] = yield dbV2_1.default.query(result);
         console.log("rows", rows);
         if (rows.affectedRows > 0) {
             return apiResponse.successResponse(res, "Contacts syncs successfully", null);

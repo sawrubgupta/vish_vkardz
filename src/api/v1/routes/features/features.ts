@@ -28,8 +28,8 @@ featureRouter.get("/getProducts", tempAuthenticatingToken, productController.get
 featureRouter.patch("/updateProduct", tempAuthenticatingToken, validation.userProductsValidation, productController.updateProduct); //use in business tpe
 featureRouter.delete("/deleteProduct", tempAuthenticatingToken, productController.deleteProduct);//use in business type
 
-featureRouter.post("/addBusinessHour", authenticatingToken, validation.businessHourValidation, businessHourController.addBusinessHour);//use in business type
-featureRouter.get("/businessHour", authenticatingToken, businessHourController.businessHourList);//use in business type
+featureRouter.post("/addBusinessHour", tempAuthenticatingToken, validation.businessHourValidation, businessHourController.addBusinessHour);//use in business type
+featureRouter.get("/businessHour", tempAuthenticatingToken, businessHourController.businessHourList);//use in business type
 
 featureRouter.post("/portfolio", tempAuthenticatingToken, gallaryController.gallary); //use in business type
 featureRouter.get("/getPortfolio", tempAuthenticatingToken, gallaryController.getPortfolio);//use in business type

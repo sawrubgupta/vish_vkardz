@@ -1,9 +1,11 @@
 import { Request, Response } from "express";
-import pool from '../../../../db';
+import pool from '../../../../dbV2';
 import * as apiResponse from '../../helper/apiResponse';
 import * as utility from "../../helper/utility";
 import config  from '../../config/development';
+import resMsg from '../../config/responseMsg';
 
+const orderResMsg = resMsg.orders.transaction;
 
 export const transactionHistory =async (req:Request, res:Response) => {
     try {
@@ -20,13 +22,13 @@ export const transactionHistory =async (req:Request, res:Response) => {
                     rows[index].paymntMethod = 'online';
                 }
             });
-            return apiResponse.successResponse(res, "Transacion list are here", rows);
+            return apiResponse.successResponse(res, orderResMsg.transactionHistory.successMsg, rows);
         } else {
-            return apiResponse.successResponse(res, "No transactions yet!", null);
+            return apiResponse.successResponse(res, orderResMsg.transactionHistory.noDataFoundMsg, null);
         }
     } catch (error) {
         console.log(error);
-        return apiResponse.errorMessage(res, 400, "Something went wrong");
+        return apiResponse.somethingWentWrongMessage(res);
     }
 }
 

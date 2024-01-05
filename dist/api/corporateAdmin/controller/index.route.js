@@ -11,4 +11,5 @@ const corporateAdminRoute = (0, express_1.Router)();
 corporateAdminRoute.use("/auth", index_1.default);
 corporateAdminRoute.use("/profile", index_2.default);
 corporateAdminRoute.use("/teams", index_3.default);
+corporateAdminRoute.use("/profileV2", index_2.default);
 exports.default = corporateAdminRoute;

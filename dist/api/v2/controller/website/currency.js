@@ -36,12 +36,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.currencyList = void 0;
-const db_1 = __importDefault(require("../../../../db"));
+const dbV2_1 = __importDefault(require("../../../../dbV2"));
 const apiResponse = __importStar(require("../../helper/apiResponse"));
 const currencyList = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const sql = `SELECT * FROM currencies`;
-        const [rows] = yield db_1.default.query(sql);
+        const [rows] = yield dbV2_1.default.query(sql);
         return apiResponse.successResponse(res, "Data Retrieved Successfully", rows);
     }
     catch (error) {

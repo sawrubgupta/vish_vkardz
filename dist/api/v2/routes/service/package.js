@@ -24,10 +24,12 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
-const packageController = __importStar(require("../../controller/services/package"));
+const oldPackageController = __importStar(require("../../controller/services/package"));
+const updatePackageController = __importStar(require("../../controller/services/updateUserPackage"));
 const authorization_controller_1 = require("../../middleware/authorization.controller");
 const validation = __importStar(require("../../middleware/validation"));
 const serviceRouter = (0, express_1.Router)();
-serviceRouter.patch("/updatePackage", authorization_controller_1.authenticatingToken, validation.updatePackageValidation, packageController.updatePackage);
-serviceRouter.get("/getPackageList", packageController.getPackage);
+serviceRouter.patch("/package", authorization_controller_1.authenticatingToken, validation.oldUpdatePackageValidation, oldPackageController.updatePackage);
+serviceRouter.get("/getPackageList", oldPackageController.getPackage);
+serviceRouter.patch("/updatePackage", authorization_controller_1.authenticatingToken, validation.updatePackageValidation, updatePackageController.updatePackage);
 exports.default = serviceRouter;

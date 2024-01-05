@@ -36,38 +36,39 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.validatePin = exports.removePin = exports.setPin = void 0;
-const db_1 = __importDefault(require("../../../../db"));
+const dbV2_1 = __importDefault(require("../../../../dbV2"));
 const apiResponse = __importStar(require("../../helper/apiResponse"));
 const development_1 = __importDefault(require("../../config/development"));
+const responseMsg_1 = __importDefault(require("../../config/responseMsg"));
+const setSecurityPinResMsg = responseMsg_1.default.profile.setSecurityPin;
 //according v2
 const setPin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // const userId:string = res.locals.jwt.userId;
         let userId;
-        const type = req.query.type; //type = business, user, null
+        const type = req.body.type; //type = business, user, null
         if (type && (type === development_1.default.businessType || type === development_1.default.websiteType || type === development_1.default.vcfWebsite)) {
-            userId = req.query.userId;
+            userId = req.body.userId;
         }
         else {
             userId = res.locals.jwt.userId;
         }
-        if (!userId || userId === "" || userId === undefined) {
-            return apiResponse.errorMessage(res, 401, "User Id is required!");
-        }
+        if (!userId || userId === "" || userId === undefined)
+            return apiResponse.errorMessage(res, 401, setSecurityPinResMsg.setPin.nullUserId);
         const { securityPin, profileId } = req.body;
         const sql = `UPDATE users_profile SET set_password = ? WHERE user_id = ? AND id = ?`;
         const VALUES = [securityPin, userId, profileId];
-        const [rows] = yield db_1.default.query(sql, VALUES);
+        const [rows] = yield dbV2_1.default.query(sql, VALUES);
         if (rows.affectedRows > 0) {
-            return apiResponse.successResponse(res, "Profile Password Added Successfully", null);
+            return apiResponse.successResponse(res, setSecurityPinResMsg.setPin.successMsg, null);
         }
         else {
-            return apiResponse.errorMessage(res, 400, "Failed to add profle password");
+            return apiResponse.errorMessage(res, 400, setSecurityPinResMsg.setPin.failedMsg);
         }
     }
     catch (error) {
         console.log(error);
-        return apiResponse.errorMessage(res, 400, "Something went wrong");
+        return apiResponse.somethingWentWrongMessage(res);
     }
 });
 exports.setPin = setPin;
@@ -85,22 +86,21 @@ const removePin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         else {
             userId = res.locals.jwt.userId;
         }
-        if (!userId || userId === "" || userId === undefined) {
-            return apiResponse.errorMessage(res, 401, "User Id is required!");
-        }
+        if (!userId || userId === "" || userId === undefined)
+            return apiResponse.errorMessage(res, 401, setSecurityPinResMsg.removePin.nullUserId);
         const profileId = req.query.profileId;
         const sql = `UPDATE users_profile SET set_password = null WHERE user_id = ${userId} AND id = ${profileId}`;
-        const [rows] = yield db_1.default.query(sql);
+        const [rows] = yield dbV2_1.default.query(sql);
         if (rows.affectedRows > 0) {
-            return apiResponse.successResponse(res, "Profile Pin Remove Successfully", null);
+            return apiResponse.successResponse(res, setSecurityPinResMsg.removePin.successMsg, null);
         }
         else {
-            return apiResponse.errorMessage(res, 400, "Failed to remove security pin, try again later");
+            return apiResponse.errorMessage(res, 400, setSecurityPinResMsg.removePin.failedMsg);
         }
     }
     catch (error) {
         console.log(error);
-        return apiResponse.errorMessage(res, 400, "Something went wrong");
+        return apiResponse.somethingWentWrongMessage(res);
     }
 });
 exports.removePin = removePin;
@@ -110,22 +110,23 @@ const validatePin = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     try {
         const { username, pin } = req.body;
         const sql = `SELECT * FROM users WHERE username = '${username}' LIMIT 1`;
-        const [rows] = yield db_1.default.query(sql);
+        const [rows] = yield dbV2_1.default.query(sql);
         if (rows.length === 0)
-            return apiResponse.errorMessage(res, 400, "Invalid username");
-        if (rows[0].is_password_enable === 0) {
-            return apiResponse.successResponse(res, "Profile Pin is disabled", null);
-        }
+            return apiResponse.errorMessage(res, 400, setSecurityPinResMsg.validatePin.invalidUsername);
+        const profileSql = `SELECT set_password FROM users_profile `;
+        // if (rows[0].is_password_enable === 0) {
+        //     return apiResponse.successResponse(res, "Profile Pin is disabled", null);
+        // }
         if (pin == rows[0].set_password) {
-            return apiResponse.successResponse(res, "Profile pin verified", null);
+            return apiResponse.successResponse(res, setSecurityPinResMsg.validatePin.successMsg, null);
         }
         else {
-            return apiResponse.errorMessage(res, 400, "Wrong profile pin");
+            return apiResponse.errorMessage(res, 400, setSecurityPinResMsg.validatePin.wrongPinMsg);
         }
     }
     catch (error) {
         console.log(error);
-        return apiResponse.errorMessage(res, 400, "Something went wrong");
+        return apiResponse.somethingWentWrongMessage(res);
     }
 });
 exports.validatePin = validatePin;

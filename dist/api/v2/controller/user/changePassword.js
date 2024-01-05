@@ -37,42 +37,43 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.changePassword = void 0;
 const apiResponse = __importStar(require("../../helper/apiResponse"));
-const db_1 = __importDefault(require("../../../../db"));
+const dbV2_1 = __importDefault(require("../../../../dbV2"));
 const md5_1 = __importDefault(require("md5"));
+const responseMsg_1 = __importDefault(require("../../config/responseMsg"));
+const changePasswordMsg = responseMsg_1.default.user.changePassword;
 const changePassword = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userId = res.locals.jwt.userId;
         const { oldPassword, newPassword } = req.body;
         const hash = (0, md5_1.default)(newPassword);
         const sql = `SELECT password from users WHERE id = ${userId}`;
-        const [data] = yield db_1.default.query(sql);
+        const [data] = yield dbV2_1.default.query(sql);
         if (data.length > 0) {
             const oldPassCorrect = (0, md5_1.default)(oldPassword) == data[0].password;
             if (oldPassCorrect) {
-                if (oldPassword === newPassword) {
-                    return apiResponse.errorMessage(res, 400, "old password and new password can't same");
-                }
+                if (oldPassword === newPassword)
+                    return apiResponse.errorMessage(res, 400, changePasswordMsg.changePassword.passwordNotMatch);
                 const updatePassSql = `Update users Set password = ? where id = ?`;
                 const VALUES = [hash, userId];
-                const [updatePassword] = yield db_1.default.query(updatePassSql, VALUES);
+                const [updatePassword] = yield dbV2_1.default.query(updatePassSql, VALUES);
                 if (updatePassword.affectedRows > 0) {
-                    return apiResponse.successResponse(res, "Password updated successfully !", null);
+                    return apiResponse.successResponse(res, changePasswordMsg.changePassword.successMsg, null);
                 }
                 else {
-                    return apiResponse.errorMessage(res, 400, "Something Went Wrong, Please Try again later");
+                    return apiResponse.errorMessage(res, 400, changePasswordMsg.changePassword.failedMsg);
                 }
             }
             else {
-                return apiResponse.errorMessage(res, 400, "Wrong old password !!");
+                return apiResponse.errorMessage(res, 400, changePasswordMsg.changePassword.wrongPasword);
             }
         }
         else {
-            return apiResponse.errorMessage(res, 400, "User not found !");
+            return apiResponse.errorMessage(res, 400, changePasswordMsg.changePassword.userNotFound);
         }
     }
     catch (error) {
         console.log(error);
-        return apiResponse.errorMessage(res, 400, "Something went wrong");
+        return apiResponse.somethingWentWrongMessage(res);
     }
 });
 exports.changePassword = changePassword;

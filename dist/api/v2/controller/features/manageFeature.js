@@ -31,108 +31,139 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __asyncValues = (this && this.__asyncValues) || function (o) {
-    if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
-    var m = o[Symbol.asyncIterator], i;
-    return m ? m.call(o) : (o = typeof __values === "function" ? __values(o) : o[Symbol.iterator](), i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function () { return this; }, i);
-    function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }
-    function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateUserFeaturesStatus = exports.getFeatureByUserId = void 0;
-const db_1 = __importDefault(require("../../../../db"));
+exports.features = exports.updateUserFeaturesStatus = exports.getFeatureByUserId = void 0;
+const dbV2_1 = __importDefault(require("../../../../dbV2"));
 const apiResponse = __importStar(require("../../helper/apiResponse"));
 const development_1 = __importDefault(require("../../config/development"));
+const responseMsg_1 = __importDefault(require("../../config/responseMsg"));
+const manageFeatureResMsg = responseMsg_1.default.features.manageFeature;
 const getFeatureByUserId = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b;
     try {
         // const userId:string = res.locals.jwt.userId;
         let userId;
         const type = req.query.type; //type = business, user, null
+        const profileId = req.query.profileId;
         if (type && (type === development_1.default.businessType || type === development_1.default.websiteType || type === development_1.default.vcfWebsite)) {
             userId = req.query.userId;
         }
         else {
             userId = res.locals.jwt.userId;
         }
-        if (!userId || userId === "" || userId === undefined) {
-            return apiResponse.errorMessage(res, 401, "User Id is required!");
+        if (!userId || userId === "" || userId === undefined)
+            return apiResponse.errorMessage(res, 401, manageFeatureResMsg.getFeatureByUserId.nullUserId);
+        if (!profileId || profileId === null)
+            return apiResponse.errorMessage(res, 400, manageFeatureResMsg.getFeatureByUserId.nullProfileId);
+        const checkPackageSql = `SELECT * FROM users_package WHERE user_id = ${userId} LIMIT 1`;
+        const [packageRows] = yield dbV2_1.default.query(checkPackageSql);
+        let package_name = (_b = (_a = packageRows[0]) === null || _a === void 0 ? void 0 : _a.package_slug) !== null && _b !== void 0 ? _b : null;
+        let sql = "";
+        if (package_name == null) {
+            sql = `SELECT users_features.feature_id, features.type, features.icon, features.features, features.slug, users_features.status FROM features LEFT JOIN users_features ON features.id = users_features.feature_id WHERE users_features.user_id = ${userId} AND users_features.profile_id = ${profileId} AND features.status = 1 AND is_business_feature = 0`;
+        }
+        else {
+            sql = `SELECT users_features.feature_id, features.type, features.icon, features.features, features.slug, users_features.status FROM features LEFT JOIN users_features ON features.id = users_features.feature_id WHERE users_features.user_id = ${userId} AND users_features.profile_id = ${profileId} AND features.status = 1`;
         }
         // const sql = `SELECT users_features.feature_id, features.features, features.slug, users_features.status FROM features LEFT JOIN users_features ON features.id = users_features.feature_id WHERE users_features.user_id = ${userId} AND features.id IN (3, 5, 6, 8, 10, 11)`;
-        const sql = `SELECT users_features.feature_id, features.features, features.slug, users_features.status FROM features LEFT JOIN users_features ON features.id = users_features.feature_id WHERE users_features.user_id = ${userId} AND features.feature_show = 1`;
-        const [rows] = yield db_1.default.query(sql);
-        const avgFeatureSql = `SELECT users_features.feature_id, features.features, features.slug, users_features.status FROM features LEFT JOIN users_features ON features.id = users_features.feature_id WHERE users_features.user_id = ${userId} AND features.feature_show = 1 AND users_features.status = 1`;
-        const [avgRows] = yield db_1.default.query(avgFeatureSql);
+        const [rows] = yield dbV2_1.default.query(sql);
+        const avgFeatureSql = `SELECT users_features.feature_id, features.features, features.slug, users_features.status FROM features LEFT JOIN users_features ON features.id = users_features.feature_id WHERE users_features.user_id = ${userId} AND users_features.profile_id = ${profileId} AND features.status = 1 AND features.id IN (3, 5, 6, 8, 10, 11)`;
+        const [avgRows] = yield dbV2_1.default.query(avgFeatureSql);
         const avgActiveFeature = (avgRows.length / 6) * 100;
         // return apiResponse.successResponse(res, "User Features Get Successfully", rows);
         return res.status(200).json({
             status: true,
             data: rows, avgActiveFeature,
-            message: "User Features Get Successfully"
+            message: manageFeatureResMsg.getFeatureByUserId.successMsg
         });
     }
     catch (error) {
         console.log(error);
-        return apiResponse.errorMessage(res, 400, "Something went wrong");
+        return apiResponse.somethingWentWrongMessage(res);
     }
 });
 exports.getFeatureByUserId = getFeatureByUserId;
 // ====================================================================================================
 // ====================================================================================================
 const updateUserFeaturesStatus = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, e_1, _b, _c;
     try {
         // const userId:string = res.locals.jwt.userId;
         let userId;
+        const type = req.body.type; //type = business, user, null
+        const profileId = req.body.profileId;
+        if (type && (type === development_1.default.businessType || type === development_1.default.websiteType || type === development_1.default.vcfWebsite)) {
+            userId = req.body.userId;
+        }
+        else {
+            userId = res.locals.jwt.userId;
+        }
+        if (!userId || userId === "" || userId === undefined)
+            return apiResponse.errorMessage(res, 401, manageFeatureResMsg.updateUserFeaturesStatus.nullUserId);
+        if (!profileId || profileId === null)
+            return apiResponse.errorMessage(res, 400, manageFeatureResMsg.updateUserFeaturesStatus.nullProfileId);
+        let data;
+        const sql = `UPDATE users_features SET status = ? WHERE user_id = ? AND feature_id = ? AND profile_id = ?`;
+        for (const element of req.body.features) {
+            const featureId = element.featureId;
+            const status = element.status;
+            let VALUES = [status, userId, featureId, profileId];
+            [data] = yield dbV2_1.default.query(sql, VALUES);
+        }
+        if (data.affectedRows > 0) {
+            return apiResponse.successResponse(res, manageFeatureResMsg.updateUserFeaturesStatus.successMsg, null);
+        }
+        else {
+            return apiResponse.errorMessage(res, 400, manageFeatureResMsg.updateUserFeaturesStatus.failedMsg);
+        }
+    }
+    catch (error) {
+        console.log(error);
+        return apiResponse.somethingWentWrongMessage(res);
+    }
+});
+exports.updateUserFeaturesStatus = updateUserFeaturesStatus;
+// ====================================================================================================
+// ====================================================================================================
+// get business features (profile setting)
+const features = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _c, _d;
+    try {
+        let userId;
         const type = req.query.type; //type = business, user, null
+        const profileId = req.query.profileId;
         if (type && (type === development_1.default.businessType || type === development_1.default.websiteType || type === development_1.default.vcfWebsite)) {
             userId = req.query.userId;
         }
         else {
             userId = res.locals.jwt.userId;
         }
-        if (!userId || userId === "" || userId === undefined) {
-            return apiResponse.errorMessage(res, 401, "User Id is required!");
-        }
-        let data;
-        const sql = `UPDATE users_features SET status = ? WHERE user_id = ? AND feature_id = ?`;
-        try {
-            for (var _d = true, _e = __asyncValues(req.body.features), _f; _f = yield _e.next(), _a = _f.done, !_a;) {
-                _c = _f.value;
-                _d = false;
-                try {
-                    const element = _c;
-                    const featureId = element.featureId;
-                    const status = element.status;
-                    let VALUES = [status, userId, featureId];
-                    [data] = yield db_1.default.query(sql, VALUES);
-                }
-                finally {
-                    _d = true;
-                }
-            }
-        }
-        catch (e_1_1) { e_1 = { error: e_1_1 }; }
-        finally {
-            try {
-                if (!_d && !_a && (_b = _e.return)) yield _b.call(_e);
-            }
-            finally { if (e_1) throw e_1.error; }
-        }
-        if (data.affectedRows > 0) {
-            return apiResponse.successResponse(res, "Features updated successfully", null);
+        if (!userId || userId === "" || userId === undefined)
+            return apiResponse.errorMessage(res, 401, manageFeatureResMsg.getFeatureByUserId.nullUserId);
+        const checkPackageSql = `SELECT * FROM users_package WHERE user_id = ${userId} LIMIT 1`;
+        const [packageRows] = yield dbV2_1.default.query(checkPackageSql);
+        let package_name = (_d = (_c = packageRows[0]) === null || _c === void 0 ? void 0 : _c.package_slug) !== null && _d !== void 0 ? _d : null;
+        let sql = "";
+        if (package_name == null) {
+            sql = `SELECT * FROM features WHERE feature_show = 1 AND is_business_feature = 0 ORDER BY sequence_id ASC`;
         }
         else {
-            return apiResponse.errorMessage(res, 400, "Failed to update user feature, try again");
+            sql = `SELECT * FROM features WHERE feature_show = 1 ORDER BY sequence_id ASC`;
         }
+        const [rows] = yield dbV2_1.default.query(sql);
+        return res.status(200).json({
+            status: true,
+            data: rows,
+            message: manageFeatureResMsg.features.successMsg
+        });
     }
     catch (error) {
         console.log(error);
-        return apiResponse.errorMessage(res, 400, "Something went wrong");
+        return apiResponse.somethingWentWrongMessage(res);
     }
 });
-exports.updateUserFeaturesStatus = updateUserFeaturesStatus;
-// =======w============================================================================================
+exports.features = features;
+// ====================================================================================================
 // ====================================================================================================

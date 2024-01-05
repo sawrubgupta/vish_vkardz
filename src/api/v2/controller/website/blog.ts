@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import pool from '../../../../db';
+import pool from '../../../../dbV2';
 import * as apiResponse from '../../helper/apiResponse';
 import * as utility from "../../helper/utility";
 import config  from '../../config/development';
@@ -32,7 +32,7 @@ export const blogList =async (req:Request, res:Response) => {
             totalPage: totalPage,
             currentPage: page,
             totalLength: result[0].totalLength,
-            message: "Products details are here"
+            message: "Data Retrieved Successfully"
         })
 
     } catch (error) {

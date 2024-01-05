@@ -36,7 +36,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.reedemCouponCoin = exports.coinHistory = void 0;
-const db_1 = __importDefault(require("../../../../db"));
+const dbV2_1 = __importDefault(require("../../../../dbV2"));
 const apiResponse = __importStar(require("../../helper/apiResponse"));
 const utility = __importStar(require("../../helper/utility"));
 const development_1 = __importDefault(require("../../config/development"));
@@ -51,16 +51,29 @@ const coinHistory = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         var page_size = development_1.default.pageSize;
         const offset = (page - 1) * page_size;
         const getPageQuery = `SELECT COUNT(id) AS length FROM user_coins WHERE user_id = ${userId}`;
-        const [result] = yield db_1.default.query(getPageQuery);
-        const sql = `SELECT * FROM user_coins WHERE user_id = ${userId} ORDER BY created_at desc limit ${page_size} offset ${offset}`;
-        const [rows] = yield db_1.default.query(sql);
+        const [result] = yield dbV2_1.default.query(getPageQuery);
+        const sql = `SELECT user_coins.*, users.username, users.name, users.referral_code, users.offer_coin FROM user_coins LEFT JOIN users ON users.id = user_coins.user_id WHERE user_id = ${userId} ORDER BY created_at desc limit ${page_size} offset ${offset}`;
+        const [rows] = yield dbV2_1.default.query(sql);
+        const userSql = `SELECT offer_coin FROM users WHERE id = ${userId} LIMIT 1`;
+        const [userRows] = yield dbV2_1.default.query(userSql);
+        const totalCoin = userRows[0].offer_coin;
+        const coinFaqSql = `SELECT * FROM faq WHERE (type = '${development_1.default.vKoin}' OR type = '${development_1.default.earnCoin}') AND status = 1`;
+        const [faqRows] = yield dbV2_1.default.query(coinFaqSql);
+        let faqData = [];
+        let useCoin = [];
+        for (const ele of faqRows) {
+            if (ele.type === development_1.default.vKoin)
+                faqData.push(ele);
+            if (ele.type === development_1.default.earnCoin)
+                useCoin.push(ele);
+        }
         let totalPages = result[0].length / page_size;
         let totalPage = Math.ceil(totalPages);
         let totalLength = result[0].length;
         // return apiResponse.successResponse
         return res.status(200).json({
             status: true,
-            data: rows,
+            data: rows, faqData, useCoin, totalCoin,
             totalPage: totalPage,
             currentPage: page,
             totalLength: totalLength,
@@ -86,26 +99,25 @@ const reedemCouponCoin = (req, res) => __awaiter(void 0, void 0, void 0, functio
         const extendedDate = utility.extendedDateAndTime("yearly");
         const checkCouponCodeQuery = `SELECT coupon_code, discount_amount, discount_type FROM coupons WHERE coupon_code = ? AND expiration_date >= ?`;
         const couponVALUES = [couponCode, createdAt];
-        const [couponrows] = yield db_1.default.query(checkCouponCodeQuery, couponVALUES);
+        const [couponrows] = yield dbV2_1.default.query(checkCouponCodeQuery, couponVALUES);
         if (couponrows.length === 0) {
             return apiResponse.errorMessage(res, 400, "Invalid Coupon Code!!");
         }
         const coins = couponrows[0].discount_amount;
         const chekCodeUsedQuery = `SELECT id FROM coupon_redemptions WHERE coupon_code = ? AND customer_id = ?`;
         const codeVALUES = [couponCode, userId];
-        const [data] = yield db_1.default.query(chekCodeUsedQuery, codeVALUES);
-        if (data.length > 0) {
+        const [data] = yield dbV2_1.default.query(chekCodeUsedQuery, codeVALUES);
+        if (data.length > 0)
             return apiResponse.errorMessage(res, 400, "This coupon code has already used");
-        }
         const sql = `INSERT INTO coupon_redemptions(customer_id, coupon_code, total_discount, redemption_date) VALUES(?, ?, ?, ?)`;
         const VALUES = [userId, couponCode, coins, createdAt];
-        const [rows] = yield db_1.default.query(sql, VALUES);
+        const [rows] = yield dbV2_1.default.query(sql, VALUES);
         if (rows.affectedRows > 0) {
             const coinSql = `INSERT INTO user_coins(user_id, type, coin, used_coin_amount, coin_status, created_at, expired_at) VALUES(?, ?, ?, ?, ?, ?, ?)`;
             const coinVALUES = [userId, development_1.default.couponRedeem, coins, 0, development_1.default.activeStatus, createdAt, extendedDate];
-            const [coinRows] = yield db_1.default.query(coinSql, coinVALUES);
+            const [coinRows] = yield dbV2_1.default.query(coinSql, coinVALUES);
             const updateUser = `UPDATE users SET offer_coin = offer_coin + ${coins} WHERE id = ${userId}`;
-            const [userRows] = yield db_1.default.query(updateUser);
+            const [userRows] = yield dbV2_1.default.query(updateUser);
             return apiResponse.successResponse(res, "Coupon Redeem Sucessfully", null);
         }
         else {

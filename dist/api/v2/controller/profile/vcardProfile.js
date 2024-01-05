@@ -43,9 +43,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.checkPinEnable = exports.vcardProfile = void 0;
-const db_1 = __importDefault(require("../../../../db"));
+const dbV2_1 = __importDefault(require("../../../../dbV2"));
 const apiResponse = __importStar(require("../../helper/apiResponse"));
 const development_1 = __importDefault(require("../../config/development"));
+// not used
 const vcardProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, e_1, _b, _c;
     try {
@@ -59,7 +60,7 @@ const vcardProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         console.log("newCardNumber", newCardNumber);
         const getUserQuery = `SELECT * FROM users WHERE deleted_at IS NULL AND (username = '${key}' OR username = '${newCardNumber}' OR card_number = '${key}' OR card_number = '${newCardNumber}' OR card_number_fix = '${key}' OR card_number_fix = '${newCardNumber}') LIMIT 1`;
         // const getUserQuery = `SELECT * FROM users WHERE deleted_at IS NULL AND username = 'abhi76' LIMIT 1`;
-        const [userRows] = yield db_1.default.query(getUserQuery);
+        const [userRows] = yield dbV2_1.default.query(getUserQuery);
         if (userRows.length > 0) {
             const userId = userRows[0].id;
             let display_number = [userRows[0].display_number];
@@ -79,9 +80,9 @@ const vcardProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             //     if (profilePin !== userRows[0].set_password || !profilePin) return apiResponse.errorMessage(res, 400, "Invalid pin!");
             // }
             const getSocialSiteQuery = `SELECT social_sites.id, social_sites.name, social_sites.social_link, social_sites.social_img, social_sites.type, social_sites.status, social_sites.primary_profile, vcard_social_sites.value, vcard_social_sites.label, vcard_social_sites.orders FROM social_sites LEFT JOIN vcard_social_sites ON social_sites.id = vcard_social_sites.site_id AND vcard_social_sites.user_id = ${userId} HAVING vcard_social_sites.value IS NOT NULL ORDER BY vcard_social_sites.value DESC, vcard_social_sites.orders IS NULL ASC`;
-            const [socialRows] = yield db_1.default.query(getSocialSiteQuery);
+            const [socialRows] = yield dbV2_1.default.query(getSocialSiteQuery);
             const customFieldSql = `SELECT icon, value, type FROM vcf_custom_field WHERE user_id = ${userId} AND status = 1`;
-            const [vcfRows] = yield db_1.default.query(customFieldSql);
+            const [vcfRows] = yield dbV2_1.default.query(customFieldSql);
             try {
                 // const getThemes = `SELECT users.themes as themeId, vkard_layouts.vkard_style, vkard_layouts.image FROM users LEFT JOIN vkard_layouts ON users.vcard_layouts = vkard_layouts.id WHERE users.id = ${userId} LIMIT 1`;
                 // const [themeData]:any = await pool.query(getThemes);
@@ -151,7 +152,7 @@ const checkPinEnable = (req, res) => __awaiter(void 0, void 0, void 0, function*
         let splitNewCardNumber = newCardNum.split('/');
         let newCardNumber = splitNewCardNumber[0] || newCardNum;
         const sql = `SELECT is_password_enable FROM users WHERE deleted_at IS NULL AND ((username = '${key}' OR username = '${newCardNumber}') OR (card_number = '${key}' OR card_number = '${newCardNumber}') OR (card_number_fix = '${key}' OR card_number_fix = '${newCardNumber}')) LIMIT 1`;
-        const [rows] = yield db_1.default.query(sql);
+        const [rows] = yield dbV2_1.default.query(sql);
         if (rows.length === 0)
             return apiResponse.errorMessage(res, 400, "Activate your card");
         return apiResponse.successResponse(res, "Data Retrieved Successfully", rows[0]);

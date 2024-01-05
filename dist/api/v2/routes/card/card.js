@@ -31,6 +31,7 @@ const couponCodeController = __importStar(require("../../controller/card/coupons
 const purchaseController = __importStar(require("../../controller/card/purchase"));
 const ratingController = __importStar(require("../../controller/card/rating"));
 // import * as packageController from '../../controller/cart/package';
+const addressController = __importStar(require("../../controller/card/address"));
 const authorization_controller_1 = require("../../middleware/authorization.controller");
 const validation = __importStar(require("../../middleware/validation"));
 const cardRouter = (0, express_1.Router)();
@@ -40,6 +41,7 @@ cardRouter.get("/productDetail", authorization_controller_1.tempAuthenticatingTo
 cardRouter.get("/productsFaq", productController.productFaq);
 cardRouter.post("/purchaseCard", authorization_controller_1.authenticatingToken, validation.purchaseValidation, purchaseController.cardPurchase);
 // cardRouter.post("/shipping_method", authenticatingToken, validation.purchaseValidation, cartController.shipping);
+cardRouter.get("/vkardzProducts", authorization_controller_1.tempAuthenticatingToken, productController.vkardzProducts);
 // cardRouter.patch("/updatePackage", authenticatingToken, packageController.updatePackage);
 // cardRouter.get("/getPackageList", packageController.getPackage);
 cardRouter.post("/addToWishlist", authorization_controller_1.authenticatingToken, wishlistContriller.addToWishlist);
@@ -47,14 +49,15 @@ cardRouter.get("/getWishlist", authorization_controller_1.authenticatingToken, w
 cardRouter.delete("/removeFromWishlist", authorization_controller_1.authenticatingToken, wishlistContriller.removeFromWishlist);
 cardRouter.post("/addCart", authorization_controller_1.authenticatingToken, validation.cartValidation, cartController.addToCart);
 cardRouter.get("/getCart", authorization_controller_1.authenticatingToken, cartController.getCart);
+cardRouter.get("/cartCount", authorization_controller_1.authenticatingToken, cartController.cartCount);
 cardRouter.delete("/removeFromCart", authorization_controller_1.authenticatingToken, cartController.removeFromCart);
-cardRouter.patch("/updateCartQty", authorization_controller_1.authenticatingToken, validation.cartValidation, cartController.updataCartQty);
+cardRouter.patch("/updateCartQty", authorization_controller_1.authenticatingToken, validation.cartValidation, cartController.updateCartQty);
 cardRouter.post("/customizeCard", authorization_controller_1.authenticatingToken, validation.customizeCardValidation, cartController.addCostmizeCard);
-cardRouter.post("/addDeliveryAddress", authorization_controller_1.authenticatingToken, validation.deliveryAddressValidation, cartController.addDeliveryAddresess);
-cardRouter.patch("/updateDeliveryAddress", authorization_controller_1.authenticatingToken, validation.updateDdeliveryAddressValidation, cartController.updateDeliveryAddresess);
-cardRouter.get("/getDeliveryAddress", authorization_controller_1.authenticatingToken, cartController.getDeliveryAddresses);
-cardRouter.delete("/deleteAddress", authorization_controller_1.authenticatingToken, cartController.deleteDaliveryAddress);
-cardRouter.post("/defaultAddress", authorization_controller_1.authenticatingToken, cartController.defaultAddres);
+cardRouter.post("/addDeliveryAddress", authorization_controller_1.authenticatingToken, validation.deliveryAddressValidation, addressController.addDeliveryAddresess);
+cardRouter.patch("/updateDeliveryAddress", authorization_controller_1.authenticatingToken, validation.updateDdeliveryAddressValidation, addressController.updateDeliveryAddresess);
+cardRouter.get("/getDeliveryAddress", authorization_controller_1.authenticatingToken, addressController.getDeliveryAddresses);
+cardRouter.delete("/deleteAddress", authorization_controller_1.authenticatingToken, addressController.deleteDaliveryAddress);
+cardRouter.post("/defaultAddress", authorization_controller_1.authenticatingToken, addressController.defaultAddress);
 cardRouter.get("/checkCouponCode", authorization_controller_1.authenticatingToken, couponCodeController.coupnDiscount);
 cardRouter.post("/redeemCoupon", authorization_controller_1.authenticatingToken, couponCodeController.couponRedemptions);
 cardRouter.post("/productRating", authorization_controller_1.authenticatingToken, validation.productRatingValidation, ratingController.productRating);

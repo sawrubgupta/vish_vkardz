@@ -35,7 +35,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getPrimarySite = exports.setPrimaryProfile = void 0;
+exports.addPrimaryLink = exports.getPrimarySite = exports.setPrimaryProfile = void 0;
 const db_1 = __importDefault(require("../../../../db"));
 const apiResponse = __importStar(require("../../helper/apiResponse"));
 const setPrimaryProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -121,5 +121,27 @@ const getPrimarySite = (req, res) => __awaiter(void 0, void 0, void 0, function*
     }
 });
 exports.getPrimarySite = getPrimarySite;
+// ====================================================================================================
+// ====================================================================================================
+const addPrimaryLink = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const userId = res.locals.jwt.userId;
+        const { primaryProfileLink } = req.body;
+        const primaryProfileQuery = `UPDATE users SET primary_profile_link = ? WHERE id = ?`;
+        const VALUES = [primaryProfileLink, userId];
+        const [rows] = yield db_1.default.query(primaryProfileQuery, VALUES);
+        if (rows.affectedRows > 0) {
+            return apiResponse.successResponse(res, "Primary Profile Added Successfully", null);
+        }
+        else {
+            return apiResponse.errorMessage(res, 400, "Failed to Add Primary Profile, try again!");
+        }
+    }
+    catch (error) {
+        console.log(error);
+        return apiResponse.errorMessage(res, 400, "Something Went Wrong");
+    }
+});
+exports.addPrimaryLink = addPrimaryLink;
 // ====================================================================================================
 // ====================================================================================================

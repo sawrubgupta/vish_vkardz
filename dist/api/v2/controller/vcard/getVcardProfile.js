@@ -37,7 +37,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getVcardProfile = void 0;
 const apiResponse = __importStar(require("../../helper/apiResponse"));
-const db_1 = __importDefault(require("../../../../db"));
+const dbV2_1 = __importDefault(require("../../../../dbV2"));
 const development_1 = __importDefault(require("../../config/development"));
 const getVcardProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -50,14 +50,13 @@ const getVcardProfile = (req, res) => __awaiter(void 0, void 0, void 0, function
         else {
             userId = res.locals.jwt.userId;
         }
-        if (!userId || userId === "" || userId === undefined) {
+        if (!userId || userId === "" || userId === undefined)
             return apiResponse.errorMessage(res, 404, "User profile not found !");
-        }
         const sql = `SELECT username, card_number, full_name, thumb, cover_photo, vcard_layouts,  vcard_bg_color, designation, company_name, display_email, display_dial_code, display_number, website, display_email, address, colors FROM users WHERE id = ${userId} LIMIT 1`;
-        const [userData] = yield db_1.default.query(sql);
+        const [userData] = yield dbV2_1.default.query(sql);
         if (userData.length > 0) {
             const getSocialSiteQyery = `SELECT social_sites.id, social_sites.name, social_sites.social_link, social_sites.social_img, social_sites.type, social_sites.status, social_sites.primary_profile, vcard_social_sites.value, vcard_social_sites.orders FROM social_sites INNER JOIN vcard_social_sites on social_sites.id = vcard_social_sites.site_id AND vcard_social_sites.user_id = ${userId} ORDER BY vcard_social_sites.orders IS NULL ASC`;
-            const [socialRows] = yield db_1.default.query(getSocialSiteQyery);
+            const [socialRows] = yield dbV2_1.default.query(getSocialSiteQyery);
             if (socialRows.length > 0) {
                 userData[0].socialSites = socialRows;
                 return apiResponse.successResponse(res, "Get user vcard profile data !", userData[0]);

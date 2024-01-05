@@ -33,12 +33,17 @@ const getVcardProfileController = __importStar(require("../../controller/vcard/g
 const authorization_controller_1 = require("../../middleware/authorization.controller");
 const validation = __importStar(require("../../middleware/validation"));
 const vcardRouter = (0, express_1.Router)();
-vcardRouter.post("/activateCard", authorization_controller_1.tempAuthenticatingToken, activateCardController.activateCard); //use in business type
+// vcardRouter.post("/activateCard", tempAuthenticatingToken, validation.activateCardValidation, activateCardController.activateCard);//use in business type
 vcardRouter.get("/deactivateCard", authorization_controller_1.tempAuthenticatingToken, deactivateCardController.deactivateCard); //use in business type
 vcardRouter.get("/getVcardProfile", authorization_controller_1.tempAuthenticatingToken, getVcardProfileController.getVcardProfile); //use in business type
+vcardRouter.post("/activateCard", authorization_controller_1.tempAuthenticatingToken, validation.activateCardValidation, activateCardController.multiProfileActivateCard); //use in business type
+vcardRouter.post("/removeCard", authorization_controller_1.tempAuthenticatingToken, validation.removeCardValidation, deactivateCardController.removeCard); //use in business type
 vcardRouter.get("/getSocialLinks", authorization_controller_1.tempAuthenticatingToken, socialLinksController.getSocialLinks); //use in business type
+vcardRouter.post("/addSocialLinks", authorization_controller_1.tempAuthenticatingToken, validation.addSocialLinksValidation, socialLinksController.addSocialLinks); //use in business type
 vcardRouter.patch("/updateSocialLinks", authorization_controller_1.tempAuthenticatingToken, validation.editSocialLinksValidation, socialLinksController.updateSocialLinks); //use in business type
-vcardRouter.delete("/deleteSocialLink", authorization_controller_1.tempAuthenticatingToken, socialLinksController.deleteSocialLink); //use in business type
+vcardRouter.patch("/addUpdateSocialLinks", authorization_controller_1.tempAuthenticatingToken, validation.addUpdateSocialLinksValidation, socialLinksController.addUpdateSocialLinks); //not used //use in business type
+vcardRouter.delete("/deleteSocialLink", authorization_controller_1.tempAuthenticatingToken, validation.deleteSocialLinkValidation, socialLinksController.deleteSocialLink); //use in business type
+vcardRouter.post("/socialStatus", authorization_controller_1.tempAuthenticatingToken, validation.socialStatusValidation, socialLinksController.socialStatus); //use in business type
 // vcardRouter.patch("/updateVcardProfile", authenticatingToken,  updateVcardProfileController.updateVcardProfile);
 // vcardRouter.get("/viewVcardProfile", authenticatingToken, viewVcardProfileController.viewVcardProfile);
 // vcardRouter.get("/getSocialQuickSetupLinks", authenticatingToken, getSocialLinksController.getQuickSetupSocialLinks);

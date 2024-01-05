@@ -156,7 +156,7 @@ export const updateProfileValidation =async (req:Request, res:Response, next:Nex
         phone: Joi.string().trim().min(8).max(20).trim().required(),
         email: Joi.string().email( ).max(60).required(),
         website: Joi.string().trim().max(80).min(5).allow(''),
-        address: Joi.string().normalize().max(200).required(),
+        address: Joi.string().normalize().max(200).allow('', null),
     });
 
     const value = schema.validate(req.body);
@@ -800,6 +800,25 @@ export const primaryProfileValidation = async(req: Request, res: Response, next:
 
     const schema = Joi.object({
         primaryProfileSlug: Joi.string().required(),
+    })
+
+    const value = schema.validate(req.body);
+    
+    if (value.error) {
+        const errMsg = await validationCheck(value);
+        return await apiResponse.errorMessage(res,400, errMsg);
+    }
+    next();
+}
+
+// ====================================================================================================
+// ====================================================================================================
+
+export const addPrimaryLinkValidation = async(req: Request, res: Response, next: NextFunction) => {
+
+    const schema = Joi.object({
+        // primaryProfileSlug: Joi.string().required(),
+        primaryProfileLink: Joi.string().allow("", null)
     })
 
     const value = schema.validate(req.body);

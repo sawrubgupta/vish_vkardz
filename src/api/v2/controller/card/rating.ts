@@ -1,8 +1,11 @@
-import pool from '../../../../db';
+import pool from '../../../../dbV2';
 import { Request, Response } from "express";
 import * as apiResponse from '../../helper/apiResponse';
 import config  from '../../config/development';
 import * as utility from "../../helper/utility";
+import responseMsg from '../../config/responseMsg';
+
+const ratingResponseMsg = responseMsg.card.rating;
 
 export const productRating =async (req:Request, res:Response) => {
     try {
@@ -13,45 +16,46 @@ export const productRating =async (req:Request, res:Response) => {
         const checkProductBuySql = `SELECT id FROM orderlist WHERE user_id = ${userId} AND product_id = ${productId} LIMIT 1`;
         const [orderData]:any = await pool.query(checkProductBuySql);
 
-        if (orderData.length === 0) {
-            return apiResponse.errorMessage(res, 400, "Sorry! You are not allowed to review this product since you haven't bought it.")
-        }
+        if (orderData.length === 0) return apiResponse.errorMessage(res, 400, ratingResponseMsg.productRating.notBuy);
 
         const checkReviewSql = `SELECT id FROM product_rating WHERE user_id = ${userId} AND product_id = ${productId} LIMIT 1`;
         const [reviewData]:any = await pool.query(checkReviewSql);
-
-        if (reviewData.length > 0) {
-            return apiResponse.errorMessage(res, 400, "Already review!");
-        }
+        if (reviewData.length > 0) return apiResponse.errorMessage(res, 400, ratingResponseMsg.productRating.alreadyReviewMsg);
 
         const sql = `INSERT INTO product_rating(user_id, product_id, rating, message, created_at) VALUES(?, ?, ?, ?, ?)`;
         const VALUES = [userId, productId, rating, message, createdAt];
         const [rows]:any = await pool.query(sql, VALUES);
 
         if (rows.affectedRows > 0) {
-            return apiResponse.successResponse(res, "Rated Successfully", null);
+            return apiResponse.successResponse(res, ratingResponseMsg.productRating.successMsg, null);
         } else {
-            return apiResponse.errorMessage(res, 400, "Failed!!, Please try again");
+            return apiResponse.errorMessage(res, 400, ratingResponseMsg.productRating.failedMsg);
         }
 
     } catch (error) {
         console.log(error);
-        return apiResponse.errorMessage(res, 400, "Something wnt wrong")
+        return apiResponse.somethingWentWrongMessage(res);
     }
 }
 // ====================================================================================================
 // ====================================================================================================
 
 export const reviewList =async (req:Request, res:Response) => {
-    const productId = req.query.productId;
-
-    const sql = `SELECT product_rating.id AS reviewId, users.name, product_rating.rating, product_rating.message FROM product_rating LEFT JOIN users ON product_rating.user_id = users.id WHERE product_rating.product_id = ${productId}`;
-    const [rows]:any = await pool.query(sql);
-
-    if (rows.length > 0) {
-        return apiResponse.successResponse(res, "Success", rows);
-    } else {
-        return apiResponse.successResponse(res, "No Reviews Found", []);
+    try {
+        const productId = req.query.productId;
+        if (!productId || productId === null || productId === undefined) return apiResponse.errorMessage(res, 400, ratingResponseMsg.reviewList.nullProductIdMsg);
+    
+        const sql = `SELECT product_rating.id AS reviewId, users.name, product_rating.rating, product_rating.message FROM product_rating LEFT JOIN users ON product_rating.user_id = users.id WHERE product_rating.product_id = ${productId}`;
+        const [rows]:any = await pool.query(sql);
+    
+        if (rows.length > 0) {
+            return apiResponse.successResponse(res, ratingResponseMsg.reviewList.successMsg, rows);
+        } else {
+            return apiResponse.successResponse(res, ratingResponseMsg.reviewList.noDataFoundMsg, null);
+        }    
+    } catch (e) {
+        console.log(e);
+        return apiResponse.somethingWentWrongMessage(res)
     }
 }
 
@@ -68,13 +72,13 @@ export const updateProductReviews =async (req:Request, res:Response) => {
         const [rows]:any = await pool.query(sql, VALUES);
 
         if (rows.affectedRows > 0) {
-            return apiResponse.successResponse(res, "Review updated successfully", null);
+            return apiResponse.successResponse(res, ratingResponseMsg.updateProductReviews.successMsg, null);
         } else {
-            return apiResponse.errorMessage(res, 400, "Failed to update, Please try again!");
+            return apiResponse.errorMessage(res, 400, ratingResponseMsg.updateProductReviews.failedMsg);
         }
     } catch (error) {
         console.log(error);
-        return apiResponse.errorMessage(res, 400, "Something went wrong");
+        return apiResponse.somethingWentWrongMessage(res);
     }
 }
 

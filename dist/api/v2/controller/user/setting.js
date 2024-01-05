@@ -36,25 +36,27 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.setting = void 0;
-const db_1 = __importDefault(require("../../../../db"));
+const dbV2_1 = __importDefault(require("../../../../dbV2"));
 const apiResponse = __importStar(require("../../helper/apiResponse"));
+const responseMsg_1 = __importDefault(require("../../config/responseMsg"));
+const settingResMsg = responseMsg_1.default.user.setting;
 const setting = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userId = res.locals.jwt.userId;
         const { pushNotificationEnable, emailNotificationEnable, currencyCode, languageSelection } = req.body;
         const sql = `UPDATE users SET currency_code = ?, push_notification_enable = ?,email_notification_enable = ?, language_selection = ? where id = ?`;
         const VALUES = [currencyCode, pushNotificationEnable, emailNotificationEnable, languageSelection, userId];
-        const [rows] = yield db_1.default.query(sql, VALUES);
+        const [rows] = yield dbV2_1.default.query(sql, VALUES);
         if (rows.affectedRows > 0) {
-            return apiResponse.successResponse(res, "Setting updated successfully !", null);
+            return apiResponse.successResponse(res, settingResMsg.setting.successMsg, null);
         }
         else {
-            return apiResponse.errorMessage(res, 400, "Failed to update setting");
+            return apiResponse.errorMessage(res, 400, settingResMsg.setting.failedMsg);
         }
     }
     catch (error) {
         console.log(error);
-        return apiResponse.errorMessage(res, 400, "Something went wrong");
+        return apiResponse.somethingWentWrongMessage(res);
     }
 });
 exports.setting = setting;

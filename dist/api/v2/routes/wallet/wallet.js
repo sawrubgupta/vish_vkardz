@@ -30,6 +30,7 @@ const authorization_controller_1 = require("../../middleware/authorization.contr
 const walletRouter = (0, express_1.Router)();
 walletRouter.get("/checkReferralCode", referController.checkReferCode);
 walletRouter.post("/applyReferCode", authorization_controller_1.authenticatingToken, referController.useReferCode);
+walletRouter.get("/referCoinList", authorization_controller_1.authenticatingToken, referController.referCoinHistory);
 walletRouter.get("/walletHistory", authorization_controller_1.authenticatingToken, coinsController.coinHistory);
 walletRouter.post("/reedemCouponCoin", authorization_controller_1.authenticatingToken, coinsController.reedemCouponCoin);
 exports.default = walletRouter;

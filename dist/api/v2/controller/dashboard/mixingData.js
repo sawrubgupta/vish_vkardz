@@ -35,15 +35,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.mixingData = void 0;
-const db_1 = __importDefault(require("../../../../db"));
+exports.apiTest = exports.test = exports.mixingData = void 0;
+const dbV2_1 = __importDefault(require("../../../../dbV2"));
 const apiResponse = __importStar(require("../../helper/apiResponse"));
+const development_1 = __importDefault(require("../../config/development"));
+const nodemailer_1 = __importDefault(require("nodemailer"));
 const mixingData = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const geturls = `SELECT * FROM app_setting WHERE status = 1`;
-        const [url] = yield db_1.default.query(geturls);
+        const [url] = yield dbV2_1.default.query(geturls);
         const appVersionQuery = `SELECT * FROM app_update LIMIT 1`;
-        const [appVersionData] = yield db_1.default.query(appVersionQuery);
+        const [appVersionData] = yield dbV2_1.default.query(appVersionQuery);
+        const limitationSql = `SELECT * FROM user_limitations WHERE status = 1`;
+        const [limitationRows] = yield dbV2_1.default.query(limitationSql);
         const appVersionRows = {
             android: {
                 forceUpdate: appVersionData[0].force_android_update,
@@ -62,10 +66,67 @@ const mixingData = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
                 isRequired: appVersionData[0].is_required,
             }
         };
+        const limitationData = {
+        // product: 50,
+        // gallery: 50,
+        // profile: 5
+        };
+        const customUrls = {
+            imgUrl: "https://vkardz.s3.ap-south-1.amazonaws.com/",
+            siteUrl: development_1.default.vkardUrl
+        };
+        for (const ele of limitationRows) {
+            // if (ele.type === config.productType) limitationData['product'] = ele.limitation;
+            // if (ele.type === config.galleryType) limitationData['gallery'] = ele.limitation;
+            // if (ele.type === config.profileType) limitationData['profile'] = ele.limitation;
+            limitationData[ele.type] = ele.limitation;
+            continue;
+        }
+        const secretKeys = {
+            razorPayKey: process.env.RAZORPAY_KEY,
+        };
+        const imageResolution = {
+            "profileImage": {
+                "type": "circular",
+                "height": 150,
+                "width": 150,
+                "quality": 50
+            },
+            "profileCoverImage": {
+                "type": "rect",
+                "height": 200,
+                "width": 750,
+                "quality": 50
+            },
+            "productImage": {
+                "type": "rect",
+                "height": 500,
+                "width": 300,
+                "quality": 50
+            },
+            "galleryImage": {
+                "type": "rect",
+                "height": 750,
+                "width": 750,
+                "quality": 50
+            },
+            "aboutUsCoverImage": {
+                "type": "rect",
+                "height": 200,
+                "width": 750,
+                "quality": 50
+            },
+            "aboutUsProfileImage": {
+                "type": "circular",
+                "height": 150,
+                "width": 150,
+                "quality": 50
+            }
+        };
         // return apiResponse.successResponse(res, "Data Retrieved Successfully", data);\
         return res.status(200).json({
             status: true,
-            url, appVersionRows,
+            url, appVersionRows, limitationData, customUrls, secretKeys, imageResolution,
             message: "Data Retrieved Successfully"
         });
     }
@@ -75,5 +136,95 @@ const mixingData = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
 });
 exports.mixingData = mixingData;
+// ====================================================================================================
+// ====================================================================================================
+const test = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        //   const transporter = nodemailer.createTransport({
+        //     name: "mail.lookingforjob.co",
+        //         host: "mail.lookingforjob.co",
+        //         port: 465,
+        //         auth: {
+        //           user: "mailto:info@lookingforjob.co",
+        //           pass: "asd12300"
+        //         },
+        //   });
+        //   const mailOptions = {
+        //     from: "mailto:info@lookingforjob.co",
+        //     to: email,
+        //     name: email,
+        //     subject: `${subject}`,
+        //     text: `name is ${name} and phoneNumber is ${phone} and message is ${message}`,
+        //   };
+        var transport = nodemailer_1.default.createTransport({
+            // host: "mail.office365.com",
+            service: "gmail",
+            // port: 465,
+            auth: {
+                user: "vkardzinfo@gmail.com",
+                pass: "cmwp cahr iysd lndl" //"kokvjhmsplezxfva"
+            }
+        });
+        //   console.log("transport ", transport);
+        let info = yield transport.sendMail({
+            from: "noreply@vkardz.com",
+            to: "vishalpathriya9252@gmail.com",
+            subject: "subject",
+            text: "message", // plain text body
+        });
+        // result = info.messageId;
+        console.log("Message sent: %s", info);
+        console.log("Preview URL: %s", nodemailer_1.default.getTestMessageUrl(info));
+        //   transporter.sendMail(mailOptions, (error:any, info:any) => {
+        // let info = await transporter.sendMail({
+        //     from: "noreply@vkardz.com", // sender address
+        //     to: "vishalpathriya9252@gmail.com", // list of receivers
+        //     subject: "subject", // Subject line
+        //     text: "message", // plain text body
+        // })
+        return res.status(200).json({
+            status: true,
+            data: null,
+            message: "Data Retrieved Successfully"
+        });
+    }
+    catch (error) {
+        console.log(error);
+        return apiResponse.errorMessage(res, 400, "Something went wrong");
+    }
+});
+exports.test = test;
+// ====================================================================================================
+const apiTest = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        // Define your API endpoint
+        const apiUrl = 'https://api.example.com/data';
+        // Function to make the API call
+        function makeApiCall() {
+            // Use your preferred method for making API calls (e.g., fetch, axios, etc.)
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                // Handle the API response data here
+                console.log("api call", data);
+            })
+                .catch(error => {
+                // Handle errors
+                console.error('Error making API call:', error);
+            });
+        }
+        // Set up the loop with a 1-second interval
+        const intervalId = setInterval(makeApiCall, 1000);
+        // You can stop the loop after a certain number of iterations if needed
+        // Uncomment the next line and replace 10 with the desired number of iterations
+        // setTimeout(() => clearInterval(intervalId), 1000 * 10);
+        // Call the function to start the loop
+    }
+    catch (e) {
+        console.log(e);
+        return apiResponse.somethingWentWrongMessage;
+    }
+});
+exports.apiTest = apiTest;
 // ====================================================================================================
 // ====================================================================================================

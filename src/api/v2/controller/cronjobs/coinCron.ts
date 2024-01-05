@@ -1,4 +1,4 @@
-import pool from '../../../../db';
+import pool from '../../../../dbV2';
 import * as utility from "../../helper/utility";
 import config from '../../config/development';
 

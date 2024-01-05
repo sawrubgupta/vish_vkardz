@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import pool from '../../../../db';
+import pool from '../../../../dbV2';
 import * as apiResponse from '../../helper/apiResponse';
 import * as utility from "../../helper/utility";
 import config  from '../../config/development';
@@ -22,6 +22,21 @@ export const contactUs =async (req:Request, res:Response) => {
     } catch (error) {
         console.log(error);
         return apiResponse.errorMessage(res, 400, "Something Went Wrong");
+    }
+}
+
+// ====================================================================================================
+// ====================================================================================================
+
+export const nfcDeviceList =async (req:Request, res:Response) => {
+    try {
+        const sql = `SELECT * FROM nfc_devices`;
+        const [rows]:any = await pool.query(sql);
+
+        return apiResponse.successResponse(res, "Data Retrieved Successfully", rows);
+    } catch (e) {
+        console.log(e);
+        return apiResponse.somethingWentWrongMessage(res);
     }
 }
 

@@ -1,8 +1,11 @@
 import {Request, Response, NextFunction} from 'express';
 import * as apiResponse from '../../helper/apiResponse';
-import pool from '../../../../db';
+import pool from '../../../../dbV2';
 import bcrypt from 'bcryptjs';
 import md5 from "md5";
+import resMsg from '../../config/responseMsg';
+
+const changePasswordMsg = resMsg.user.changePassword;
 
 export const changePassword =async (req:Request, res:Response) => {
     try {
@@ -16,27 +19,26 @@ export const changePassword =async (req:Request, res:Response) => {
         if (data.length > 0) {
             const oldPassCorrect = md5(oldPassword) ==  data[0].password;
             if (oldPassCorrect) {
-                if (oldPassword === newPassword) {
-                    return apiResponse.errorMessage(res, 400, "old password and new password can't same");
-                }
+                if (oldPassword === newPassword) return apiResponse.errorMessage(res, 400, changePasswordMsg.changePassword.passwordNotMatch);
+                
                 const updatePassSql = `Update users Set password = ? where id = ?`;
                 const VALUES = [hash, userId]
                 const [updatePassword]:any = await pool.query(updatePassSql, VALUES)
 
                 if (updatePassword.affectedRows > 0) {                    
-                    return apiResponse.successResponse(res,"Password updated successfully !", null);
+                    return apiResponse.successResponse(res,changePasswordMsg.changePassword.successMsg, null);
                 } else {
-                    return apiResponse.errorMessage(res,400,"Something Went Wrong, Please Try again later");
+                    return apiResponse.errorMessage(res,400,changePasswordMsg.changePassword.failedMsg);
                 }   
             } else {
-                return apiResponse.errorMessage(res, 400, "Wrong old password !!");
+                return apiResponse.errorMessage(res, 400, changePasswordMsg.changePassword.wrongPasword);
             }
         } else{
-            return apiResponse.errorMessage(res, 400, "User not found !")
+            return apiResponse.errorMessage(res, 400, changePasswordMsg.changePassword.userNotFound);
         }
     } catch (error) {
         console.log(error);
-        return apiResponse.errorMessage(res, 400, "Something went wrong");
+        return apiResponse.somethingWentWrongMessage(res);
     }
 }
 

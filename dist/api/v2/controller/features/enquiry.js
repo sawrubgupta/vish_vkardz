@@ -36,24 +36,26 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.submitEnquiry = exports.replyEnquiry = exports.deleteEnquiry = exports.enquiryList = void 0;
-const db_1 = __importDefault(require("../../../../db"));
+const dbV2_1 = __importDefault(require("../../../../dbV2"));
 const apiResponse = __importStar(require("../../helper/apiResponse"));
 const utility = __importStar(require("../../helper/utility"));
 const development_1 = __importDefault(require("../../config/development"));
+const responseMsg_1 = __importDefault(require("../../config/responseMsg"));
+const enquiryResMsg = responseMsg_1.default.features.enquiry;
 const enquiryList = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // const userId:string = res.locals.jwt.userId;
         let userId;
-        const type = req.query.type; //type = business, user, null
+        const type = req.query.type; //type = business, user, 
+        const profileId = req.query.profileId;
         if (type && (type === development_1.default.businessType || type === development_1.default.websiteType || type === development_1.default.vcfWebsite)) {
             userId = req.query.userId;
         }
         else {
             userId = res.locals.jwt.userId;
         }
-        if (!userId || userId === "" || userId === undefined) {
-            return apiResponse.errorMessage(res, 401, "User Id is required!");
-        }
+        if (!userId || userId === "" || userId === undefined)
+            return apiResponse.errorMessage(res, 401, enquiryResMsg.enquiryList.nullUserId);
         var getPage = req.query.page;
         var page = parseInt(getPage);
         if (page === null || page <= 1 || !page) {
@@ -61,12 +63,12 @@ const enquiryList = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         }
         var page_size = development_1.default.pageSize;
         const offset = (page - 1) * page_size;
-        const getPageQuery = `SELECT id, name, email, phone_num, msg, created_at FROM user_contacts WHERE user_id = ${userId}`;
-        const [result] = yield db_1.default.query(getPageQuery);
-        const sql = `SELECT id, name, email, phone_num, msg, created_at FROM user_contacts WHERE user_id = ${userId} ORDER BY id DESC LIMIT ${page_size} OFFSET ${offset}`;
-        const [rows] = yield db_1.default.query(sql);
-        const getFeatureStatus = `SELECT status FROM users_features WHERE user_id = ${userId} AND feature_id = 11`;
-        let [featureStatus] = yield db_1.default.query(getFeatureStatus);
+        const getPageQuery = `SELECT id, name, email, phone_num, msg, created_at FROM user_contacts WHERE user_id = ${userId} AND profile_id = ${profileId}`;
+        const [result] = yield dbV2_1.default.query(getPageQuery);
+        const sql = `SELECT id, name, email, phone_num, msg, created_at FROM user_contacts WHERE user_id = ${userId} AND profile_id = ${profileId} ORDER BY id DESC LIMIT ${page_size} OFFSET ${offset}`;
+        const [rows] = yield dbV2_1.default.query(sql);
+        const getFeatureStatus = `SELECT status FROM users_features WHERE user_id = ${userId} AND profile_id = ${profileId} AND feature_id = 11`;
+        let [featureStatus] = yield dbV2_1.default.query(getFeatureStatus);
         if (featureStatus.length === 0) {
             featureStatus[0] = {};
             featureStatus[0].status = 0;
@@ -81,7 +83,7 @@ const enquiryList = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
                 totalPage: totalPage,
                 currentPage: page,
                 totalLength: result.length,
-                message: "Data Retrieved Successflly"
+                message: enquiryResMsg.enquiryList.successMsg
             });
         }
         else {
@@ -92,13 +94,13 @@ const enquiryList = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
                 totalPage: totalPage,
                 currentPage: page,
                 totalLength: result.length,
-                message: "No Data Found"
+                message: enquiryResMsg.enquiryList.noDataFoundMsg
             });
         }
     }
     catch (error) {
         console.log(error);
-        return apiResponse.errorMessage(res, 400, "Something went wrong");
+        return apiResponse.somethingWentWrongMessage(res);
     }
 });
 exports.enquiryList = enquiryList;
@@ -108,30 +110,33 @@ const deleteEnquiry = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     try {
         // const userId:string = res.locals.jwt.userId;
         let userId;
-        const type = req.query.type; //type = business, user, null
+        const type = req.body.type; //type = business, user, null
+        // const profileId = req.body.profileId;
         if (type && type == development_1.default.businessType) {
             userId = req.query.userId;
         }
         else {
             userId = res.locals.jwt.userId;
         }
-        if (!userId || userId === "" || userId === undefined) {
-            return apiResponse.errorMessage(res, 401, "User Id is required!");
-        }
+        if (!userId || userId === "" || userId === undefined)
+            return apiResponse.errorMessage(res, 401, enquiryResMsg.deleteEnquiry.nullUserId);
         const enquiryId = req.body.enquiryId;
+        // const checkEnquirySql = `SELECT id FROM user_contacts WHERE id = ${enquiryId} AND user_id = ${userId} AND profile_id = ${profileId}`;
+        // const [enquryRows]:any = await pool.query(checkEnquirySql);
+        // if (enquryRows.length === 0) return apiResponse.errorMessage(res, 400, "Invalid Enqury!");
         const sql = `DELETE FROM user_contacts WHERE user_id = ? AND id = ?`;
         const VALUES = [userId, enquiryId];
-        const [rows] = yield db_1.default.query(sql, VALUES);
+        const [rows] = yield dbV2_1.default.query(sql, VALUES);
         if (rows.affectedRows > 0) {
-            return apiResponse.successResponse(res, "Enquiry Deleted Successfuly", null);
+            return apiResponse.successResponse(res, enquiryResMsg.deleteEnquiry.successMsg, null);
         }
         else {
-            return apiResponse.errorMessage(res, 400, "Failed to delete, try again");
+            return apiResponse.errorMessage(res, 400, enquiryResMsg.deleteEnquiry.failedMsg);
         }
     }
     catch (error) {
         console.log(error);
-        return apiResponse.errorMessage(res, 400, "Something ent wrong");
+        return apiResponse.somethingWentWrongMessage(res);
     }
 });
 exports.deleteEnquiry = deleteEnquiry;
@@ -141,33 +146,32 @@ const replyEnquiry = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     try {
         // const userId:string = res.locals.jwt.userId;
         let userId;
-        const type = req.query.type; //type = business, user, null
+        const type = req.body.type; //type = business, user, null
         if (type && (type === development_1.default.businessType || type === development_1.default.websiteType || type === development_1.default.vcfWebsite)) {
-            userId = req.query.userId;
+            userId = req.body.userId;
         }
         else {
             userId = res.locals.jwt.userId;
         }
-        if (!userId || userId === "" || userId === undefined) {
-            return apiResponse.errorMessage(res, 401, "User Id is required!");
-        }
+        if (!userId || userId === "" || userId === undefined)
+            return apiResponse.errorMessage(res, 401, enquiryResMsg.replyEnquiry.nullUserId);
         const enquiryId = req.body.enquiryId;
         const message = req.body.message;
         const sql = `SELECT email FROM user_contacts WHERE user_id = ? AND id = ? LIMIT 1`;
         const VALUES = [userId, enquiryId];
-        const [rows] = yield db_1.default.query(sql, VALUES);
+        const [rows] = yield dbV2_1.default.query(sql, VALUES);
         if (rows.length > 0) {
             const email = rows[0].email;
             yield utility.sendMail(email, "testing subject", message);
-            return apiResponse.successResponse(res, "Email Sent Successfully", null);
+            return apiResponse.successResponse(res, enquiryResMsg.replyEnquiry.successMsg, null);
         }
         else {
-            return apiResponse.errorMessage(res, 400, "Enquiry not found");
+            return apiResponse.errorMessage(res, 400, enquiryResMsg.replyEnquiry.failedMsg);
         }
     }
     catch (error) {
         console.log(error);
-        return apiResponse.errorMessage(res, 400, "Something went wrong");
+        return apiResponse.somethingWentWrongMessage(res);
     }
 });
 exports.replyEnquiry = replyEnquiry;
@@ -175,21 +179,21 @@ exports.replyEnquiry = replyEnquiry;
 // ====================================================================================================
 const submitEnquiry = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { username, name, email, phone, message } = req.body;
+        const { profileId, username, name, email, phone, message } = req.body;
         const createdAt = utility.dateWithFormat();
         const userSql = `SELECT id FROM users WHERE username = '${username}' LIMIT 1`;
-        const [userRows] = yield db_1.default.query(userSql);
+        const [userRows] = yield dbV2_1.default.query(userSql);
         if (userRows.length === 0)
-            return apiResponse.errorMessage(res, 400, "Invalid username");
+            return apiResponse.errorMessage(res, 400, enquiryResMsg.submitEnquiry.invalidUsername);
         const userId = userRows[0].id;
-        const sql = `INSERT INTO user_contacts(user_id, name, email, phone_num, msg, created_at) VALUES(?, ?, ?, ?, ?, ?)`;
-        const VALUES = [userId, name, email, phone, message, createdAt];
-        const [rows] = yield db_1.default.query(sql, VALUES);
+        const sql = `INSERT INTO user_contacts(user_id, profile_id, name, email, phone_num, msg, created_at) VALUES(?, ?, ?, ?, ?, ?, ?)`;
+        const VALUES = [userId, profileId, name, email, phone, message, createdAt];
+        const [rows] = yield dbV2_1.default.query(sql, VALUES);
         if (rows.affectedRows > 0) {
-            return apiResponse.successResponse(res, "Success", null);
+            return apiResponse.successResponse(res, enquiryResMsg.submitEnquiry.successMsg, null);
         }
         else {
-            return apiResponse.errorMessage(res, 400, "Failed!, try again");
+            return apiResponse.errorMessage(res, 400, enquiryResMsg.submitEnquiry.failedMsg);
         }
     }
     catch (error) {

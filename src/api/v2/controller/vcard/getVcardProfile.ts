@@ -1,6 +1,6 @@
 import {Request, Response} from "express";
 import * as apiResponse from '../../helper/apiResponse';
-import pool from '../../../../db';
+import pool from '../../../../dbV2';
 import config from '../../config/development';
 
 export const getVcardProfile =async (req:Request, res:Response) => {
@@ -14,9 +14,7 @@ export const getVcardProfile =async (req:Request, res:Response) => {
             userId = res.locals.jwt.userId;
         }
 
-        if (!userId || userId === "" || userId === undefined) {
-            return apiResponse.errorMessage(res, 404, "User profile not found !");
-        }
+        if (!userId || userId === "" || userId === undefined) return apiResponse.errorMessage(res, 404, "User profile not found !");
 
         const sql = `SELECT username, card_number, full_name, thumb, cover_photo, vcard_layouts,  vcard_bg_color, designation, company_name, display_email, display_dial_code, display_number, website, display_email, address, colors FROM users WHERE id = ${userId} LIMIT 1`;
         const [userData]:any = await pool.query(sql);

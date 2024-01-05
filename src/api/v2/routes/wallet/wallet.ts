@@ -10,6 +10,7 @@ const walletRouter = Router();
 
 walletRouter.get("/checkReferralCode", referController.checkReferCode);
 walletRouter.post("/applyReferCode", authenticatingToken, referController.useReferCode);
+walletRouter.get("/referCoinList", authenticatingToken, referController.referCoinHistory);
 
 walletRouter.get("/walletHistory", authenticatingToken, coinsController.coinHistory);
 walletRouter.post("/reedemCouponCoin", authenticatingToken, coinsController.reedemCouponCoin);

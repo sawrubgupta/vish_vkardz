@@ -1,8 +1,11 @@
 import { Request, Response } from "express";
-import pool from '../../../../db';
+import pool from '../../../../dbV2';
 import * as apiResponse from '../../helper/apiResponse';
 import * as utility from "../../helper/utility";
 import config  from '../../config/development';
+import resMsg from '../../config/responseMsg';
+
+const enquiryResMsg = resMsg.features.enquiry;
 
 
 export const enquiryList =async (req:Request, res:Response) => {
@@ -16,9 +19,7 @@ export const enquiryList =async (req:Request, res:Response) => {
         } else {
             userId = res.locals.jwt.userId;
         }
-        if (!userId || userId === "" || userId === undefined) {
-            return apiResponse.errorMessage(res, 401, "User Id is required!");
-        }
+        if (!userId || userId === "" || userId === undefined) return apiResponse.errorMessage(res, 401, enquiryResMsg.enquiryList.nullUserId);
  
         var getPage:any = req.query.page;
         var page = parseInt(getPage);
@@ -53,7 +54,7 @@ export const enquiryList =async (req:Request, res:Response) => {
                 totalPage: totalPage,
                 currentPage: page,
                 totalLength: result.length,
-                message: "Data Retrieved Successflly"
+                message: enquiryResMsg.enquiryList.successMsg
             })
         } else {
             return res.status(200).json({
@@ -63,12 +64,12 @@ export const enquiryList =async (req:Request, res:Response) => {
                 totalPage: totalPage,
                 currentPage: page,
                 totalLength: result.length,
-                message: "No Data Found"
+                message: enquiryResMsg.enquiryList.noDataFoundMsg
             })
         }
     } catch (error) {
         console.log(error);
-        return apiResponse.errorMessage(res, 400, "Something went wrong");
+        return apiResponse.somethingWentWrongMessage(res);
     }
 }
 
@@ -86,7 +87,7 @@ export const deleteEnquiry =async (req:Request, res:Response) => {
         } else {
             userId = res.locals.jwt.userId;
         }
-        if (!userId || userId === "" || userId === undefined) return apiResponse.errorMessage(res, 401, "User Id is required!");
+        if (!userId || userId === "" || userId === undefined) return apiResponse.errorMessage(res, 401, enquiryResMsg.deleteEnquiry.nullUserId);
         
         const enquiryId = req.body.enquiryId;
 
@@ -99,13 +100,13 @@ export const deleteEnquiry =async (req:Request, res:Response) => {
         const [rows]:any = await pool.query(sql, VALUES)
 
         if (rows.affectedRows > 0) {
-            return apiResponse.successResponse(res, "Enquiry Deleted Successfuly", null);
+            return apiResponse.successResponse(res, enquiryResMsg.deleteEnquiry.successMsg, null);
         } else {
-            return apiResponse.errorMessage(res, 400, "Failed to delete, try again");
+            return apiResponse.errorMessage(res, 400, enquiryResMsg.deleteEnquiry.failedMsg);
         }
     } catch (error) {
         console.log(error);
-        return apiResponse.errorMessage(res, 400, "Something ent wrong");
+        return apiResponse.somethingWentWrongMessage(res);
     }
 }
 
@@ -122,9 +123,7 @@ export const replyEnquiry =async (req:Request, res:Response) => {
         } else {
             userId = res.locals.jwt.userId;
         }
-        if (!userId || userId === "" || userId === undefined) {
-            return apiResponse.errorMessage(res, 401, "User Id is required!");
-        }
+        if (!userId || userId === "" || userId === undefined) return apiResponse.errorMessage(res, 401, enquiryResMsg.replyEnquiry.nullUserId);
 
         const enquiryId = req.body.enquiryId;
         const message = req.body.message;
@@ -136,13 +135,13 @@ export const replyEnquiry =async (req:Request, res:Response) => {
         if (rows.length > 0) {
             const email = rows[0].email
             await utility.sendMail(email, "testing subject", message);
-            return apiResponse.successResponse(res, "Email Sent Successfully", null);
+            return apiResponse.successResponse(res, enquiryResMsg.replyEnquiry.successMsg, null);
         } else {
-            return apiResponse.errorMessage(res, 400, "Enquiry not found");
+            return apiResponse.errorMessage(res, 400, enquiryResMsg.replyEnquiry.failedMsg);
         }
     } catch (error) {
         console.log(error);
-        return apiResponse.errorMessage(res, 400, "Something went wrong");
+        return apiResponse.somethingWentWrongMessage(res);
     }
 }
 
@@ -156,7 +155,7 @@ export const submitEnquiry =async (req:Request, res:Response) => {
 
         const userSql = `SELECT id FROM users WHERE username = '${username}' LIMIT 1`;
         const [userRows]:any = await pool.query(userSql);
-        if (userRows.length === 0) return apiResponse.errorMessage(res, 400, "Invalid username");
+        if (userRows.length === 0) return apiResponse.errorMessage(res, 400, enquiryResMsg.submitEnquiry.invalidUsername);
         const userId = userRows[0].id;
 
         const sql = `INSERT INTO user_contacts(user_id, profile_id, name, email, phone_num, msg, created_at) VALUES(?, ?, ?, ?, ?, ?, ?)`;
@@ -164,9 +163,9 @@ export const submitEnquiry =async (req:Request, res:Response) => {
         const [rows]:any = await pool.query(sql, VALUES);
 
         if (rows.affectedRows > 0) {
-            return apiResponse.successResponse(res, "Success", null);
+            return apiResponse.successResponse(res, enquiryResMsg.submitEnquiry.successMsg, null);
         } else {
-            return apiResponse.errorMessage(res, 400, "Failed!, try again");
+            return apiResponse.errorMessage(res, 400, enquiryResMsg.submitEnquiry.failedMsg);
         }
         
     } catch (error) {

@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import pool from '../../../../db';
+import pool from '../../../../dbV2';
 import * as apiResponse from '../../helper/apiResponse';
 import * as utility from "../../helper/utility";
 import config  from '../../config/development';
@@ -20,8 +20,23 @@ export const coinHistory =async (req:Request, res:Response) => {
         const getPageQuery = `SELECT COUNT(id) AS length FROM user_coins WHERE user_id = ${userId}`;
         const [result]: any = await pool.query(getPageQuery);
 
-        const sql = `SELECT * FROM user_coins WHERE user_id = ${userId} ORDER BY created_at desc limit ${page_size} offset ${offset}`;
+        const sql = `SELECT user_coins.*, users.username, users.name, users.referral_code, users.offer_coin FROM user_coins LEFT JOIN users ON users.id = user_coins.user_id WHERE user_id = ${userId} ORDER BY created_at desc limit ${page_size} offset ${offset}`;
         const [rows]:any = await pool.query(sql);
+
+        const userSql = `SELECT offer_coin FROM users WHERE id = ${userId} LIMIT 1`;
+        const [userRows]:any = await pool.query(userSql);
+        const totalCoin = userRows[0].offer_coin;
+
+        const coinFaqSql = `SELECT * FROM faq WHERE (type = '${config.vKoin}' OR type = '${config.earnCoin}') AND status = 1`;
+        const [faqRows]:any = await pool.query(coinFaqSql);
+
+        let faqData = [];
+        let useCoin = [];
+
+        for (const ele of faqRows) {
+            if (ele.type === config.vKoin) faqData.push(ele);
+            if (ele.type === config.earnCoin) useCoin.push(ele);
+        }
 
         let totalPages: any = result[0].length / page_size;
         let totalPage = Math.ceil(totalPages);
@@ -30,7 +45,7 @@ export const coinHistory =async (req:Request, res:Response) => {
         // return apiResponse.successResponse
         return res.status(200).json({
             status: true,
-            data: rows,
+            data: rows, faqData, useCoin, totalCoin,
             totalPage: totalPage,
             currentPage: page,
             totalLength: totalLength,
@@ -69,9 +84,7 @@ export const reedemCouponCoin =async (req:Request, res:Response) => {
         const codeVALUES = [couponCode, userId];
         const [data]:any = await pool.query(chekCodeUsedQuery, codeVALUES);
 
-        if (data.length > 0) {
-            return apiResponse.errorMessage(res, 400, "This coupon code has already used");
-        }
+        if (data.length > 0) return apiResponse.errorMessage(res, 400, "This coupon code has already used");
 
         const sql = `INSERT INTO coupon_redemptions(customer_id, coupon_code, total_discount, redemption_date) VALUES(?, ?, ?, ?)`;
         const VALUES = [userId, couponCode, coins, createdAt];

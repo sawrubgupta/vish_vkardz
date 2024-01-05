@@ -36,13 +36,22 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.updatePackage = exports.getPackage = void 0;
-const db_1 = __importDefault(require("../../../../db"));
+const dbV2_1 = __importDefault(require("../../../../dbV2"));
 const apiResponse = __importStar(require("../../helper/apiResponse"));
 const utility = __importStar(require("../../helper/utility"));
 const getPackage = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const sql = `SELECT id, type_name, slug FROM features_type WHERE id IN (16, 18)`;
-        const [rows] = yield db_1.default.query(sql);
+        // const vari = ["Everything in vkardz", "Create Unlimited Profiles", "Link Profile to multiple cards", "Lifetime help & Support", "Unlimited Device Management", "Lifetime Analytics", "Link your card to an individual link"];
+        // const str = vari.join();
+        // console.log(str);
+        const sql = `SELECT * FROM packages WHERE status = 1`;
+        let [rows] = yield dbV2_1.default.query(sql);
+        let index = -1;
+        for (const iterator of rows) {
+            index++;
+            rows[index].details = iterator.details.split(',');
+        }
+        ;
         return apiResponse.successResponse(res, "Package list get Successfully", rows);
     }
     catch (error) {
@@ -53,11 +62,13 @@ const getPackage = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
 exports.getPackage = getPackage;
 // ====================================================================================================
 // ====================================================================================================
+//old api   
 const updatePackage = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userId = res.locals.jwt.userId;
         const createdAt = utility.dateWithFormat();
         const endDate = utility.extendedDateWithFormat("yearly");
+        // return apiResponse.errorMessage(res, 400, "not working");
         let paymentType = req.body.paymentType;
         const { txnId, priceCurrencyCode, price, status } = req.body;
         if (paymentType === "stripe") {
@@ -75,11 +86,11 @@ const updatePackage = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         // username, email, name, phone_number, locality, country, city, address,pincode, contact_info, delivery_charges, vat_num, note, is_gift_enable, gift_message,
         const sql = `INSERT INTO service_buy_payment_info(txn_id, user_id, package, currency_code, price, payment_type, status, start_date, end_date, created_at, approve_time) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
         const VALUES = [txnId, userId, 18, priceCurrencyCode, price, paymentType, status, createdAt, endDate, createdAt, '0000-00-00 00:00:00'];
-        const [rows] = yield db_1.default.query(sql, VALUES);
+        const [rows] = yield dbV2_1.default.query(sql, VALUES);
         if (rows.affectedRows > 0) {
             const updateUser = ` UPDATE users SET account_type = ?, start_date = ?, end_date = ? WHERE id = ?`;
             const VALUES = [18, createdAt, endDate, userId];
-            const [userRows] = yield db_1.default.query(updateUser, VALUES);
+            const [userRows] = yield dbV2_1.default.query(updateUser, VALUES);
             if (userRows.affectedRows > 0) {
                 return apiResponse.successResponse(res, "Survice buy successfully", null);
             }

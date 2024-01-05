@@ -46,3 +46,18 @@ export const somethingWentWrongMessage = async (res:Response) => {
 
 // ====================================================================================================
 // ====================================================================================================
+
+export const successResponseWithPagination = async  (res:Response, msg:String , data:any, totalPage:any, currentPage:any, totalLength:any) => {
+	var resData = {
+		status: true,
+		data: data,
+		totalPage: totalPage,
+		currentPage: currentPage,
+		totalLength: totalLength,
+		message: msg,
+	};
+	return res.status(200).json(resData);
+}
+
+// ====================================================================================================
+// ====================================================================================================

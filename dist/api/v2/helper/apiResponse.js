@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.somethingWentWrongMessage = exports.errorMessage = exports.validationErrorWithData = exports.successResponse = void 0;
+exports.successResponseWithPagination = exports.somethingWentWrongMessage = exports.errorMessage = exports.validationErrorWithData = exports.successResponse = void 0;
 const successResponse = (res, msg, data) => __awaiter(void 0, void 0, void 0, function* () {
     var resData = {
         status: true,
@@ -50,5 +50,19 @@ const somethingWentWrongMessage = (res) => __awaiter(void 0, void 0, void 0, fun
     });
 });
 exports.somethingWentWrongMessage = somethingWentWrongMessage;
+// ====================================================================================================
+// ====================================================================================================
+const successResponseWithPagination = (res, msg, data, totalPage, currentPage, totalLength) => __awaiter(void 0, void 0, void 0, function* () {
+    var resData = {
+        status: true,
+        data: data,
+        totalPage: totalPage,
+        currentPage: currentPage,
+        totalLength: totalLength,
+        message: msg,
+    };
+    return res.status(200).json(resData);
+});
+exports.successResponseWithPagination = successResponseWithPagination;
 // ====================================================================================================
 // ====================================================================================================

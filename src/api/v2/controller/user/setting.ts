@@ -1,6 +1,9 @@
 import {Request, Response} from "express";
-import pool from '../../../../db';
+import pool from '../../../../dbV2';
 import * as apiResponse from '../../helper/apiResponse';
+import resMsg from '../../config/responseMsg';
+
+const settingResMsg = resMsg.user.setting;
 
 export const setting =async (req:Request, res:Response) => {
     try {
@@ -12,13 +15,13 @@ export const setting =async (req:Request, res:Response) => {
         const [rows]:any = await pool.query(sql, VALUES);
 
         if (rows.affectedRows > 0) {
-            return apiResponse.successResponse(res,"Setting updated successfully !", null);
+            return apiResponse.successResponse(res, settingResMsg.setting.successMsg, null);
         } else {
-            return apiResponse.errorMessage(res, 400, "Failed to update setting")
+            return apiResponse.errorMessage(res, 400, settingResMsg.setting.failedMsg);
         }
     } catch (error) {
         console.log(error);
-        return apiResponse.errorMessage(res, 400, "Something went wrong")
+        return apiResponse.somethingWentWrongMessage(res);
     }
 }
 

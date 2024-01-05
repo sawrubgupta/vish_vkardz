@@ -1,9 +1,11 @@
 import { Request, Response } from "express";
-import pool from '../../../../db';
+import pool from '../../../../dbV2';
 import * as apiResponse from '../../helper/apiResponse';
 import * as utility from "../../helper/utility";
 import config  from '../../config/development';
+import resMsg from '../../config/responseMsg';
 
+const galleryResMsg = resMsg.features.gallery;
 
 export const gallary =async (req:Request, res:Response) => {
     try {
@@ -15,27 +17,35 @@ export const gallary =async (req:Request, res:Response) => {
         } else {
             userId = res.locals.jwt.userId;
         }
-        if (!userId || userId === "" || userId === undefined) {
-            return apiResponse.errorMessage(res, 401, "User Id is required!");
-        }
+        if (!userId || userId === "" || userId === undefined) return apiResponse.errorMessage(res, 401, galleryResMsg.gallary.nullUserId);
 
         const createdAt = utility.dateWithFormat();
         const { profileId, image } = req.body;
         if (!profileId || profileId === null) return apiResponse.errorMessage(res, 400, "Profile id is required");
         if (!image || image === "" || image === undefined) return apiResponse.errorMessage(res, 400, "Please Upload Image");
 
+        const limitSql = `SELECT * FROM user_limitations WHERE type = '${config.galleryType}' AND status = 1 LIMIT 1`;
+        const [limitRows]:any = await pool.query(limitSql);
+        const galleryLimit = limitRows[0]?.limitation ?? 50;
+
+        const galleryCountSql = `SELECT COUNT(id) AS totalGallery FROM portfolio WHERE user_id = ${userId} AND profile_id = ${profileId}`;
+        const [galleryCountRows]:any = await pool.query(galleryCountSql);
+
+        if (galleryCountRows[0].totalGallery >= galleryLimit) return apiResponse.errorMessage(res, 400, `Profile limit reached. You can only have a maximum of ${galleryLimit} Images.`);
+
+
         const sql = `INSERT INTO portfolio(user_id, profile_id, image, thumb, status, created_at) VALUES(?, ?, ?, ?, ?, ?)`;
         const VALUES = [userId, profileId, image, image, 1, createdAt];
         const [rows]:any = await pool.query(sql, VALUES);
 
         if (rows.affectedRows > 0) {
-            return apiResponse.successResponse(res, "Portfolio Added Successfully", null)
+            return apiResponse.successResponse(res, galleryResMsg.gallary.successMsg, null)
         } else {
-            return apiResponse.errorMessage(res, 400, "Failed to add portfolio, try again");
+            return apiResponse.errorMessage(res, 400, galleryResMsg.gallary.failedMsg);
         }
     } catch (error) {
         console.log(error);
-        return apiResponse.errorMessage(res, 400, "Something went wrong");
+        return apiResponse.somethingWentWrongMessage(res);
     }
 }
 
@@ -53,9 +63,7 @@ export const getPortfolio =async (req:Request, res:Response) => {
         } else {
             userId = res.locals.jwt.userId;
         }
-        if (!userId || userId === "" || userId === undefined) {
-            return apiResponse.errorMessage(res, 401, "User Id is required!");
-        }
+        if (!userId || userId === "" || userId === undefined) return apiResponse.errorMessage(res, 401, galleryResMsg.getPortfolio.nullUserId);
 
         var getPage:any = req.query.page;
         var page = parseInt(getPage);
@@ -72,8 +80,14 @@ export const getPortfolio =async (req:Request, res:Response) => {
         const [rows]:any = await pool.query(sql);
 
         const getFeatureStatus = `SELECT status FROM users_features WHERE user_id = ${userId} AND profile_id = ${profileId} AND feature_id = 8`;
+        console.log("getFeatureStatus", getFeatureStatus);
         const [featureRows]:any = await pool.query(getFeatureStatus);
-        const featureStatus = featureRows[0].status || 0;
+        let featureStatus = featureRows[0]?.status ?? 0;
+        // if (featureRows.length > 0) {
+            // featureStatus = featureRows[0]?.status ?? 0;
+        // } else {
+        //     featureStatus = 0;
+        // }
 
         let totalPages:any = result.length/page_size;
         let totalPage = Math.ceil(totalPages);
@@ -86,22 +100,22 @@ export const getPortfolio =async (req:Request, res:Response) => {
                 totalPage: totalPage,
                 currentPage: page,
                 totalLength: result.length,
-                message: "Data Retrieved Successflly"
+                message: galleryResMsg.getPortfolio.successMsg
             })
         } else {
             return res.status(200).json({
                 status: true,
                 data: null,
-                featureStatus: featureStatus[0].status,
+                featureStatus: featureStatus,
                 totalPage: totalPage,
                 currentPage: page,
                 totalLength: result.length,
-                message: "No Data Found"
+                message: galleryResMsg.getPortfolio.noDataFoundMsg
             })
         }
     } catch (error) {
         console.log(error);
-        return apiResponse.errorMessage(res, 400, "Something went wrong");
+        return apiResponse.somethingWentWrongMessage(res);
     }
 } 
 
@@ -118,19 +132,17 @@ export const deleteImage =async (req:Request, res:Response) => {
         } else {
             userId = res.locals.jwt.userId;
         }
-        if (!userId || userId === "" || userId === undefined) {
-            return apiResponse.errorMessage(res, 401, "User Id is required!");
-        }
+        if (!userId || userId === "" || userId === undefined) return apiResponse.errorMessage(res, 401, galleryResMsg.deleteImage.nullUserId);
 
         const portfolioId = req.body.portfolioId;
 
         const sql = `DELETE FROM portfolio WHERE user_id = ${userId} AND id IN (${portfolioId})`;
         const [rows]:any = await pool.query(sql);
 
-        return apiResponse.successResponse(res, "Image Deleted Successfully", null);
+        return apiResponse.successResponse(res, galleryResMsg.deleteImage.successMsg, null);
     } catch (error) {
         console.log(error);
-        return apiResponse.errorMessage(res, 400, "Something went wrong");
+        return apiResponse.somethingWentWrongMessage(res);
     }
 }
 

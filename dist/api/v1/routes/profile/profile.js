@@ -45,6 +45,7 @@ profileRouter.post("/validatePin", validation.validatePinValidation, setPinContr
 profileRouter.get("/getLayots", themeController.getLayout); //use in business type
 profileRouter.patch("/updateVcardLayout", authorization_controller_1.tempAuthenticatingToken, themeController.updateVcardLayout); //use in business type
 profileRouter.post('/addPrimaryProfile', authorization_controller_1.authenticatingToken, validation.primaryProfileValidation, primaryProfileController.setPrimaryProfile);
+profileRouter.post('/primaryProfileLink', authorization_controller_1.authenticatingToken, validation.addPrimaryLinkValidation, primaryProfileController.addPrimaryLink);
 profileRouter.get('/getPrimrySites', authorization_controller_1.authenticatingToken, primaryProfileController.getPrimarySite);
 profileRouter.post('/switchAccount', authorization_controller_1.authenticatingToken, validation.switchAccountValidation, switchAccountController.switchToPublic);
 profileRouter.get('/searchUser', searchController.search);

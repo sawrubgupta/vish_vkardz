@@ -33,6 +33,8 @@ const searchController = __importStar(require("../../controller/profile/searchUs
 const vcfController = __importStar(require("../../controller/profile/customField"));
 const vcardProfileController = __importStar(require("../../controller/profile/vcardProfile"));
 const customUserInfoController = __importStar(require("../../controller/profile/customField"));
+const multiProfileController = __importStar(require("../../controller/profile/multiProfile"));
+const vcfDownloadController = __importStar(require("../../controller/profile/vcf"));
 const authorization_controller_1 = require("../../middleware/authorization.controller");
 const validation = __importStar(require("../../middleware/validation"));
 const profileRouter = (0, express_1.Router)();
@@ -47,6 +49,7 @@ profileRouter.post("/validatePin", validation.validatePinValidation, setPinContr
 profileRouter.get("/getLayots", themeController.getLayout); //use in business type
 profileRouter.patch("/updateVcardLayout", authorization_controller_1.tempAuthenticatingToken, themeController.updateVcardLayout); //use in business type
 profileRouter.post('/addPrimaryProfile', authorization_controller_1.authenticatingToken, validation.primaryProfileValidation, primaryProfileController.setPrimaryProfile);
+profileRouter.post('/primaryProfileLink', authorization_controller_1.authenticatingToken, validation.addPrimaryLinkValidation, primaryProfileController.addPrimaryLink);
 profileRouter.get('/getPrimrySites', authorization_controller_1.authenticatingToken, primaryProfileController.getPrimarySite);
 profileRouter.post('/switchAccount', authorization_controller_1.authenticatingToken, validation.switchAccountValidation, privateAccountController.switchToPublic);
 profileRouter.post('/privateUserProfile', authorization_controller_1.authenticatingToken, validation.privateUserProfileValidation, privateAccountController.privateProfile);
@@ -54,9 +57,17 @@ profileRouter.get('/searchUser', searchController.search);
 profileRouter.post('/addUpdateVcf', authorization_controller_1.tempAuthenticatingToken, validation.addVcfValidation, vcfController.addCustomField);
 profileRouter.delete('/deleteVcf', authorization_controller_1.tempAuthenticatingToken, vcfController.deleteVcf);
 profileRouter.get('/getVcf', authorization_controller_1.tempAuthenticatingToken, vcfController.getVcf);
-profileRouter.get('/checkProfilePin', vcardProfileController.checkPinEnable);
-profileRouter.get('/vcardProfile', vcardProfileController.vcardProfile);
-profileRouter.post('/addCustomInfo', authorization_controller_1.authenticatingToken, validation.customUserInfoValidation, customUserInfoController.addUserInfo);
+profileRouter.get('/checkProfilePin', vcardProfileController.checkPinEnable); //not used
+profileRouter.get('/vcardProfile', vcardProfileController.vcardProfile); //not used
+profileRouter.post('/addCustomInfo', authorization_controller_1.authenticatingToken, validation.customUserInfoValidation, customUserInfoController.addUserCustomInfo);
 profileRouter.get('/getUserField', authorization_controller_1.authenticatingToken, customUserInfoController.getUserCustomField);
 profileRouter.delete('/deleteUserCf', authorization_controller_1.authenticatingToken, customUserInfoController.deleteUsercf);
+profileRouter.get('/profileList', authorization_controller_1.authenticatingToken, multiProfileController.profileListing);
+profileRouter.get('/profileDetail', authorization_controller_1.authenticatingToken, multiProfileController.profileDetail);
+// profileRouter.post('/addProfile', authenticatingToken, validation.addProfileValidation, multiProfileController.addProfile);
+// profileRouter.patch('/updateUserProfile', authenticatingToken, validation.updateUserProfileValidation, multiProfileController.updateProfile);
+profileRouter.patch('/updateUserProfile', authorization_controller_1.authenticatingToken, validation.addUpdateUserProfileValidation, multiProfileController.addUpdateProfile);
+profileRouter.delete('/deleteProfile', authorization_controller_1.authenticatingToken, multiProfileController.deleteProfile);
+profileRouter.get('/cardList', authorization_controller_1.tempAuthenticatingToken, multiProfileController.cardList);
+profileRouter.get('/vcf', authorization_controller_1.tempAuthenticatingToken, vcfDownloadController.vcf);
 exports.default = profileRouter;

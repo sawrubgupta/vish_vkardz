@@ -42,7 +42,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateUserFeaturesStatus = exports.getFeatureByUserId = void 0;
+exports.features = exports.updateUserFeaturesStatus = exports.getFeatureByUserId = void 0;
 const db_1 = __importDefault(require("../../../../db"));
 const apiResponse = __importStar(require("../../helper/apiResponse"));
 const development_1 = __importDefault(require("../../config/development"));
@@ -134,4 +134,22 @@ const updateUserFeaturesStatus = (req, res) => __awaiter(void 0, void 0, void 0,
 });
 exports.updateUserFeaturesStatus = updateUserFeaturesStatus;
 // =======w============================================================================================
+// ====================================================================================================
+const features = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const sql = `SELECT * FROM features WHERE feature_show = 1`;
+        const [rows] = yield db_1.default.query(sql);
+        return res.status(200).json({
+            status: true,
+            data: rows,
+            message: "User Features Get Successfully"
+        });
+    }
+    catch (error) {
+        console.log(error);
+        return apiResponse.errorMessage(res, 400, "Something went wrong");
+    }
+});
+exports.features = features;
+// ====================================================================================================
 // ====================================================================================================

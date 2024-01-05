@@ -1,6 +1,9 @@
-import pool from '../../../../db';
+import pool from '../../../../dbV2';
 import { Request, Response } from "express";
 import * as apiResponse from '../../helper/apiResponse';
+import resMsg from '../../config/responseMsg';
+
+const countryListMsg = resMsg.user.countryList;
 
 export const countryList =async (req:Request, res:Response) => {
     try {
@@ -8,13 +11,13 @@ export const countryList =async (req:Request, res:Response) => {
         const [rows]:any = await pool.query(sql);
 
         if (rows.length > 0) {
-            return apiResponse.successResponse(res, "Plans list is here !", rows)
+            return apiResponse.successResponse(res, countryListMsg.countryList.dataRetrivedMsg, rows)
         } else {
-            return apiResponse.errorMessage(res, 400, "No Country List found");
+            return apiResponse.errorMessage(res, 400, countryListMsg.countryList.noDataFoundMsg);
         }
     } catch (error) {
         console.log(error);
-        return apiResponse.errorMessage(res, 400, "Something went wrong");
+        return apiResponse.somethingWentWrongMessage(res);
     }
 }
 // ====================================================================================================

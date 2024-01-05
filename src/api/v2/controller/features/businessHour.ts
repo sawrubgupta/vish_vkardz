@@ -1,29 +1,31 @@
 import { Request, Response } from "express";
-import pool from '../../../../db';
+import pool from '../../../../dbV2';
 import * as apiResponse from '../../helper/apiResponse';
 import * as utility from "../../helper/utility";
 import config from '../../config/development';
+import resMsg from '../../config/responseMsg';
 
+const businessHourResMsg = resMsg.features.businessHour;
 
 export const addBusinessHour = async (req: Request, res: Response) => {
     try {
         // const userId: string = res.locals.jwt.userId;
         let userId:any; 
-        const type = req.query.type; //type = business, user, null
+        const type = req.body.type; //type = business, user, null
         const profileId = req.body.profileId;
         if (type && (type === config.businessType  || type === config.websiteType || type === config.vcfWebsite)) {
             userId = req.body.userId;
         } else {
             userId = res.locals.jwt.userId;
         }
-        if (!userId || userId === "" || userId === undefined) return apiResponse.errorMessage(res, 401, "User Id is required!");
+        if (!userId || userId === "" || userId === undefined) return apiResponse.errorMessage(res, 401, businessHourResMsg.addBusinessHour.nullUserId);
         
         const createdAt = utility.dateWithFormat();
 
         const deleteQuery = `DELETE FROM business_hours WHERE user_id = ${userId} AND profile_id = ${profileId}`;
         const [data]: any = await pool.query(deleteQuery);
 
-        let sql: any = `INSERT INTO business_hours(user_id, days, start_time, end_time, status, created_at) VALUES `;
+        let sql: any = `INSERT INTO business_hours(user_id, profile_id, days, start_time, end_time, status, created_at) VALUES `;
 
         let result: any = "";
         for await (const businessHourData of req.body.businessHours) {
@@ -32,19 +34,19 @@ export const addBusinessHour = async (req: Request, res: Response) => {
             const endTime = businessHourData.endTime;
             const status = businessHourData.status;
 
-            sql = sql + ` (${userId}, '${days}', '${startTime}', '${endTime}', '${status}', '${createdAt}'), `;
+            sql = sql + ` (${userId}, ${profileId}, '${days}', '${startTime}', '${endTime}', '${status}', '${createdAt}'), `;
             result = sql.substring(0, sql.lastIndexOf(','));
         }
         const [rows]: any = await pool.query(result);
 
         if (rows.affectedRows > 0) {
-            return apiResponse.successResponse(res, "Business Hours Added Successfully", null);
+            return apiResponse.successResponse(res, businessHourResMsg.addBusinessHour.successMsg, null);
         } else {
-            return apiResponse.errorMessage(res, 400, "Failed to insert, try again");
+            return apiResponse.errorMessage(res, 400, businessHourResMsg.addBusinessHour.failedMsg);
         }
     } catch (error) {
         console.log(error);
-        return apiResponse.errorMessage(res, 400, "Something went wrong");
+        return apiResponse.somethingWentWrongMessage(res);
     }
 }
 
@@ -62,10 +64,9 @@ export const businessHourList = async (req: Request, res: Response) => {
         } else {
             userId = res.locals.jwt.userId;
         }
-        if (!userId || userId === "" || userId === undefined) {
-            return apiResponse.errorMessage(res, 401, "User Id is required!");
-        }
-        if (!profileId || profileId == null) return apiResponse.errorMessage(res, 400, "Profile id is required");
+        if (!userId || userId === "" || userId === undefined) return apiResponse.errorMessage(res, 401, businessHourResMsg.businessHourList.nullUserId);
+    
+        if (!profileId || profileId == null) return apiResponse.errorMessage(res, 400, businessHourResMsg.businessHourList.nullProfileId);
 
         const sql = `SELECT * FROM business_hours WHERE user_id = ${userId} AND profile_id = ${profileId}`;
         const [rows]: any = await pool.query(sql);
@@ -77,7 +78,7 @@ export const businessHourList = async (req: Request, res: Response) => {
         if (rows.length > 0) {
             rows[0].featureStatus = featureStatus;
             delete rows[0].user_id
-            return apiResponse.successResponse(res, "Data Retrieved Successfully", rows);
+            return apiResponse.successResponse(res, businessHourResMsg.businessHourList.successMsg, rows);
         } else {
             let data = [{
                 "id": null,
@@ -139,14 +140,14 @@ export const businessHourList = async (req: Request, res: Response) => {
             return res.status(200).json({
                 status: true,
                 data: data, featureStatus,
-                message: "No Data Found"
+                message: businessHourResMsg.businessHourList.noDataFoundMsg
             })
 
         }
 
     } catch (error) {
         console.log(error);
-        return apiResponse.errorMessage(res, 400, "Something went wrong");
+        return apiResponse.somethingWentWrongMessage(res);
     }
 }
 

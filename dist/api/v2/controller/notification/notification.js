@@ -43,7 +43,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.sendNotification = exports.getNotification = void 0;
-const db_1 = __importDefault(require("../../../../db"));
+const dbV2_1 = __importDefault(require("../../../../dbV2"));
 const apiResponse = __importStar(require("../../helper/apiResponse"));
 // import { dateWithFormat } from "../utility/utility";
 // import fcmSend from "../../helper/notification";
@@ -61,9 +61,18 @@ const getNotification = (req, res) => __awaiter(void 0, void 0, void 0, function
         var page_size = development_1.default.pageSize;
         const offset = (page - 1) * page_size;
         const getPageQuery = `SELECT id FROM notifications WHERE user_id = ${userId}`;
-        const [result] = yield db_1.default.query(getPageQuery);
+        const [result] = yield dbV2_1.default.query(getPageQuery);
         const sql = `SELECT * FROM notifications WHERE user_id = ${userId} ORDER BY created_at desc limit ${page_size} offset ${offset}`;
-        const [rows] = yield db_1.default.query(sql);
+        const [rows] = yield dbV2_1.default.query(sql);
+        let rowsIndex = -1;
+        for (const ele of rows) {
+            rowsIndex++;
+            if (ele.type === development_1.default.cardPurchase) {
+                const productSql = `SELECT products.name, products.product_image, products.image_back, products.image_other FROM products LEFT JOIN orderlist ON orderlist.product_id = products.product_id WHERE orderlist.order_id = ${ele.identity} LIMIT 1`;
+                const [productRows] = yield dbV2_1.default.query(productSql);
+                rows[rowsIndex].productDetail = productRows[0] || {};
+            }
+        }
         let totalPages = result.length / page_size;
         let totalPage = Math.ceil(totalPages);
         if (rows.length > 0) {
@@ -114,7 +123,7 @@ const sendNotification = (req, res) => __awaiter(void 0, void 0, void 0, functio
         else {
             fcmSql = `SELECT fcm_token FROM users WHERE deleted_at IS NULL`;
         }
-        const [rows] = yield db_1.default.query(fcmSql);
+        const [rows] = yield dbV2_1.default.query(fcmSql);
         try {
             // console.log("rows", rows);
             for (var _d = true, rows_1 = __asyncValues(rows), rows_1_1; rows_1_1 = yield rows_1.next(), _a = rows_1_1.done, !_a;) {
@@ -150,3 +159,5 @@ const sendNotification = (req, res) => __awaiter(void 0, void 0, void 0, functio
     }
 });
 exports.sendNotification = sendNotification;
+// ====================================================================================================
+// ====================================================================================================

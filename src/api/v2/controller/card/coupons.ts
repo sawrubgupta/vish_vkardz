@@ -1,16 +1,17 @@
-import pool from '../../../../db';
+import pool from '../../../../dbV2';
 import { Request, Response } from "express";
 import * as apiResponse from '../../helper/apiResponse';
 import config  from '../../config/development';
 import * as utility from "../../helper/utility";
+import responseMsg from '../../config/responseMsg';
+
+const couponsResponseMsg = responseMsg.card.coupons;
 
 export const coupnDiscount =async (req:Request, res:Response) => {
     try {
         const userId = res.locals.jwt.userId;
         const couponCode = req.query.couponCode;
-        if (!couponCode || couponCode === "" || couponCode === undefined) {
-            return apiResponse.errorMessage(res, 400, "Please enter a coupon code");
-        }
+        if (!couponCode || couponCode === "" || couponCode === undefined) return apiResponse.errorMessage(res, 400, couponsResponseMsg.coupnDiscount.emptyCouponCode);
         const createdAt = utility.dateWithFormat();
         
         const checkCouponCodeQuery = `SELECT * FROM coupons WHERE coupon_code = ? AND expiration_date >= ?`;
@@ -20,22 +21,22 @@ export const coupnDiscount =async (req:Request, res:Response) => {
         const [rows]:any = await pool.query(checkCouponCodeQuery, VALUES);
         
         if (rows.length === 0) {
-            return apiResponse.errorMessage(res, 400, "Invalid Coupon Code!!");
+            return apiResponse.errorMessage(res, 400, couponsResponseMsg.coupnDiscount.invalidCouponCode);
         } else {
             const chekCodeUsedQuery = `SELECT id FROM coupon_redemptions WHERE coupon_code = ? AND customer_id = ?`;
             const codeVALUES = [couponCode, userId];
             const [data]:any = await pool.query(chekCodeUsedQuery, codeVALUES);
 
             if (data.length > 0) {
-                return apiResponse.errorMessage(res, 400, "This coupon code is already used or has expired")
+                return apiResponse.errorMessage(res, 400, couponsResponseMsg.coupnDiscount.failedMsg);
             } else {
-                return apiResponse.successResponse(res, "Coupon Code Verified", rows[0]);
+                return apiResponse.successResponse(res, couponsResponseMsg.coupnDiscount.successMsg, rows[0]);
             }
         }
 
     } catch (error) {
         console.log(error);
-        return apiResponse.errorMessage(res, 400, "Something went wrong");
+        return apiResponse.somethingWentWrongMessage(res);
     }
 }
 
@@ -52,31 +53,27 @@ export const couponRedemptions =async (req:Request, res:Response) => {
         const couponVALUES = [couponCode, createdAt];
         const [couponrows]:any = await pool.query(checkCouponCodeQuery, couponVALUES);
         
-        if (couponrows.length === 0) {
-            return apiResponse.errorMessage(res, 400, "Invalid Coupon Code!!");
-        }
+        if (couponrows.length === 0) return apiResponse.errorMessage(res, 400, couponsResponseMsg.couponRedemptions.invalidCouponCode);
 
         const chekCodeUsedQuery = `SELECT id FROM coupon_redemptions WHERE coupon_code = ? AND customer_id = ?`;
         const codeVALUES = [couponCode, userId];
         const [data]:any = await pool.query(chekCodeUsedQuery, codeVALUES);
 
-        if (data.length > 0) {
-            return apiResponse.errorMessage(res, 400, "This coupon code is invalid or has expired")
-        }
+        if (data.length > 0) return apiResponse.errorMessage(res, 400, couponsResponseMsg.couponRedemptions.invalidCouponCode);
 
         const sql = `INSERT INTO coupon_redemptions(customer_id, coupon_code, total_discount, redemption_date) VALUES(?, ?, ?, ?)`;
         const VALUES = [userId, couponCode, totalDiscount, createdAt];
         const [rows]:any = await pool.query(sql, VALUES);
 
         if (rows.affectedRows > 0) {
-            return apiResponse.successResponse(res, "Coupon Redeem Sucessfully", null);
+            return apiResponse.successResponse(res, couponsResponseMsg.couponRedemptions.successMsg, null);
         } else {
-            return apiResponse.errorMessage(res, 400, "Failed to reedem coupon");
+            return apiResponse.errorMessage(res, 400, couponsResponseMsg.couponRedemptions.failedMsg);
         }
 
     } catch (error) {
         console.log(error);
-        return apiResponse.errorMessage(res, 400, "Something went wrong");
+        return apiResponse.somethingWentWrongMessage(res);
     }
 }
 

@@ -1,8 +1,10 @@
 import { Request, Response } from "express";
-import pool from '../../../../db';
+import pool from '../../../../dbV2';
 import * as apiResponse from '../../helper/apiResponse';
 import * as utility from "../../helper/utility";
 import config  from '../../config/development';
+
+// not used
 
 
 export const vcardProfile =async (req:Request, res:Response) => {

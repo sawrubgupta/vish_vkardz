@@ -37,19 +37,24 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.socialRegister = exports.register = void 0;
 const apiResponse = __importStar(require("../../helper/apiResponse"));
-const db_1 = __importDefault(require("../../../../db"));
+const dbV2_1 = __importDefault(require("../../../../dbV2"));
 const utility = __importStar(require("../../helper/utility"));
 const qrCode_1 = require("../../helper/qrCode");
 const md5_1 = __importDefault(require("md5"));
 const development_1 = __importDefault(require("../../config/development"));
+const responseMsg_1 = __importDefault(require("../../config/responseMsg"));
+const fs_1 = __importDefault(require("fs"));
+const path_1 = __importDefault(require("path"));
+const handlebars_1 = __importDefault(require("handlebars"));
+const registerMsg = responseMsg_1.default.user.register;
 //not used
 const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { name, email, password, username, dial_code, phone, country, fcmToken } = req.body;
         const justDate = utility.dateWithFormat();
         const endDate = utility.extendedDateWithFormat("yearly");
-        const qrData = yield (0, qrCode_1.getQr)(username);
-        let vcardLink = `https://vkardz.com/`;
+        const qrData = yield (0, qrCode_1.generateQr)(username);
+        let vcardLink = development_1.default.vcardLink;
         let uName;
         let featureStatus;
         let featureResult;
@@ -58,7 +63,7 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         referralCode = utility.randomString(6);
         const checkUser = `Select email, phone, username, referral_code from users where email = ? || phone = ? || username = ? || referral_code = ? limit 1`;
         const checkUserVALUES = [email, phone, username, referralCode];
-        const [rows] = yield db_1.default.query(checkUser, checkUserVALUES);
+        const [rows] = yield dbV2_1.default.query(checkUser, checkUserVALUES);
         if (rows[0].referral_code === referralCode) {
             referralCode = utility.randomString(6);
         }
@@ -82,16 +87,16 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             });
         }
         const checkPackageQuery = `Select * from features_type where status = 1 && slug = 'pro' `;
-        const [packageFound] = yield db_1.default.query(checkPackageQuery);
+        const [packageFound] = yield dbV2_1.default.query(checkPackageQuery);
         if (packageFound.length > 0) {
             const sql = `Insert into users(name, full_name, email, display_email, password, username, dial_code, qr_code, phone, display_dial_code, display_number, country, referral_code, offer_coin, quick_active_status, is_deactived, is_verify, is_payment, is_active, is_expired, post_time, start_date, login_time, end_date, fcm_token, account_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
             const VALUES = [name, name, email, email, hash, username, dial_code, qrData.data, phone, dial_code, phone, country, referralCode, 0, 1, 0, 1, 1, 1, 0, justDate, justDate, justDate, endDate, fcmToken, packageFound[0].id];
-            const [userData] = yield db_1.default.query(sql, VALUES);
+            const [userData] = yield dbV2_1.default.query(sql, VALUES);
             if (userData.affectedRows > 0) {
                 let userProfileSql = `INSERT INTO users_profile(user_id, profile_image, cover_photo, qr_code, language, vcard_layouts, vcard_bg_color, set_password, on_tap_url, is_default, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
                 const VALUES = [userData.insertId,];
                 const getUserName = `SELECT * FROM users WHERE id = ${userData.insertId} LIMIT 1`;
-                const [userRows] = yield db_1.default.query(getUserName);
+                const [userRows] = yield dbV2_1.default.query(getUserName);
                 if (userRows[0].card_number !== null && userRows[0].card_number !== undefined && userRows[0].card_number !== '') {
                     uName = userRows[0].card_number;
                 }
@@ -103,7 +108,7 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 }
                 let vcardProfileLink = (vcardLink) + (uName);
                 const getFeatures = `SELECT * FROM features WHERE status = 1`;
-                const [featureData] = yield db_1.default.query(getFeatures);
+                const [featureData] = yield dbV2_1.default.query(getFeatures);
                 if (featureData.length > 0) {
                     let addFeatures = `INSERT INTO users_features (feature_id, user_id,status) VALUES`;
                     featureData.forEach((element) => __awaiter(void 0, void 0, void 0, function* () {
@@ -116,7 +121,7 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                         addFeatures = addFeatures + `(${element.id},'${userData.insertId}',${featureStatus}), `;
                         featureResult = addFeatures.substring(0, addFeatures.lastIndexOf(','));
                     }));
-                    const [userFeatureData] = yield db_1.default.query(featureResult);
+                    const [userFeatureData] = yield dbV2_1.default.query(featureResult);
                 }
                 else {
                     return apiResponse.errorMessage(res, 400, "Can not get features");
@@ -154,21 +159,36 @@ exports.register = register;
 // ====================================================================================================
 // ====================================================================================================
 const socialRegister = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    // const client = await pool.getConnection();
     try {
-        const { name, type, socialId, email, password, username, dial_code, phone, country, countryName, fcmToken, deviceId, deviceType } = req.body;
+        const { type, socialId, email, password, country, countryName, fcmToken, deviceId, deviceType, refer_code } = req.body;
         const justDate = utility.dateWithFormat();
         const endDate = utility.extendedDateWithFormat("yearly");
-        const qrData = yield (0, qrCode_1.getQr)(username);
-        let vcardLink = `https://vkardz.com/`;
-        const primaryProfileLink = (vcardLink) + (username);
+        const extendedDate = utility.extendedDateAndTime("monthly");
+        // const qrCode = await generateQr("username");
+        // console.log("qrCode", qrCode);
+        // return
+        // const mailMsg = `Dear ${name},
+        // Congratulations! You've successfully registered on vKardz, and we're excited to have you on board.
+        // `;
+        // const result:any = await utility.sendTestMail(email, "Welcome to vKardz!", mailMsg);
+        // console.log("result", result);
+        // await client.query("START TRANSACTION");
+        let vcardLink = development_1.default.vkardUrl;
         const hash = (0, md5_1.default)(password);
         let referralCode;
-        referralCode = utility.randomString(10);
+        referralCode = utility.randomString(8);
         const referSql = `SELECT referral_code FROM users where referral_code = '${referralCode}' LIMIT 1`;
-        const [referRows] = yield db_1.default.query(referSql);
-        if (referRows.length > 0) {
+        const [referRows] = yield dbV2_1.default.query(referSql);
+        if (referRows.length > 0)
             referralCode = utility.randomString(10);
-        }
+        let profileIdUniq = utility.randomString(6);
+        const checkProfile = `SELECT profile_id FROM users_profile WHERE profile_id = '${profileIdUniq}' AND deleted_at IS NULL LIMIT 1`;
+        const [profileRows] = yield dbV2_1.default.query(checkProfile);
+        if (profileRows.length > 0)
+            profileIdUniq = utility.randomString(10);
+        const primaryProfileLink = (vcardLink) + (profileIdUniq);
+        const qrData = yield (0, qrCode_1.generateQr)(profileIdUniq);
         let uName;
         let featureStatus;
         let featureResult;
@@ -196,24 +216,22 @@ const socialRegister = (req, res) => __awaiter(void 0, void 0, void 0, function*
             appleId = socialId;
         }
         else {
-            return apiResponse.errorMessage(res, 400, "Wrong type passed !");
+            return apiResponse.errorMessage(res, 400, registerMsg.socialRegister.wrongType);
         }
         // const emailSql = `SELECT * FROM users where status = 0 AND deleted_at IS NULL AND (email = ? or username = ? or phone = ? or facebook_id = ? or google_id = ? or apple_id = ?) LIMIT 1`;
         // const emailValues = [email, username, phone, socialId, socialId, socialId, referralCode]
-        const emailSql = `SELECT * FROM users where deleted_at IS NULL AND (email = ? or username = ? or phone = ?) LIMIT 1`;
-        const emailValues = [email, username, phone];
-        const [data] = yield db_1.default.query(emailSql, emailValues);
-        console.log("data", data);
+        const emailSql = `SELECT * FROM users where email = ? LIMIT 1`;
+        const emailValues = [email];
+        const [data] = yield dbV2_1.default.query(emailSql, emailValues);
         const dupli = [];
         if (data.length > 0) {
-            if (data[0].email === email) {
+            if ((yield data[0].deleted_at) != null)
+                return apiResponse.errorMessage(res, 400, registerMsg.socialRegister.accountDeleted);
+            if ((yield data[0].email) == email) {
                 dupli.push("email");
             }
-            if (data[0].username === username) {
-                dupli.push("username");
-            }
-            if (data[0].phone === phone) {
-                dupli.push("phone");
+            else {
+                dupli.push("email");
             }
             // if (data[0].facebook_id  === socialId) {
             //     dupli.push("facebook id ");
@@ -225,6 +243,7 @@ const socialRegister = (req, res) => __awaiter(void 0, void 0, void 0, function*
             //     dupli.push("apple id");
             // }
             console.log(dupli);
+            // if (dupli.length === 0) email/username
             const msg = `${dupli.join()} is duplicate, Please change it`;
             return res.status(400).json({
                 status: false,
@@ -232,21 +251,27 @@ const socialRegister = (req, res) => __awaiter(void 0, void 0, void 0, function*
                 message: msg,
             });
         }
-        const sql = `INSERT INTO users(name, full_name, email, display_email, password, username, dial_code, qr_code, phone, currency_code, display_dial_code, display_number, country, country_name, referral_code, offer_coin, quick_active_status, is_deactived, is_verify, is_payment, is_active, is_expired, post_time, start_date, login_time, end_date, account_type, primary_profile_slug, fcm_token, device_id, device_type, facebook_id, google_id, apple_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-        const VALUES = [name, name, email, email, hash, username, dial_code, qrData.data, phone, 'USD', dial_code, phone, country, countryName, referralCode, 100, 1, 0, 1, 1, 1, 0, justDate, justDate, justDate, endDate, 16, 'vcard', fcmToken, deviceId, deviceType, facebookId, googleId, appleId];
-        const [userData] = yield db_1.default.query(sql, VALUES);
+        let referCodeRows = [];
+        if (refer_code && refer_code != null) {
+            const referCodeSql = `SELECT id, referral_code, offer_coin FROM users WHERE referral_code = '${refer_code}'`;
+            [referCodeRows] = yield dbV2_1.default.query(referCodeSql);
+            if (referCodeRows.length === 0)
+                return apiResponse.errorMessage(res, 400, registerMsg.socialRegister.invalidReferCode);
+        }
+        const sql = `INSERT INTO users(email, display_email, password, qr_code, currency_code, country, country_name, referral_code, offer_coin, quick_active_status, is_deactived, is_verify, is_payment, is_active, is_expired, post_time, start_date, login_time, end_date, account_type, primary_profile_slug, fcm_token, device_id, device_type, facebook_id, google_id, apple_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+        const VALUES = [email, email, hash, qrData, 'USD', country, countryName, referralCode, 100, 1, 0, 1, 1, 1, 0, justDate, justDate, justDate, endDate, 16, 'vcard', fcmToken, deviceId, deviceType, facebookId, googleId, appleId];
+        const [userData] = yield dbV2_1.default.query(sql, VALUES);
         if (userData.affectedRows > 0) {
             const userId = userData.insertId;
-            let userProfileSql = `INSERT INTO users_profile(user_id, qr_code, on_tap_url, is_default, created_at) VALUES (?, ?, ?, ?, ?)`;
-            const profileVALUES = [userData.insertId, qrData.data, primaryProfileLink, 1, justDate];
-            const [profileRows] = yield db_1.default.query(userProfileSql, profileVALUES);
+            let userProfileSql = `INSERT INTO users_profile(user_id, profile_id, theme_name, qr_code, on_tap_url, is_default, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)`;
+            const profileVALUES = [userData.insertId, profileIdUniq, 'Profile' + profileIdUniq, qrData, primaryProfileLink, 1, justDate];
+            const [profileRows] = yield dbV2_1.default.query(userProfileSql, profileVALUES);
             const profileId = profileRows.insertId;
-            const vcfPhone = dial_code + ' ' + phone;
-            const vcfInfoSql = `INSERT INTO vcf_info(user_id, profile_id, type, value, status, created_at) VALUES(?, ?, ?, ?, ?, ?), (?, ?, ?, ?, ?, ?), (?, ?, ?, ?, ?, ?)`;
-            const vcfVALUES = [userId, profileId, development_1.default.vcfNumber, vcfPhone, 1, justDate, userId, profileId, development_1.default.vcfEmail, email, 1, justDate, userId, profileId, development_1.default.vcfName, name, 1, justDate];
-            const [vcfInfoRows] = yield db_1.default.query(vcfInfoSql, vcfVALUES);
+            const vcfInfoSql = `INSERT INTO vcf_info(user_id, profile_id, type, value, status, created_at) VALUES(?, ?, ?, ?, ?, ?)`;
+            const vcfVALUES = [userId, profileId, development_1.default.vcfEmail, email, 1, justDate];
+            const [vcfInfoRows] = yield dbV2_1.default.query(vcfInfoSql, vcfVALUES);
             const getUserName = `SELECT * FROM users WHERE id = ${userData.insertId} LIMIT 1`;
-            const [userRows] = yield db_1.default.query(getUserName);
+            const [userRows] = yield dbV2_1.default.query(getUserName);
             if (userRows[0].card_number !== null && userRows[0].card_number !== undefined && userRows[0].card_number !== '') {
                 uName = userRows[0].card_number;
             }
@@ -258,39 +283,70 @@ const socialRegister = (req, res) => __awaiter(void 0, void 0, void 0, function*
             }
             let vcardProfileLink = (vcardLink) + (uName);
             const getFeatures = `SELECT * FROM features WHERE status = 1`;
-            const [featureData] = yield db_1.default.query(getFeatures);
-            let addFeatures = `INSERT INTO users_features(feature_id, user_id,status) VALUES`;
+            const [featureData] = yield dbV2_1.default.query(getFeatures);
+            let addFeatures = `INSERT INTO users_features(feature_id, user_id, profile_id, status) VALUES`;
             for (const element of featureData) {
                 console.log("element.id", element.id);
-                if (element.id === 1 || element.id === 2 || element.id === 13 || element.id === 14 || element.id === 15 || (element.id >= 18)) {
+                if (element.id === 1 || element.id === 2 || element.id === 13 || element.id === 15 || (element.id >= 19 && element.id !== 30 && element.id !== 31 && element.id !== 34 && element.id !== 35 && element.id !== 36 && element.id !== 38)) {
                     featureStatus = 1;
                 }
                 else {
                     featureStatus = 0;
                 }
-                addFeatures = addFeatures + `(${element.id},'${userData.insertId}',${featureStatus}), `;
+                addFeatures = addFeatures + `(${element.id}, ${userData.insertId}, ${profileId}, ${featureStatus}), `;
                 featureResult = addFeatures.substring(0, addFeatures.lastIndexOf(','));
             }
-            const [userFeatureData] = yield db_1.default.query(featureResult);
+            const [userFeatureData] = yield dbV2_1.default.query(featureResult);
             userRows[0].share_url = vcardProfileLink;
+            if (refer_code && refer_code != null) {
+                // const referCodeSql = `SELECT id, referral_code, offer_coin FROM users WHERE referral_code = '${refer_code}'`;
+                // const [referCodeRows]:any = await client.query(referCodeSql);
+                // if (referCodeRows.length === 0) return apiResponse.errorMessage(res, 400, "Invalid Refferal Code");
+                const referAmountSql = `SELECT * FROM vkoin_limit LIMIT 1`;
+                const [referAmountRows] = yield dbV2_1.default.query(referAmountSql);
+                const offerCoin = referCodeRows[0].offer_coin + referAmountRows[0].referrer_coin;
+                const addreferral = `INSERT INTO referrals(user_id, referrer_user_id, refer_code, created_at) VALUES(?, ?, ?, ?)`;
+                const referVALUES = [userId, referCodeRows[0].id, referralCode, justDate];
+                const [referRows] = yield dbV2_1.default.query(addreferral, referVALUES);
+                const coinSql = `INSERT INTO user_coins(user_id, type, coin, used_coin_amount, coin_status, created_at, expired_at) VALUES(?, ?, ?, ?, ?, ?, ?)`;
+                const coinVALUES = [referCodeRows[0].id, development_1.default.referrerType, referAmountRows[0].referrer_coin, 0, development_1.default.activeStatus, justDate, extendedDate[0]];
+                const [coinRows] = yield dbV2_1.default.query(coinSql, coinVALUES);
+                const updateReferreData = `UPDATE users SET offer_coin = offer_coin + ${offerCoin} WHERE id = ${referCodeRows[0].id}`;
+                const [data] = yield dbV2_1.default.query(updateReferreData);
+            }
+            // await client.query("COMMIT");
             let token = yield utility.jwtGenerate(userRows[0].id);
             delete userRows[0].password;
             delete userRows[0].id;
+            var source = fs_1.default.readFileSync(path_1.default.join('./views', 'registrationConfirmation.hbs'), 'utf8');
+            var template = handlebars_1.default.compile(source);
+            var htmlData = { email: email };
+            var sendData = template(htmlData);
+            const result = yield utility.sendHtmlMail(email, "Welcome to vKardz!", sendData);
+            if (result == false)
+                console.log("Failed to send email", result);
+            console.log("email result", result);
+            const data = {
+                profileId: profileId,
+            };
             return res.status(200).json({
                 status: true,
                 token,
-                data: userRows[0],
-                message: "Congratulations, Registered successfully !",
+                data: data,
+                message: registerMsg.socialRegister.successMsg,
             });
         }
         else {
-            return apiResponse.errorMessage(res, 400, "Failed to Register, Please try again later");
+            return apiResponse.errorMessage(res, 400, registerMsg.socialRegister.failedMsg);
         }
     }
     catch (error) {
         console.log(error);
-        return apiResponse.errorMessage(res, 400, "Something went wrong");
+        return apiResponse.somethingWentWrongMessage(res);
     }
+    // finally {
+    //     await client.release();
+    // }
 });
 exports.socialRegister = socialRegister;
 // ====================================================================================================

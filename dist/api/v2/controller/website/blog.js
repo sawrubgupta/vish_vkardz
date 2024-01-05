@@ -36,7 +36,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.blogList = void 0;
-const db_1 = __importDefault(require("../../../../db"));
+const dbV2_1 = __importDefault(require("../../../../dbV2"));
 const apiResponse = __importStar(require("../../helper/apiResponse"));
 const development_1 = __importDefault(require("../../config/development"));
 const blogList = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -51,9 +51,9 @@ const blogList = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         var page_size = development_1.default.pageSize;
         const offset = (page - 1) * page_size;
         const getPageQuery = `SELECT COUNT(id) AS totalLength FROM blog_post WHERE status = 1`;
-        const [result] = yield db_1.default.query(getPageQuery);
+        const [result] = yield dbV2_1.default.query(getPageQuery);
         const sql = `SELECT * FROM blog_post WHERE status = 1 ORDER BY id limit ${page_size} offset ${offset}`;
-        const [rows] = yield db_1.default.query(sql);
+        const [rows] = yield dbV2_1.default.query(sql);
         let totalPages = result[0].totalLength / page_size;
         let totalPage = Math.ceil(totalPages);
         return res.status(200).json({
@@ -62,7 +62,7 @@ const blogList = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             totalPage: totalPage,
             currentPage: page,
             totalLength: result[0].totalLength,
-            message: "Products details are here"
+            message: "Data Retrieved Successfully"
         });
     }
     catch (error) {

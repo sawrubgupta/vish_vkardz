@@ -2,6 +2,7 @@ import {Router} from "express";
 
 import * as transactionController from '../../controller/orders/transaction';
 import * as orderController from '../../controller/orders/order';
+import * as webhookController from '../../controller/orders/webhook';
 
 import {authenticatingToken} from '../../middleware/authorization.controller';
 import * as validation from '../../middleware/validation';
@@ -12,5 +13,7 @@ orderRouter.get("/getTransactions", authenticatingToken, transactionController.t
 orderRouter.get("/orderList", authenticatingToken, orderController.orderHistory);
 orderRouter.post("/cancelOrder", authenticatingToken, orderController.cancelOrder);
 orderRouter.get("/orderSummary", authenticatingToken, orderController.orderSummary);
+
+orderRouter.post("/webhooks", authenticatingToken, webhookController.webhookApi);
 
 export default orderRouter;

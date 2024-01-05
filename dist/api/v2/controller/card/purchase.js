@@ -43,17 +43,22 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.cardPurchase = void 0;
-const db_1 = __importDefault(require("../../../../db"));
+const dbV2_1 = __importDefault(require("../../../../dbV2"));
 const apiResponse = __importStar(require("../../helper/apiResponse"));
 const utility = __importStar(require("../../helper/utility"));
 const notify = __importStar(require("../../helper/notification"));
+const development_1 = __importDefault(require("../../config/development"));
+const responseMsg_1 = __importDefault(require("../../config/responseMsg"));
+const fs_1 = __importDefault(require("fs"));
+const path_1 = __importDefault(require("path"));
+const handlebars_1 = __importDefault(require("handlebars"));
+const purchaseResponseMsg = responseMsg_1.default.card.purchase;
 const cardPurchase = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, e_1, _b, _c;
     try {
         const userId = res.locals.jwt.userId;
-        if (!userId || userId === "" || userId === undefined) {
-            return apiResponse.errorMessage(res, 401, "Please login !");
-        }
+        if (!userId || userId === "" || userId === undefined)
+            return apiResponse.errorMessage(res, 401, purchaseResponseMsg.cardPurchase.invalidUserIdMsg);
         // const isReturnPolicyAccepted = req.body.isReturnPolicyAccepted;
         // if (isReturnPolicyAccepted === 0) {
         //     return apiResponse.errorMessage(res, 400, "Please Accept return policy");
@@ -62,9 +67,8 @@ const cardPurchase = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         const extendedDate = utility.extendedDateAndTime("yearly");
         var paymentType = '';
         const { orderType, isGiftEnable, giftMessage } = req.body;
-        if (orderType !== "online" && orderType !== "offline") {
-            return apiResponse.errorMessage(res, 400, "Order type not define");
-        }
+        if (orderType !== "online" && orderType !== "offline")
+            return apiResponse.errorMessage(res, 400, purchaseResponseMsg.cardPurchase.invalidOrderType);
         // let reedemCoinStatus = req.body.coinReedem;
         // let coins = req.body.reedemCoins.coins;
         const deliveryDetails = req.body.deliveryDetails;
@@ -102,7 +106,7 @@ const cardPurchase = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             }
             const sql = `INSERT INTO all_payment_info(txn_id, user_id, username, email, currency_code, price, name, phone_number, locality, country, city, address, pincode, contact_info, delivery_charges, payment_type, vat_num, note, is_gift_enable, gift_message, coupon_discount, gst_amount, status, created_at, approve_time) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
             const VALUES = [paymentInfo.txnId, userId, paymentInfo.username, paymentInfo.email, paymentInfo.price_currency_code, paymentInfo.price, deliveryDetails.name, deliveryDetails.phoneNumber, deliveryDetails.locality, deliveryDetails.country, deliveryDetails.city, deliveryDetails.address, deliveryDetails.pincode, deliveryDetails.email, paymentInfo.deliveryCharge, paymentType, deliveryDetails.vat_number, paymentInfo.note, isGiftEnable, giftMessage, paymentInfo.couponDiscount, paymentInfo.gstAmount, paymentInfo.status, createdAt, '0000-00-00 00:00:00'];
-            [rows] = yield db_1.default.query(sql, VALUES);
+            [rows] = yield dbV2_1.default.query(sql, VALUES);
         }
         else {
             const randomAlhpa = utility.randomString(4);
@@ -111,7 +115,7 @@ const cardPurchase = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             const paymentType = 1;
             const offlineSql = `INSERT INTO all_payment_info(user_id, txn_id, username, email, currency_code, price, name, phone_number, locality, country, city, address, pincode, contact_info, delivery_charges, payment_type, vat_num, note, is_gift_enable, gift_message, status, order_status, created_at, approve_time) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
             const offlineVALUES = [userId, offlineTrx, paymentInfo.username, paymentInfo.email, paymentInfo.price_currency_code, paymentInfo.price, deliveryDetails.name, deliveryDetails.phoneNumber, deliveryDetails.locality, deliveryDetails.country, deliveryDetails.city, deliveryDetails.address, deliveryDetails.pincode, deliveryDetails.email, paymentInfo.deliveryCharge, paymentType, deliveryDetails.vat_number, paymentInfo.note, isGiftEnable, giftMessage, paymentInfo.status, 'placed', createdAt, '0000-00-00 00:00:00'];
-            [rows] = yield db_1.default.query(offlineSql, offlineVALUES);
+            [rows] = yield dbV2_1.default.query(offlineSql, offlineVALUES);
         }
         const paymentId = rows.insertId;
         let orderListSql = `INSERT INTO orderlist(user_id, order_id, product_id, qty, sub_total, created_at) VALUES `;
@@ -143,13 +147,10 @@ const cardPurchase = (req, res) => __awaiter(void 0, void 0, void 0, function* (
                         orderListSql = orderListSql + `(${userId}, ${orderId}, ${productId}, ${qty}, '${subTotal}', '${createdAt}'),`;
                         result = orderListSql.substring(0, orderListSql.lastIndexOf(','));
                         if (isCustomizable === 1) {
-                            let customizeSql = `INSERT INTO customize_card(user_id, product_id, name, designation, qty, other_info, created_at) VALUES(?, ?, ?, ?, ?, ?, ?)`;
-                            const VALUES = [userId, productId, name, designation, customizeQty, otherInfo, createdAt];
-                            const [customizeRows] = yield db_1.default.query(customizeSql, VALUES);
+                            let customizeSql = `INSERT INTO user_customize_card(user_id, product_id, order_id, name, designation, qty, other_info, image, created_at) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+                            const VALUES = [userId, productId, orderId, name, designation, customizeQty, otherInfo, logo, createdAt];
+                            const [customizeRows] = yield dbV2_1.default.query(customizeSql, VALUES);
                             const customize_id = customizeRows.insertId;
-                            const addLogoQuery = `INSERT INTO customize_card_files(customize_id, type, file_name) VALUES (?, ?, ?)`;
-                            const fileVALUES = [customize_id, "cusfile", logo];
-                            const [data] = yield db_1.default.query(addLogoQuery, fileVALUES);
                         }
                     }
                     finally {
@@ -164,15 +165,15 @@ const cardPurchase = (req, res) => __awaiter(void 0, void 0, void 0, function* (
                 }
                 finally { if (e_1) throw e_1.error; }
             }
-            const [data] = yield db_1.default.query(result);
+            const [data] = yield dbV2_1.default.query(result);
             const orderStatusQuery = `INSERT INTO order_tracking(user_id, order_id, status, expected_date, delivey_date) VALUES(?, ?, ?, ?, ?)`;
             const orderStatusValues = [userId, orderId, 'placed', createdAt, createdAt];
-            const [orderStatusRows] = yield db_1.default.query(orderStatusQuery, orderStatusValues);
+            const [orderStatusRows] = yield dbV2_1.default.query(orderStatusQuery, orderStatusValues);
             if (data.affectedRows > 0) {
                 const deleteCartQuery = `DELETE FROM cart_details WHERE user_id = ${userId}`;
-                const [deleteCartRows] = yield db_1.default.query(deleteCartQuery);
+                const [deleteCartRows] = yield dbV2_1.default.query(deleteCartQuery);
                 const getFcm = `SELECT fcm_token FROM users WHERE id = ${userId}`;
-                const [rows] = yield db_1.default.query(getFcm);
+                const [rows] = yield dbV2_1.default.query(getFcm);
                 let fcm;
                 for (const ele of rows) {
                     fcm = [ele.fcm_token];
@@ -183,27 +184,36 @@ const cardPurchase = (req, res) => __awaiter(void 0, void 0, void 0, function* (
                 };
                 const result = yield notify.fcmSend(notificationData, fcm, null);
                 const notificationQuery = `INSERT INTO notifications(user_id, identity, type, title, body, created_at) VALUES(?, ?, ?, ?, ?, ?)`;
-                const VALUES = [userId, paymentId, 'purchase_card', notificationData.title, notificationData.body, createdAt];
-                const [notificationRows] = yield db_1.default.query(notificationQuery, VALUES);
+                const VALUES = [userId, paymentId, development_1.default.cardPurchase, notificationData.title, notificationData.body, createdAt];
+                const [notificationRows] = yield dbV2_1.default.query(notificationQuery, VALUES);
                 // return apiResponse.successResponse(res, "Purchase Successfully!", null);
+                var source = fs_1.default.readFileSync(path_1.default.join('./views', 'orderConfirmation.hbs'), 'utf8');
+                var template = handlebars_1.default.compile(source);
+                // ₹ $
+                var htmlData = { name: paymentInfo.username, orderDate: createdAt, totalAmount: paymentInfo.price, address: `${deliveryDetails.address} ${deliveryDetails.city} -${deliveryDetails.pincode}`, };
+                var sendData = template(htmlData);
+                const emailResult = yield utility.sendHtmlMail(deliveryDetails.email, "Order Confirmation", sendData);
+                if (emailResult == false)
+                    console.log("Failed to send email", result);
+                console.log("email result", result);
                 return res.status(200).json({
                     status: true,
                     data: null,
                     paymentId: paymentId,
-                    message: "Purchase Successfully!"
+                    message: purchaseResponseMsg.cardPurchase.successMsg
                 });
             }
             else {
-                return apiResponse.errorMessage(res, 400, "Something went wrong, please try again later or contact our support team");
+                return apiResponse.errorMessage(res, 400, purchaseResponseMsg.cardPurchase.failedMsg);
             }
         }
         else {
-            return apiResponse.errorMessage(res, 400, "Purchase Failed, Please try again");
+            return apiResponse.errorMessage(res, 400, purchaseResponseMsg.cardPurchase.failedMsg);
         }
     }
     catch (error) {
         console.log(error);
-        return apiResponse.errorMessage(res, 400, "Something went wrong");
+        return apiResponse.somethingWentWrongMessage(res);
     }
 });
 exports.cardPurchase = cardPurchase;

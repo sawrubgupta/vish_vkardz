@@ -36,7 +36,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getFollowings = exports.getFollowers = exports.unfollow = exports.followed = void 0;
-const db_1 = __importDefault(require("../../../../db"));
+const dbV2_1 = __importDefault(require("../../../../dbV2"));
 const apiResponse = __importStar(require("../../helper/apiResponse"));
 const utility = __importStar(require("../../helper/utility"));
 const development_1 = __importDefault(require("../../config/development"));
@@ -49,19 +49,19 @@ const followed = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             return apiResponse.errorMessage(res, 400, "Invalid Following Id");
         }
         const checkAccountQuery = `SELECT is_private FROM users WHERE id = ${followingId} LIMIT 1`;
-        const [accountRows] = yield db_1.default.query(checkAccountQuery);
+        const [accountRows] = yield dbV2_1.default.query(checkAccountQuery);
         if (accountRows[0].is_private === 1) {
             return apiResponse.errorMessage(res, 400, "Can't Follow Private Account");
         }
         const checkFollower = `SELECT id FROM user_followers WHERE user_id = ${followingId} AND follower_id = ${userId}`;
-        const [followerRows] = yield db_1.default.query(checkFollower);
+        const [followerRows] = yield dbV2_1.default.query(checkFollower);
         if (followerRows.length > 0) {
             return apiResponse.errorMessage(res, 400, "Already followed!");
         }
         const sql = `INSERT INTO user_followers(user_id, follower_id, followed_at) VALUES(?, ?, ?)`;
         //here i an add follower id in user id because i follow another person and get him id as user id and  i am followed him so i am follower, so my user id save in follower id.
         const VALUES = [followingId, userId, createdAt];
-        const [rows] = yield db_1.default.query(sql, VALUES);
+        const [rows] = yield dbV2_1.default.query(sql, VALUES);
         if (rows.affectedRows > 0) {
             return apiResponse.successResponse(res, "Follow Successfully", null);
         }
@@ -85,12 +85,12 @@ const unfollow = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             return apiResponse.errorMessage(res, 400, "Invalid Following Id");
         }
         const checkFollowingSql = `SELECT id FROM user_followers WHERE follower_id = ${userId} AND user_id = ${followingId}`;
-        const [followerRows] = yield db_1.default.query(checkFollowingSql);
+        const [followerRows] = yield dbV2_1.default.query(checkFollowingSql);
         if (followerRows.length === 0) {
             return apiResponse.errorMessage(res, 400, "You Can't follow this account!!");
         }
         const unfollowQuery = `DELETE FROM user_followers WHERE follower_id = ${userId} AND user_id = ${followingId}`;
-        const [rows] = yield db_1.default.query(unfollowQuery);
+        const [rows] = yield dbV2_1.default.query(unfollowQuery);
         if (rows.affectedRows > 0) {
             return apiResponse.successResponse(res, "Unfollow Successfully", null);
         }
@@ -118,9 +118,9 @@ const getFollowers = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         var page_size = development_1.default.pageSize;
         const offset = (page - 1) * page_size;
         const getPageQuery = `SELECT users.username, users.name, users.thumb FROM user_followers LEFT JOIN users ON user_followers.follower_id = users.id WHERE user_followers.user_id = ${userId} AND users.username LIKE '%${keyword}%'`;
-        const [result] = yield db_1.default.query(getPageQuery);
+        const [result] = yield dbV2_1.default.query(getPageQuery);
         const sql = `SELECT users.username, users.name, users.thumb FROM user_followers LEFT JOIN users ON user_followers.follower_id = users.id WHERE user_followers.user_id = ${userId} AND users.username LIKE '%${keyword}%' ORDER BY user_followers.followed_at desc limit ${page_size} offset ${offset}`;
-        const [rows] = yield db_1.default.query(sql);
+        const [rows] = yield dbV2_1.default.query(sql);
         let totalPages = result.length / page_size;
         let totalPage = Math.ceil(totalPages);
         return res.status(200).json({
@@ -157,9 +157,9 @@ const getFollowings = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         var page_size = development_1.default.pageSize;
         const offset = (page - 1) * page_size;
         const getPageQuery = `SELECT users.username, users.name, users.thumb FROM user_followers LEFT JOIN users ON user_followers.follower_id = users.id WHERE user_followers.follower_id = ${userId} AND users.username LIKE '%${keyword}%'`;
-        const [result] = yield db_1.default.query(getPageQuery);
+        const [result] = yield dbV2_1.default.query(getPageQuery);
         const sql = `SELECT users.username, users.name, users.thumb FROM user_followers LEFT JOIN users ON user_followers.user_id = users.id WHERE user_followers.follower_id = ${userId} AND users.username LIKE '%${keyword}%' ORDER BY user_followers.followed_at desc limit ${page_size} offset ${offset}`;
-        const [rows] = yield db_1.default.query(sql);
+        const [rows] = yield dbV2_1.default.query(sql);
         let totalPages = result.length / page_size;
         let totalPage = Math.ceil(totalPages);
         return res.status(200).json({

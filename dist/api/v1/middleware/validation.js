@@ -35,7 +35,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.bookAppointmentValidation = exports.deleteVideosValidation = exports.videosValidation = exports.validatePinValidation = exports.captureLeadtValidation = exports.exchangeContactValidation = exports.enquiryValidation = exports.contactUsValidation = exports.updatePackageValidation = exports.primaryProfileValidation = exports.productRatingValidation = exports.businessHourValidation = exports.setProfilePinValidation = exports.purchaseValidation = exports.userProductsValidation = exports.aboutUsValidation = exports.redeemCouponCodeValidation = exports.updateDdeliveryAddressValidation = exports.deliveryAddressValidation = exports.customizeCardValidation = exports.cartValidation = exports.addVcfValidation = exports.switchAccountValidation = exports.editSocialLinksValidation = exports.updateVcardinfoValidation = exports.updateProfileValidation = exports.settingValidation = exports.changePasswordValidation = exports.socialLoginValidation = exports.loginValidation = exports.socialRegistrationValidation = exports.registrationValidation = void 0;
+exports.bookAppointmentValidation = exports.deleteVideosValidation = exports.videosValidation = exports.validatePinValidation = exports.captureLeadtValidation = exports.exchangeContactValidation = exports.enquiryValidation = exports.contactUsValidation = exports.updatePackageValidation = exports.addPrimaryLinkValidation = exports.primaryProfileValidation = exports.productRatingValidation = exports.businessHourValidation = exports.setProfilePinValidation = exports.purchaseValidation = exports.userProductsValidation = exports.aboutUsValidation = exports.redeemCouponCodeValidation = exports.updateDdeliveryAddressValidation = exports.deliveryAddressValidation = exports.customizeCardValidation = exports.cartValidation = exports.addVcfValidation = exports.switchAccountValidation = exports.editSocialLinksValidation = exports.updateVcardinfoValidation = exports.updateProfileValidation = exports.settingValidation = exports.changePasswordValidation = exports.socialLoginValidation = exports.loginValidation = exports.socialRegistrationValidation = exports.registrationValidation = void 0;
 const apiResponse = __importStar(require("../helper/apiResponse"));
 const joi_1 = __importDefault(require("joi"));
 function validationCheck(value) {
@@ -172,7 +172,7 @@ const updateProfileValidation = (req, res, next) => __awaiter(void 0, void 0, vo
         phone: joi_1.default.string().trim().min(8).max(20).trim().required(),
         email: joi_1.default.string().email().max(60).required(),
         website: joi_1.default.string().trim().max(80).min(5).allow(''),
-        address: joi_1.default.string().normalize().max(200).required(),
+        address: joi_1.default.string().normalize().max(200).allow('', null),
     });
     const value = schema.validate(req.body);
     if (value.error) {
@@ -738,6 +738,21 @@ const primaryProfileValidation = (req, res, next) => __awaiter(void 0, void 0, v
     next();
 });
 exports.primaryProfileValidation = primaryProfileValidation;
+// ====================================================================================================
+// ====================================================================================================
+const addPrimaryLinkValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const schema = joi_1.default.object({
+        // primaryProfileSlug: Joi.string().required(),
+        primaryProfileLink: joi_1.default.string().allow("", null)
+    });
+    const value = schema.validate(req.body);
+    if (value.error) {
+        const errMsg = yield validationCheck(value);
+        return yield apiResponse.errorMessage(res, 400, errMsg);
+    }
+    next();
+});
+exports.addPrimaryLinkValidation = addPrimaryLinkValidation;
 // ====================================================================================================
 // ====================================================================================================
 const updatePackageValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {

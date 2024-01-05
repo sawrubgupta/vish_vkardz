@@ -25,11 +25,12 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const currencyController = __importStar(require("../../controller/website/currency"));
-const contactUsController = __importStar(require("../../controller/website/home"));
+const homeController = __importStar(require("../../controller/website/home"));
 const blogController = __importStar(require("../../controller/website/blog"));
 const validation = __importStar(require("../../middleware/validation"));
 const websiteRouter = (0, express_1.Router)();
 websiteRouter.get("/getCurrency", currencyController.currencyList);
 websiteRouter.get("/blogs", blogController.blogList);
-websiteRouter.post("/contactUs", validation.contactUsValidation, contactUsController.contactUs);
+websiteRouter.get("/nfcDeviceList", homeController.nfcDeviceList);
+websiteRouter.post("/contactUs", validation.contactUsValidation, homeController.contactUs);
 exports.default = websiteRouter;

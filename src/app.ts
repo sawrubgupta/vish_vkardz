@@ -24,6 +24,11 @@ export default function (app: Express) {
     }));
     app.use(express.static(__dirname+"./public_html"))
     app.use('/api', apiRouter);
+    app.use('/api/v1', (req, res) => {
+        res.status(400).json({
+            message: 'We`ve released a new version, Please update your application.'
+        });
+    })
     app.use('*', (req, res) => {
         res.status(404).json({
             message: 'Resource not available'
